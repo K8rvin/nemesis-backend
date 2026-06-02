@@ -1,259 +1,413 @@
 const express = require('express');
 const cors = require('cors');
+const { Pool } = require('pg');
 require('dotenv').config();
 
+// ==========================================
+// 🕵️‍♂️ ДИАГНОСТИКА ТИХОГО ВЫХОДА (УДАЛИТЬ ПОСЛЕ ТЕСТОВ)
+// ==========================================
+const originalExit = process.exit;
+process.exit = function (code) {
+  console.error(`\n🚨 ВНИМАНИЕ! Кто-то вызвал process.exit() с кодом: ${code}`);
+  console.trace('Стек вызова, который убил сервер:');
+  originalExit.apply(process, arguments);
+};
+
+process.on('exit', (code) => {
+  console.log(`\n=== Event Loop пуст. Процесс завершается с кодом: ${code} ===`);
+});
+process.on('uncaughtException', (err) => {
+  console.error('\n💥 КРИТИЧЕСКАЯ НЕПЕРЕХВАЧЕННАЯ ОШИБКА:', err);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('\n💥 НЕОБРАБОТАННЫЙ ПРОМИС:', reason);
+});
+
+// ==========================================
+// 🎛️ НАСТРОЙКИ СЕРВЕРА И ДЕПЕНДЕНСИ
+// ==========================================
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ CORS настройки
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'apikey', 'Prefer'],
 }));
-
 app.use(express.json());
 
-// 🔧 Хелперы для Supabase
+const DB_MODE = process.env.DB_MODE || 'LOCAL';
+console.log(`📡 Инициализация движка. Режим базы данных: [${DB_MODE}]`);
+
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-const supabaseHeaders = {
+const defaultHeaders = {
   'apikey': SUPABASE_KEY,
   'Authorization': `Bearer ${SUPABASE_KEY}`,
   'Content-Type': 'application/json',
 };
 
-// Health check
-app.get('/', (req, res) => {
-  res.json({ 
-    status: '🚀 Backend is running!', 
-    supabase: SUPABASE_URL ? 'connected' : 'not configured',
-    timestamp: new Date().toISOString()
+let localPool = null;
+if (DB_MODE === 'LOCAL') {
+  localPool = new Pool({
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_DATABASE,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
   });
-});
-
-// 🎮 Основной эндпоинт
-app.post('/api/action', async (req, res) => {
-  const t0 = Date.now();
-  console.log(`\n📥 [${new Date().toISOString()}] POST /api/action`);
-  
-  try {
-    const { userId, userAction } = req.body;
-    
-    if (!userId || !userAction) {
-      return res.status(400).json({ error: 'Missing userId or userAction' });
-    }
-    
-    console.log(`🎮 User: ${userId} | Action: "${userAction}"`);
-    
-    // ========================================
-    // 1. 📥 ЗАГРУЗКА СОСТОЯНИЯ ИЗ SUPABASE
-    // ========================================
-    const t1 = Date.now();
-    const stateRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/game_state?select=*&user_id=eq.${userId}`,
-      { headers: supabaseHeaders }
-    );
-    
-    if (!stateRes.ok) {
-      throw new Error(`Supabase error: ${stateRes.status} ${stateRes.statusText}`);
-    }
-    
-    const stateData = await stateRes.json();
-    const gameState = stateData[0];
-    
-    if (!gameState) {
-      console.error('❌ Game state not found for user:', userId);
-      return res.status(404).json({ error: 'Game state not found' });
-    }
-    
-    console.log(`⏱️ DB_LOAD: ${Date.now() - t1}ms | HP: ${gameState.hp}, SYNC: ${gameState.chip_sync}%`);
-    
-    // ========================================
-    // 2. 🧠 ПРОМПТ ДЛЯ ИИ
-    // ========================================
-    const prompt = `Ты — Чип, ИИ в голове киберпанк-героя. Циничен, помогаешь выжить. Отвечай на русском.
-
-Действие игрока: "${userAction}"
-Статы: HP=${gameState.hp}, SYNC=${gameState.chip_sync}%
-Флаги: ${gameState.story_flags?.join(', ') || 'нет'}
-
-Верни СТРОГО один валидный JSON-объект (без текста до/после, без markdown):
-{
-  "narrative": "2-3 предложения описания ситуации",
-  "thought": "короткая внутренняя мысль героя в кавычках",
-  "branches": [
-    {"label": "вариант действия 1", "narrative": "краткий результат", "hp_change": 0, "image_prompt": "киберпанк сцена на английском"},
-    {"label": "вариант действия 2", "narrative": "краткий результат", "hp_change": 0, "image_prompt": "киберпанк сцена на английском"},
-    {"label": "вариант действия 3", "narrative": "краткий результат", "hp_change": 0, "image_prompt": "киберпанк сцена на английском"}
-  ]
 }
 
-Пример:
-{"narrative":"Ты в переулке","thought":"Где я?","branches":[{"label":"Осмотреться","narrative":"Вижу мусор","hp_change":0,"image_prompt":"cyberpunk alley trash"}]}`;
-    
-    // ========================================
-    // 3. 🤖 ЗАПРОС К ИИ (OpenCode)
-    // ========================================
-    const t2 = Date.now();
-    const aiRes = await fetch(`${process.env.OPENCODE_BASE_URL}/chat/completions`, {
+// Сетевой клиент для работы с Supabase REST API
+async function supabaseFetch(path, options = {}, retries = 3, baseDelay = 100) {
+  const url = `${SUPABASE_URL}/rest/v1${path}`;
+  const fetchOptions = {
+    ...options,
+    headers: { 'Connection': 'close', ...defaultHeaders, ...(options.headers || {}) }
+  };
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await fetch(url, fetchOptions);
+    } catch (error) {
+      const isNetworkError = error.code === 'ECONNRESET' || error.code === 'ECONNREFUSED' ||
+                             error.code === 'ETIMEDOUT' || error.name === 'TypeError';
+      if (isNetworkError && attempt < retries) {
+        const delay = baseDelay * Math.pow(2, attempt - 1);
+        console.warn(`⚠️ Supabase dropped. Retrying in ${delay}ms...`);
+        await new Promise(res => setTimeout(res, delay));
+        continue;
+      }
+      throw error;
+    }
+  }
+}
+
+// ==========================================
+// 📦 УНИВЕРСАЛЬНЫЙ СЛОЙ ДАННЫХ (DATA PROVIDERS)
+// ==========================================
+
+async function getPlayerState(userId) {
+  if (DB_MODE === 'LOCAL') {
+    const res = await localPool.query('SELECT * FROM public.game_state WHERE user_id = $1', [userId]);
+    return res.rows[0];
+  } {
+    const res = await supabaseFetch(`/game_state?user_id=eq.${userId}`);
+    const data = await res.json();
+    return data[0];
+  }
+}
+
+async function getStartNodeId() {
+  if (DB_MODE === 'LOCAL') {
+    const res = await localPool.query('SELECT id FROM public.nodes WHERE is_start_node = true LIMIT 1');
+    return res.rows[0]?.id;
+  } {
+    const res = await supabaseFetch('/nodes?is_start_node=eq.true&select=id');
+    const data = await res.json();
+    return data[0]?.id;
+  }
+}
+
+async function createPlayerState(userId, startNodeId) {
+  if (DB_MODE === 'LOCAL') {
+    const res = await localPool.query(
+      `INSERT INTO public.game_state (user_id, current_node_id, hp, story_flags, inventory, skills) 
+       VALUES ($1, $2, 100, $3, $4, $5) RETURNING *`,
+      [userId, startNodeId, [], [], []]
+    );
+    return res.rows[0];
+  } {
+    const res = await supabaseFetch('/game_state', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENCODE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: process.env.LLM_MODEL,
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.6,
-        max_tokens: 3000,
-      }),
+      headers: { 'Prefer': 'return=representation' },
+      body: JSON.stringify({ user_id: userId, current_node_id: startNodeId, hp: 100, story_flags: [], inventory: [], skills: [] })
     });
-    
-    const aiData = await aiRes.json();
-    const fullText = aiData.choices?.[0]?.message?.content || '';
-    console.log(`⏱️ AI_RESPONSE: ${Date.now() - t2}ms`);
-    
-    // ========================================
-    // 4. 🔪 ПАРСИНГ ОТВЕТА
-    // ========================================
-    let updates = {};
-    let narrative = fullText;
-    
-    const jsonMatch = fullText.match(/\{[\s\S]*\}\s*$/);
-    if (jsonMatch) {
-      try {
-        updates = JSON.parse(jsonMatch[0]);
-        narrative = updates.narrative || narrative;
-        console.log(`✅ Parsed JSON: narrative=${narrative?.substring(0, 40)}..., branches=${updates.branches?.length || 0}`);
-      } catch (e) {
-        console.warn('⚠️ JSON parse failed:', e.message);
-      }
-    }
-    
-    // Если ИИ вернул массив — берём первый элемент
-    if (Array.isArray(updates) && updates.length > 0) {
-      updates = updates[0];
-      narrative = updates.narrative || narrative;
-    }
-    
-    // ========================================
-    // 5. 🖼️ ГЕНЕРАЦИЯ КАРТИНОК ДЛЯ ВЕТОК
-    // ========================================
-    const branches = updates.branches || [];
-    for (let i = 0; i < branches.length; i++) {
-      const branch = branches[i];
-      if (branch.image_prompt) {
-        const branchId = `branch_${branch.label.replace(/\s+/g, '_')}`;
-        
-        // Проверяем кэш в Supabase
-        try {
-          const cacheRes = await fetch(
-            `${SUPABASE_URL}/rest/v1/location_images?select=image_url&location_id=eq.${branchId}`,
-            { headers: supabaseHeaders }
-          );
-          const cacheData = await cacheRes.json();
-          
-          if (cacheData.length > 0) {
-            branch.image_url = cacheData[0].image_url;
-            console.log(`🖼️ [BRANCH ${i}] CACHE HIT`);
-          } else {
-            // Генерируем новую картинку (Unsplash заглушка)
-            const keywords = branch.image_prompt.toLowerCase()
-              .replace(/[^a-z0-9\s,]/g, '')
-              .split(/[\s,]+/)
-              .filter(w => w.length > 3)
-              .slice(0, 3)
-              .join(',');
-            
-            const variants = [
-              'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=1024&q=80',
-              'https://images.unsplash.com/photo-1558002038-1055907df827?w=1024&q=80',
-              'https://images.unsplash.com/photo-1512499617640-c2f999098e95?w=1024&q=80',
-              'https://images.unsplash.com/photo-1515634928627-2a4e0dae3ddf?w=1024&q=80',
-            ];
-            const finalUrl = variants[i % variants.length];
-            
-            branch.image_url = finalUrl;
-            
-            // Сохраняем в кэш
-            await fetch(`${SUPABASE_URL}/rest/v1/location_images`, {
-              method: 'POST',
-              headers: { ...supabaseHeaders, 'Prefer': 'return=minimal' },
-              body: JSON.stringify({
-                location_id: branchId,
-                image_url: finalUrl,
-                prompt_used: branch.image_prompt
-              }),
-            });
-            console.log(`🖼️ [BRANCH ${i}] GENERATED & CACHED`);
-          }
-        } catch (e) {
-          console.warn(`⚠️ Image gen error: ${e.message}`);
-        }
-      }
-    }
-    
-    // ========================================
-    // 6. 💾 ОБНОВЛЕНИЕ СОСТОЯНИЯ В SUPABASE
-    // ========================================
-    const t3 = Date.now();
-    const newFlags = [...(gameState.story_flags || [])];
-    if (updates.new_flags) {
-      updates.new_flags.forEach(f => { if (!newFlags.includes(f)) newFlags.push(f); });
-    }
-    
-    const payload = {
-      hp: Math.max(0, gameState.hp + (updates.hp_change || 0)),
-      chip_sync: Math.min(100, Math.max(0, gameState.chip_sync + (updates.sync_change || 0))),
-      sabotage_score: gameState.sabotage_score + (updates.sabotage_change || 0),
-      story_flags: newFlags,
-      updated_at: new Date().toISOString(),
-    };
-    
-    if (updates.inventory_add) {
-      payload.inventory = { ...(gameState.inventory || {}), ...updates.inventory_add };
-    }
-    if (updates.currency_chip_used) payload.currency_chip_available = false;
-    if (updates.current_location_id) payload.current_location_id = updates.current_location_id;
-    
-    await fetch(`${SUPABASE_URL}/rest/v1/game_state?user_id=eq.${userId}`, {
+    return (await res.json())[0];
+  }
+}
+
+async function updatePlayerState(userId, updates) {
+  if (DB_MODE === 'LOCAL') {
+    await localPool.query(
+      `UPDATE public.game_state 
+       SET hp = $1, story_flags = $2, inventory = $3, skills = $4, current_node_id = $5, updated_at = NOW() 
+       WHERE user_id = $6`,
+      [updates.hp, updates.story_flags, updates.inventory, updates.skills, updates.current_node_id, userId]
+    );
+  } {
+    const res = await supabaseFetch(`/game_state?user_id=eq.${userId}`, {
       method: 'PATCH',
-      headers: supabaseHeaders,
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        hp: updates.hp,
+        story_flags: updates.story_flags,
+        inventory: updates.inventory,
+        skills: updates.skills, 
+        current_node_id: updates.current_node_id
+      })
     });
-    console.log(`⏱️ DB_UPDATE: ${Date.now() - t3}ms`);
-    
-    // ========================================
-    // 7. 📤 ОТВЕТ КЛИЕНТУ
-    // ========================================
-    const totalTime = Date.now() - t0;
-    console.log(`✅ TOTAL: ${totalTime}ms\n`);
-    
-    res.json({
-      narrative: narrative || 'Чип молчит...',
-      text: narrative || '',
-      thought: updates.thought || "",
-      branches: branches,
-      state_updated: true,
-      image_url: null, // Можно добавить основную картинку локации
-      debug_time_ms: totalTime
+    await res.text(); // Освобождаем сокет
+  }
+}
+
+async function getNode(nodeId) {
+  if (DB_MODE === 'LOCAL') {
+    const res = await localPool.query('SELECT * FROM public.nodes WHERE id = $1', [nodeId]);
+    return res.rows[0];
+  } {
+    const res = await supabaseFetch(`/nodes?id=eq.${nodeId}`);
+    return (await res.json())[0];
+  }
+}
+
+async function getChoicesForNode(nodeId) {
+  if (DB_MODE === 'LOCAL') {
+    const res = await localPool.query('SELECT * FROM public.choices WHERE node_id = $1 ORDER BY sort_order ASC', [nodeId]);
+    return res.rows;
+  } {
+    const res = await supabaseFetch(`/choices?node_id=eq.${nodeId}&order=sort_order.asc`);
+    return await res.json();
+  }
+}
+
+async function unlockAchievement(userId, achievementId) {
+  if (DB_MODE === 'LOCAL') {
+    await localPool.query(
+      `INSERT INTO public.user_achievements (user_id, achievement_id) 
+       VALUES ($1, $2) 
+       ON CONFLICT DO NOTHING`, 
+      [userId, achievementId]
+    );
+  } else {
+    const res = await supabaseFetch('/user_achievements', {
+      method: 'POST',
+      headers: { 'Prefer': 'resolution=ignore-duplicates' },
+      body: JSON.stringify({ user_id: userId, achievement_id: achievementId })
     });
+    if (res) await res.text(); // Освобождаем сокет Supabase!
+  }
+}
+
+async function getAchievement(achievementId) {
+  if (DB_MODE === 'LOCAL') {
+    const res = await localPool.query('SELECT * FROM public.achievements WHERE id = $1', [achievementId]);
+    return res.rows[0];
+  } {
+    const res = await supabaseFetch(`/achievements?id=eq.${achievementId}`);
+    const data = await res.json();
+    return data[0];
+  }
+}
+
+// ==========================================
+// 🛠️ ИГРОВАЯ ЛОГИКА И ФИЛЬТРЫ
+// ==========================================
+
+function filterChoices(allChoices, player) {
+  const playerSkills = player.skills || [];
+  const storyFlags = player.story_flags || [];
+  const playerInventory = player.inventory || [];
+
+  return allChoices.filter(choice => {
+    const conds = choice.conditions || {};
+    const effects = choice.effects || {};
     
+    if (conds.required_skill && !playerSkills.includes(conds.required_skill)) return false;
+    if (effects.add_skill && playerSkills.includes(effects.add_skill)) return false;
+    if (conds.flag_required && !storyFlags.includes(conds.flag_required)) return false;
+    if (conds.flag_not_required && storyFlags.includes(conds.flag_not_required)) return false;
+    if (conds.flag_forbidden && storyFlags.includes(conds.flag_forbidden)) return false;
+    if (conds.item_required && !playerInventory.includes(conds.item_required)) return false;
+    
+    // БАГ ИСПРАВЛЕН: Перенос строки убран, теперь возвращает true корректно
+    return true; 
+  });
+}
+
+// --- API ЭНДПОИНТЫ ---
+
+// 1. Получить текущую сцену и доступные выборы
+app.get('/api/state', async (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
+    let player = await getPlayerState(userId);
+
+    if (!player) {
+      const startNodeId = await getStartNodeId();
+      if (!startNodeId) throw new Error('No start node configured in DB');
+      player = await createPlayerState(userId, startNodeId);
+    }
+
+    if (!player.current_node_id) {
+      const startNodeId = await getStartNodeId();
+      if (!startNodeId) return res.status(500).json({ error: 'No start node to recover' });
+      player.current_node_id = startNodeId;
+      await updatePlayerState(userId, player);
+    }
+
+    const skillsArr = player.skills || [];
+    player.skill_primary = skillsArr[0] || 'КАЛИБРОВКА';
+
+    const currentNode = await getNode(player.current_node_id);
+    if (!currentNode) return res.status(404).json({ error: 'Current node not found in DB' });
+
+    const allChoices = await getChoicesForNode(currentNode.id);
+    const availableChoices = filterChoices(allChoices, player);
+
+    let imageUrl = null;
+    if (currentNode.image_prompt) {
+      imageUrl = `https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1024&auto=format&fit=crop&sig=${encodeURIComponent(currentNode.image_prompt)}`;
+    }
+
+    res.json({ player, node: currentNode, choices: availableChoices, imageUrl });
   } catch (err) {
-    console.error('❌ ERROR:', err);
-    res.status(500).json({ 
-      error: err.message,
-      timestamp: new Date().toISOString()
-    });
+    console.error('❌ Error in /api/state:', err.message);
+    res.status(500).json({ error: 'Failed to load game state', details: err.message });
   }
 });
 
-// Запуск сервера
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🔥 Server: http://localhost:${PORT}`);
-  console.log(`📡 Endpoint: POST http://localhost:${PORT}/api/action`);
-  console.log(`🗄️  Supabase: ${SUPABASE_URL ? '✅' : '❌'}`);
-  console.log(`🤖 OpenCode: ${process.env.OPENCODE_API_KEY ? '✅' : '❌'}`);
+// 2. Обработка выбора игрока
+app.post('/api/choice', async (req, res) => {
+  try {
+    const { userId, choiceId } = req.body;
+    if (!userId || !choiceId) return res.status(400).json({ error: 'Missing userId or choiceId' });
+
+    let choice = null;
+    if (DB_MODE === 'LOCAL') {
+      const choiceRes = await localPool.query('SELECT * FROM public.choices WHERE id = $1', [choiceId]);
+      choice = choiceRes.rows[0];
+    } else {
+      const choiceRes = await supabaseFetch(`/choices?id=eq.${choiceId}`);
+      choice = (await choiceRes.json())[0];
+    }
+    if (!choice) return res.status(404).json({ error: 'Choice not found' });
+
+    let player = await getPlayerState(userId);
+    if (!player) return res.status(404).json({ error: 'Player not found' });
+
+    const effects = choice.effects || {};
+    const updates = { ...player };
+    
+    if (effects.apply_damage) updates.hp = Math.max(0, updates.hp - effects.apply_damage);
+    if (effects.add_hp) updates.hp = Math.min(100, updates.hp + effects.add_hp);
+    if (effects.set_hp !== undefined) updates.hp = effects.set_hp;
+    
+    if (effects.add_flag) {
+      const flags = updates.story_flags || [];
+      if (!flags.includes(effects.add_flag)) flags.push(effects.add_flag);
+      updates.story_flags = flags;
+    }
+    if (effects.remove_flags && Array.isArray(effects.remove_flags)) {
+      updates.story_flags = (updates.story_flags || []).filter(f => !effects.remove_flags.includes(f));
+    }
+    
+    if (effects.add_item) {
+      const items = updates.inventory || [];
+      if (!items.includes(effects.add_item)) items.push(effects.add_item);
+      updates.inventory = items;
+    }
+    if (effects.remove_item) {
+      updates.inventory = (updates.inventory || []).filter(item => item !== effects.remove_item);
+    }
+
+    const currentSkills = updates.skills || [];
+    if (effects.add_skill && !currentSkills.includes(effects.add_skill)) {
+      currentSkills.push(effects.add_skill);
+    }
+    updates.skills = currentSkills;
+    updates.skill_primary = currentSkills[0] || 'КАЛИБРОВКА';
+
+    updates.current_node_id = choice.target_node_id;
+    await updatePlayerState(userId, updates);
+
+    // Логика обработки ачивки
+    let unlockedAchievement = null;
+    if (effects.unlock_achievement) {
+      await unlockAchievement(userId, effects.unlock_achievement);
+      const ach = await getAchievement(effects.unlock_achievement);
+      if (ach) {
+        // Маппинг для старых и новых версий клиента (совместимость medal_tier -> rarity)
+        const tierMap = { 'BRONZE': 'ОБЫЧНАЯ', 'SILVER': 'РЕДКАЯ', 'GOLD': 'ЭПИЧЕСКАЯ', 'PLATINUM': 'ЛЕГЕНДАРНАЯ' };
+        unlockedAchievement = {
+          ...ach,
+          rarity: tierMap[ach.medal_tier?.toUpperCase()] || 'ОБЫЧНАЯ'
+        };
+      }
+    }
+
+    // Если у выбора нет следующей ноды — генерируем виртуальную финальную сцену, чтобы не ломать UI фронтенда
+    if (!choice.target_node_id) {
+      const closingNode = {
+        id: 'ending_terminal_node',
+        act: 3,
+        location_name: 'КРИТИЧЕСКИЙ СЕКТОР',
+        title: 'ПРОТОКОЛ ЗАВЕРШЕН',
+        narrative: choice.narrative_override || 'Конец сессии связи с терминалом.',
+        thought: 'Био-сигналы оператора потеряны...',
+        is_ending: true,
+        ending_type: 'TERMINATED'
+      };
+      return res.json({
+        success: true,
+        node: closingNode,
+        choices: [],
+        player: updates,
+        is_ending: true,
+        unlocked_achievement: unlockedAchievement
+      });
+    }
+
+    const newNode = await getNode(choice.target_node_id);
+    if (!newNode) return res.status(404).json({ error: 'Target node missing from database' });
+    const nextAllChoices = await getChoicesForNode(newNode.id);
+    const nextChoices = filterChoices(nextAllChoices, updates);
+
+    let imageUrl = null;
+    if (newNode.image_prompt) {
+      imageUrl = `https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1024&auto=format&fit=crop&sig=${encodeURIComponent(newNode.image_prompt)}`;
+    }
+
+    res.json({
+      success: true,
+      narrative_override: choice.narrative_override,
+      node: newNode,
+      choices: nextChoices,
+      imageUrl,
+      player: updates,
+      is_ending: newNode.is_ending || false,
+      ending_type: newNode.ending_type || null,
+      unlocked_achievement: unlockedAchievement 
+    });
+  } catch (err) {
+    console.error('❌ Error in /api/choice:', err.message);
+    res.status(500).json({ error: 'Failed to process choice', details: err.message });
+  }
 });
+
+// 3. Полный сброс прогресса игрока под новую игру
+app.post('/api/reset', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
+    const startNodeId = await getStartNodeId();
+    if (!startNodeId) throw new Error('No start node configured in DB');
+
+    await updatePlayerState(userId, {
+      hp: 100,
+      story_flags: [],
+      inventory: [],
+      skills: [],
+      current_node_id: startNodeId
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Error in /api/reset:', err.message);
+    res.status(500).json({ error: 'Failed to reset game state', details: err.message });
+  }
+});
+
+app.get('/', (req, res) => res.json({ status: '🚀 Engine Running', db_mode: DB_MODE, uptime: process.uptime() }));
+app.listen(PORT, () => console.log(`🔥 Server online on port ${PORT} [Mode: ${DB_MODE}]`));
