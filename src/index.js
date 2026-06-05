@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
+const fs = require('fs').promises;
+const path = require('path');
 require('dotenv').config();
 
 // ==========================================
@@ -198,6 +200,18 @@ async function getAchievement(achievementId) {
   }
 }
 
+async function getImageUrl(node) {
+  if (!node || !node.id) return null;
+  
+  const filepath = path.join(__dirname, '..', 'uploads', 'nodes', `${node.id}.jpg`);
+  try {
+    await fs.access(filepath);
+    return `/api/image/${node.id}`;
+  } catch {
+    return null;
+  }
+}
+
 // ==========================================
 // 🛠️ ИГРОВАЯ ЛОГИКА И ФИЛЬТРЫ
 // ==========================================
@@ -255,10 +269,7 @@ app.get('/api/state', async (req, res) => {
     const allChoices = await getChoicesForNode(currentNode.id);
     const availableChoices = filterChoices(allChoices, player);
 
-    let imageUrl = null;
-    if (currentNode.image_prompt) {
-      imageUrl = `https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1024&auto=format&fit=crop&sig=${encodeURIComponent(currentNode.image_prompt)}`;
-    }
+    const imageUrl = await getImageUrl(currentNode);
 
     res.json({ player, node: currentNode, choices: availableChoices, imageUrl });
   } catch (err) {
@@ -363,10 +374,7 @@ app.post('/api/choice', async (req, res) => {
     const nextAllChoices = await getChoicesForNode(newNode.id);
     const nextChoices = filterChoices(nextAllChoices, updates);
 
-    let imageUrl = null;
-    if (newNode.image_prompt) {
-      imageUrl = `https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1024&auto=format&fit=crop&sig=${encodeURIComponent(newNode.image_prompt)}`;
-    }
+    const imageUrl = await getImageUrl(newNode);
 
     res.json({
       success: true,
@@ -406,6 +414,27 @@ app.post('/api/reset', async (req, res) => {
   } catch (err) {
     console.error('❌ Error in /api/reset:', err.message);
     res.status(500).json({ error: 'Failed to reset game state', details: err.message });
+  }
+});
+
+app.get('/api/image/:nodeId', async (req, res) => {
+  try {
+    const { nodeId } = req.params;
+    const filepath = path.join(__dirname, '..', 'uploads', 'nodes', `${nodeId}.jpg`);
+    
+    try {
+      await fs.access(filepath);
+    } catch {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+
+    const buffer = await fs.readFile(filepath);
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.send(buffer);
+  } catch (err) {
+    console.error('❌ [IMAGE] Error:', err.message);
+    res.status(500).json({ error: 'Image error', details: err.message });
   }
 });
 
