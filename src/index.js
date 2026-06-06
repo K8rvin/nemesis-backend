@@ -203,7 +203,7 @@ async function getAchievement(achievementId) {
 async function getImageUrl(node) {
   if (!node || !node.id) return null;
   
-  const filepath = path.join(__dirname, '..', 'uploads', 'nodes', `${node.id}.jpg`);
+  const filepath = path.join(__dirname, '..', 'uploads', 'nodes', `${node.id}.png`);
   try {
     await fs.access(filepath);
     return `/api/image/${node.id}`;
@@ -420,7 +420,7 @@ app.post('/api/reset', async (req, res) => {
 app.get('/api/image/:nodeId', async (req, res) => {
   try {
     const { nodeId } = req.params;
-    const filepath = path.join(__dirname, '..', 'uploads', 'nodes', `${nodeId}.jpg`);
+    const filepath = path.join(__dirname, '..', 'uploads', 'nodes', `${nodeId}.png`);
     
     try {
       await fs.access(filepath);
