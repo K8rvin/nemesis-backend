@@ -227,7 +227,10 @@ function filterChoices(allChoices, player) {
     
     if (conds.required_skill && !playerSkills.includes(conds.required_skill)) return false;
     if (effects.add_skill && playerSkills.includes(effects.add_skill)) return false;
-    if (conds.flag_required && !storyFlags.includes(conds.flag_required)) return false;
+    if (conds.flag_required) {
+      const flags = Array.isArray(conds.flag_required) ? conds.flag_required : [conds.flag_required];
+      if (!flags.every(f => storyFlags.includes(f))) return false;
+    }
     if (conds.flag_not_required && storyFlags.includes(conds.flag_not_required)) return false;
     if (conds.flag_forbidden && storyFlags.includes(conds.flag_forbidden)) return false;
     if (conds.item_required && !playerInventory.includes(conds.item_required)) return false;
