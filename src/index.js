@@ -601,6 +601,82 @@ app.get('/api/image/:nodeId', async (req, res) => {
   }
 });
 
+// 4. Кабинет достижений — список всех достижений + статус разблокировки
+app.get('/api/achievements', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    let allAchievements = [];
+    let unlockedIds = [];
+
+    if (DB_MODE === 'LOCAL') {
+      const achRes = await localPool.query('SELECT * FROM public.achievements ORDER BY medal_tier, title');
+      allAchievements = achRes.rows;
+      const uaRes = await localPool.query('SELECT achievement_id FROM public.user_achievements WHERE user_id = $1', [userId]);
+      unlockedIds = uaRes.rows.map(r => r.achievement_id);
+    } else {
+      const achRes = await supabaseFetch('/achievements?order=medal_tier.asc,title.asc');
+      allAchievements = await achRes.json();
+      const uaRes = await supabaseFetch(`/user_achievements?user_id=eq.${userId}&select=achievement_id`);
+      const uaData = await uaRes.json();
+      unlockedIds = uaData.map(r => r.achievement_id);
+    }
+
+    const achievements = allAchievements.map(ach => ({
+      ...ach,
+      unlocked: unlockedIds.includes(ach.id),
+      imageUrl: `/api/image/achievement/${ach.id}`,
+    }));
+
+    res.json({ achievements });
+  } catch (err) {
+    console.error('❌ Error in /api/achievements:', err.message);
+    res.status(500).json({ error: 'Failed to load achievements', details: err.message });
+  }
+});
+
+// 4.1 Сброс всех достижений игрока
+app.post('/api/achievements/reset', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    if (DB_MODE === 'LOCAL') {
+      await localPool.query('DELETE FROM public.user_achievements WHERE user_id = $1', [userId]);
+    } else {
+      await supabaseFetch(`/user_achievements?user_id=eq.${userId}`, {
+        method: 'DELETE',
+      });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Error in /api/achievements/reset:', err.message);
+    res.status(500).json({ error: 'Failed to reset achievements', details: err.message });
+  }
+});
+
+// 5. Раздача иконок достижений
+app.get('/api/image/achievement/:achId', async (req, res) => {
+  try {
+    const { achId } = req.params;
+    const filepath = path.join(__dirname, '..', 'uploads', 'achievements', `${achId}.png`);
+    
+    try {
+      await fs.access(filepath);
+    } catch {
+      return res.status(404).json({ error: 'Achievement image not found' });
+    }
+
+    const buffer = await fs.readFile(filepath);
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.send(buffer);
+  } catch (err) {
+    console.error('❌ [ACH_IMAGE] Error:', err.message);
+    res.status(500).json({ error: 'Image error', details: err.message });
+  }
+});
+
 app.get('/', (req, res) => res.json({ status: '🚀 Engine Running', db_mode: DB_MODE, uptime: process.uptime() }));
 
 app.listen(PORT, () => console.log(`🔥 Server online on port ${PORT} [Mode: ${DB_MODE}]`));
