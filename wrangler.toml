@@ -1,0 +1,10 @@
+name = "nemesis-backend"
+main = "src/index.js"
+compatibility_date = "2024-06-11"
+
+# Привязка R2-бакета для изображений.
+# Сам бакет нужно создать вручную через Cloudflare Dashboard или CLI:
+#   wrangler r2 bucket create nemesis-images
+[[r2_buckets]]
+binding = "IMAGES_BUCKET"
+bucket_name = "nemesis-images"
