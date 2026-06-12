@@ -176,6 +176,10 @@ function filterChoices(allChoices, player) {
       const flags = Array.isArray(conds.flag_not_required) ? conds.flag_not_required : [conds.flag_not_required];
       if (flags.some(f => storyFlags.includes(f))) return false;
     }
+    if (conds.flags_not_required_all) {
+      const flags = Array.isArray(conds.flags_not_required_all) ? conds.flags_not_required_all : [conds.flags_not_required_all];
+      if (flags.every(f => storyFlags.includes(f))) return false;
+    }
     if (conds.flag_forbidden && storyFlags.includes(conds.flag_forbidden)) return false;
     if (conds.item_required && !playerInventory.includes(conds.item_required)) return false;
 
