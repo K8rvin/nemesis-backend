@@ -531,10 +531,17 @@ app.post('/api/achievements/reset', authMiddleware, async (c) => {
 app.get('/api/image/:nodeId', async (c) => {
   try {
     const bucket = c.env.IMAGES_BUCKET;
-    const { nodeId } = c.req.param();
-    const obj = await bucket.get(`nodes/${nodeId}.png`);
+    const nodeId = c.req.param('nodeId');
+    const key = `nodes/${nodeId}.png`;
 
-    if (!obj) return c.json({ error: 'Image not found' }, 404);
+    console.log(`[IMAGE] Requested nodeId: ${nodeId}, key: ${key}, bucket exists: ${!!bucket}`);
+
+    if (!nodeId) return c.json({ error: 'Missing nodeId' }, 400);
+
+    const obj = await bucket.get(key);
+    console.log(`[IMAGE] R2 object for key ${key}: ${obj ? 'found' : 'not found'}`);
+
+    if (!obj) return c.json({ error: 'Image not found', key }, 404);
 
     const headers = new Headers();
     headers.set('Content-Type', 'image/png');
@@ -550,10 +557,17 @@ app.get('/api/image/:nodeId', async (c) => {
 app.get('/api/image/achievement/:achId', async (c) => {
   try {
     const bucket = c.env.IMAGES_BUCKET;
-    const { achId } = c.req.param();
-    const obj = await bucket.get(`achievements/${achId}.png`);
+    const achId = c.req.param('achId');
+    const key = `achievements/${achId}.png`;
 
-    if (!obj) return c.json({ error: 'Achievement image not found' }, 404);
+    console.log(`[ACH_IMAGE] Requested achId: ${achId}, key: ${key}, bucket exists: ${!!bucket}`);
+
+    if (!achId) return c.json({ error: 'Missing achId' }, 400);
+
+    const obj = await bucket.get(key);
+    console.log(`[ACH_IMAGE] R2 object for key ${key}: ${obj ? 'found' : 'not found'}`);
+
+    if (!obj) return c.json({ error: 'Achievement image not found', key }, 404);
 
     const headers = new Headers();
     headers.set('Content-Type', 'image/png');
