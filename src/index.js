@@ -531,7 +531,7 @@ app.post('/api/achievements/reset', authMiddleware, async (c) => {
 app.get('/api/image/:nodeId', async (c) => {
   try {
     const bucket = c.env.IMAGES_BUCKET;
-    const nodeId = c.req.param('nodeId');
+    const nodeId = (c.req.param('nodeId') || '').replace(/\.png$/i, '');
     const key = `nodes/${nodeId}.png`;
 
     console.log(`[IMAGE] Requested nodeId: ${nodeId}, key: ${key}, bucket exists: ${!!bucket}`);
@@ -557,7 +557,7 @@ app.get('/api/image/:nodeId', async (c) => {
 app.get('/api/image/achievement/:achId', async (c) => {
   try {
     const bucket = c.env.IMAGES_BUCKET;
-    const achId = c.req.param('achId');
+    const achId = (c.req.param('achId') || '').replace(/\.png$/i, '');
     const key = `achievements/${achId}.png`;
 
     console.log(`[ACH_IMAGE] Requested achId: ${achId}, key: ${key}, bucket exists: ${!!bucket}`);
