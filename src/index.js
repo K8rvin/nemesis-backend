@@ -148,9 +148,10 @@ async function getAchievement(env, achievementId) {
   return data[0];
 }
 
-function getImageUrl(node, origin) {
-  if (!node || !node.id) return null;
-  return `${origin}/api/image/${node.id}`;
+// Изображения теперь встроены в Flutter-клиент (assets/images/).
+// Бэкенд больше не отдает imageUrl.
+function getImageUrl() {
+  return null;
 }
 
 // ==========================================
@@ -316,7 +317,6 @@ app.post('/api/auth/refresh', async (c) => {
 app.get('/api/state', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId');
-    const origin = new URL(c.req.url).origin;
 
     let player = await getPlayerState(c.env, userId);
 
@@ -342,9 +342,7 @@ app.get('/api/state', authMiddleware, async (c) => {
     const allChoices = await getChoicesForNode(c.env, currentNode.id);
     const availableChoices = filterChoices(allChoices, player);
 
-    const imageUrl = getImageUrl(currentNode, origin);
-
-    return c.json({ player, node: currentNode, choices: availableChoices, imageUrl });
+    return c.json({ player, node: currentNode, choices: availableChoices });
   } catch (err) {
     console.error('❌ Error in /api/state:', err.message);
     return c.json({ error: 'Failed to load game state', details: err.message }, 500);
@@ -355,7 +353,6 @@ app.get('/api/state', authMiddleware, async (c) => {
 app.post('/api/choice', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId');
-    const origin = new URL(c.req.url).origin;
     const { choiceId } = await c.req.json();
     if (!choiceId) return c.json({ error: 'Missing choiceId' }, 400);
 
@@ -443,14 +440,11 @@ app.post('/api/choice', authMiddleware, async (c) => {
     const nextAllChoices = await getChoicesForNode(c.env, newNode.id);
     const nextChoices = filterChoices(nextAllChoices, updates);
 
-    const imageUrl = getImageUrl(newNode, origin);
-
     return c.json({
       success: true,
       narrative_override: choice.narrative_override,
       node: newNode,
       choices: nextChoices,
-      imageUrl,
       player: updates,
       is_ending: newNode.is_ending || false,
       ending_type: newNode.ending_type || null,
@@ -489,7 +483,6 @@ app.post('/api/reset', authMiddleware, async (c) => {
 app.get('/api/achievements', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId');
-    const origin = new URL(c.req.url).origin;
 
     const achRes = await supabaseFetch(c.env, '/achievements?order=medal_tier.asc,title.asc');
     const allAchievements = await achRes.json();
@@ -501,7 +494,6 @@ app.get('/api/achievements', authMiddleware, async (c) => {
     const achievements = allAchievements.map(ach => ({
       ...ach,
       unlocked: unlockedIds.includes(ach.id),
-      imageUrl: `${origin}/api/image/achievement/${ach.id}`,
     }));
 
     return c.json({ achievements });
@@ -524,58 +516,6 @@ app.post('/api/achievements/reset', authMiddleware, async (c) => {
   } catch (err) {
     console.error('❌ Error in /api/achievements/reset:', err.message);
     return c.json({ error: 'Failed to reset achievements', details: err.message }, 500);
-  }
-});
-
-// 5. Раздача изображений нод из Cloudflare R2
-app.get('/api/image/:nodeId', async (c) => {
-  try {
-    const bucket = c.env.IMAGES_BUCKET;
-    const nodeId = (c.req.param('nodeId') || '').replace(/\.png$/i, '');
-    const key = `nodes/${nodeId}.png`;
-
-    console.log(`[IMAGE] Requested nodeId: ${nodeId}, key: ${key}, bucket exists: ${!!bucket}`);
-
-    if (!nodeId) return c.json({ error: 'Missing nodeId' }, 400);
-
-    const obj = await bucket.get(key);
-    console.log(`[IMAGE] R2 object for key ${key}: ${obj ? 'found' : 'not found'}`);
-
-    if (!obj) return c.json({ error: 'Image not found', key }, 404);
-
-    const headers = new Headers();
-    headers.set('Content-Type', 'image/png');
-    headers.set('Cache-Control', 'public, max-age=86400');
-    return new Response(obj.body, { headers });
-  } catch (err) {
-    console.error('❌ [IMAGE] Error:', err.message);
-    return c.json({ error: 'Image error', details: err.message }, 500);
-  }
-});
-
-// 6. Раздача иконок достижений из Cloudflare R2
-app.get('/api/image/achievement/:achId', async (c) => {
-  try {
-    const bucket = c.env.IMAGES_BUCKET;
-    const achId = (c.req.param('achId') || '').replace(/\.png$/i, '');
-    const key = `achievements/${achId}.png`;
-
-    console.log(`[ACH_IMAGE] Requested achId: ${achId}, key: ${key}, bucket exists: ${!!bucket}`);
-
-    if (!achId) return c.json({ error: 'Missing achId' }, 400);
-
-    const obj = await bucket.get(key);
-    console.log(`[ACH_IMAGE] R2 object for key ${key}: ${obj ? 'found' : 'not found'}`);
-
-    if (!obj) return c.json({ error: 'Achievement image not found', key }, 404);
-
-    const headers = new Headers();
-    headers.set('Content-Type', 'image/png');
-    headers.set('Cache-Control', 'public, max-age=86400');
-    return new Response(obj.body, { headers });
-  } catch (err) {
-    console.error('❌ [ACH_IMAGE] Error:', err.message);
-    return c.json({ error: 'Image error', details: err.message }, 500);
   }
 });
 
