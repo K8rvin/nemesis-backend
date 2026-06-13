@@ -180,20 +180,19 @@ export function pickTargetAchievement(allAchievements, unlockedIds, targetTier, 
   return candidates[index];
 }
 
-export function findPath(startNodeId, player, targetAchievementId, graph, maxDepth = 15) {
+export function findPath(startNodeId, player, targetAchievementId, graph, maxDepth = 15, maxVisited = 15000) {
   const startState = clonePlayer(player);
   const queue = [{ nodeId: startNodeId, player: startState, path: [], firstChoice: null }];
   const visited = new Set();
   visited.add(makeStateKey(startNodeId, startState));
 
-  const MAX_VISITED = 10000;
   let bestPartial = null;
 
   while (queue.length > 0) {
     const { nodeId, player: currentPlayer, path, firstChoice } = queue.shift();
     const steps = path.length / 2;
     if (steps >= maxDepth) continue;
-    if (visited.size > MAX_VISITED) break;
+    if (visited.size > maxVisited) break;
 
     const choices = graph.nodeToChoices.get(nodeId) || [];
 
@@ -296,7 +295,31 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
     };
   }
 
-  const result = findPath(player.current_node_id, player, targetAchievement.id, graph);
+  // Для более редких ачивок путь обычно длиннее — даём BFS больше свободы.
+  // PLATINUM оставляем в более жёстких рамках, чтобы не провоцировать таймауты.
+  const tierUpper = (targetAchievement.medal_tier || '').toUpperCase();
+  let maxDepth = 18;
+  let maxVisited = 20000;
+  switch (tierUpper) {
+    case 'BRONZE':
+      maxDepth = 12;
+      maxVisited = 8000;
+      break;
+    case 'SILVER':
+      maxDepth = 20;
+      maxVisited = 25000;
+      break;
+    case 'GOLD':
+      maxDepth = 25;
+      maxVisited = 40000;
+      break;
+    case 'PLATINUM':
+      maxDepth = 15;
+      maxVisited = 12000;
+      break;
+  }
+
+  const result = findPath(player.current_node_id, player, targetAchievement.id, graph, maxDepth, maxVisited);
 
   const tierMap = { 'BRONZE': 'ОБЫЧНАЯ', 'SILVER': 'РЕДКАЯ', 'GOLD': 'ЭПИЧЕСКАЯ', 'PLATINUM': 'ЛЕГЕНДАРНАЯ' };
 
