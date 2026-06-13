@@ -87,18 +87,26 @@ function makeStateKey(nodeId, player) {
 
 export function buildGraph(nodes, choices) {
   const nodeToChoices = new Map();
+  const nodeToIncomingChoices = new Map();
   const achievementToChoices = new Map();
   const nodeMap = new Map();
 
   for (const node of nodes) {
     nodeMap.set(node.id, node);
     nodeToChoices.set(node.id, []);
+    nodeToIncomingChoices.set(node.id, []);
   }
 
   for (const choice of choices) {
     const list = nodeToChoices.get(choice.node_id) || [];
     list.push(choice);
     nodeToChoices.set(choice.node_id, list);
+
+    if (choice.target_node_id) {
+      const incoming = nodeToIncomingChoices.get(choice.target_node_id) || [];
+      incoming.push(choice);
+      nodeToIncomingChoices.set(choice.target_node_id, incoming);
+    }
 
     const achId = choice.effects?.unlock_achievement;
     if (achId) {
@@ -108,7 +116,7 @@ export function buildGraph(nodes, choices) {
     }
   }
 
-  return { nodeToChoices, achievementToChoices, nodeMap };
+  return { nodeToChoices, nodeToIncomingChoices, achievementToChoices, nodeMap };
 }
 
 // Кэш графа и справочника ачивок между запросами в warm-изоляторе Worker.
@@ -288,16 +296,19 @@ function buildCachedHintResponse(targetAchievement, route, graph, currentNodeId,
     ? choices.find(c => c.id === route.next_choice_id) || null
     : null;
 
-  // Если закэшированный next_choice недоступен игроку прямо сейчас,
-  // не возвращаем его как достижимый — пусть fallback посчитает точнее.
-  if (nextChoice && !filterSingleChoice(nextChoice, player)) {
+  // Для теоретических маршрутов условия игнорируются, поэтому next_choice
+  // может быть недоступен прямо сейчас — это нормально.
+  // Обратная совместимость: если is_theoretical не заполнено, ориентируемся на reason.
+  const isTheoretical = route.is_theoretical === true || route.reason === 'theoretical_reverse';
+  if (nextChoice && !isTheoretical && !filterSingleChoice(nextChoice, player)) {
     nextChoice = null;
   }
 
   return {
     hint_enabled: true,
     reachable: route.reachable,
-    reason: route.reason,
+    reason: isTheoretical ? 'theoretical_reverse' : route.reason,
+    theoretical: isTheoretical,
     target_achievement: {
       ...targetAchievement,
       rarity: tierMap[targetAchievement.medal_tier?.toUpperCase()] || 'ОБЫЧНАЯ',
@@ -309,6 +320,90 @@ function buildCachedHintResponse(targetAchievement, route, graph, currentNodeId,
     steps_remaining: route.steps_remaining,
     source: 'cache',
   };
+}
+
+function buildReverseHintResponse(targetAchievement, reverseResult) {
+  const tierMap = { 'BRONZE': 'ОБЫЧНАЯ', 'SILVER': 'РЕДКАЯ', 'GOLD': 'ЭПИЧЕСКАЯ', 'PLATINUM': 'ЛЕГЕНДАРНАЯ' };
+  return {
+    hint_enabled: true,
+    reachable: true,
+    reason: 'theoretical_path',
+    theoretical: true,
+    target_achievement: {
+      ...targetAchievement,
+      rarity: tierMap[targetAchievement.medal_tier?.toUpperCase()] || 'ОБЫЧНАЯ',
+    },
+    next_choice: reverseResult.nextChoice
+      ? { id: reverseResult.nextChoice.id, label: reverseResult.nextChoice.label }
+      : null,
+    path: reverseResult.path,
+    steps_remaining: reverseResult.stepsRemaining,
+    source: 'reverse',
+  };
+}
+
+export function findReversePath(startNodeId, targetAchievementId, graph, maxDepth = 100) {
+  // Находим choice(ы), который даёт целевую ачивку
+  const targetChoices = graph.achievementToChoices.get(targetAchievementId) || [];
+  if (targetChoices.length === 0) {
+    return { reachable: false, reason: 'no_target_choice' };
+  }
+
+  const queue = [];
+  const visited = new Set();
+
+  for (const targetChoice of targetChoices) {
+    const sourceNodeId = targetChoice.node_id;
+    const key = `${sourceNodeId}|${targetChoice.id}`;
+    if (visited.has(key)) continue;
+    visited.add(key);
+    queue.push({
+      nodeId: sourceNodeId,
+      steps: 1,
+      nextChoice: targetChoice,
+      path: [targetChoice.id],
+    });
+  }
+
+  let bestToStart = null;
+
+  while (queue.length > 0) {
+    const { nodeId, steps, nextChoice, path } = queue.shift();
+    if (steps >= maxDepth) continue;
+
+    if (nodeId === startNodeId) {
+      if (!bestToStart || steps < bestToStart.steps) {
+        bestToStart = { steps, nextChoice, path };
+      }
+      continue;
+    }
+
+    const incomingChoices = graph.nodeToIncomingChoices.get(nodeId) || [];
+    for (const choice of incomingChoices) {
+      const prevNodeId = choice.node_id;
+      const newPath = [choice.id, ...path];
+      const key = `${prevNodeId}|${choice.id}`;
+      if (visited.has(key)) continue;
+      visited.add(key);
+      queue.push({
+        nodeId: prevNodeId,
+        steps: steps + 1,
+        nextChoice: choice,
+        path: newPath,
+      });
+    }
+  }
+
+  if (bestToStart) {
+    return {
+      reachable: true,
+      nextChoice: bestToStart.nextChoice,
+      path: bestToStart.path,
+      stepsRemaining: bestToStart.steps,
+    };
+  }
+
+  return { reachable: false, reason: 'no_reverse_path' };
 }
 
 export async function getHint(env, userId, targetTier, targetType, targetAchievementId, dataProviders) {
@@ -411,6 +506,15 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
     triedIds.push(targetAchievement.id);
     const { maxDepth, maxVisited } = getSearchLimits((targetAchievement.medal_tier || '').toUpperCase());
     result = findPath(player.current_node_id, player, targetAchievement.id, graph, maxDepth, maxVisited);
+
+    // Если прямой поиск не нашёл путь — пробуем обратный (теоретический).
+    if (!result.reachable && result.reason === 'no_path_found') {
+      const reverse = findReversePath(player.current_node_id, targetAchievement.id, graph);
+      if (reverse.reachable) {
+        return buildReverseHintResponse(targetAchievement, reverse);
+      }
+    }
+
     if (!result.reachable && result.reason !== 'choice_locked') {
       targetAchievement = null;
     }
@@ -471,6 +575,28 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
   }
 
   const picked = bestReachable || bestLocked;
+
+  // Если прямой поиск не дал reachable — пробуем обратный поиск
+  // по всем подходящим ачивкам. Это находит теоретический путь
+  // даже когда forward BFS не справляется с ветвлением состояний.
+  if (!bestReachable) {
+    let bestReverse = null;
+    for (const achievement of allAchievements) {
+      if (unlockedIds.includes(achievement.id)) continue;
+      const tier = (achievement.medal_tier || '').toUpperCase();
+      if (!tiersToTry.includes(tier)) continue;
+      if (targetType && targetType !== 'any' && getAchievementType(achievement.id, graph) !== targetType) continue;
+
+      const reverse = findReversePath(player.current_node_id, achievement.id, graph);
+      if (reverse.reachable && (!bestReverse || reverse.stepsRemaining < bestReverse.result.stepsRemaining)) {
+        bestReverse = { achievement, result: reverse };
+      }
+    }
+
+    if (bestReverse) {
+      return buildReverseHintResponse(bestReverse.achievement, bestReverse.result);
+    }
+  }
 
   if (!picked) {
     return {

@@ -3,13 +3,21 @@
 // 💡 computeHintRoutes.js — предрасчёт маршрутов для hint engine
 // ==========================================
 //
+// Использует ОБРАТНЫЙ поиск (findReversePath) для быстрого построения
+// теоретических маршрутов от каждой ноды до каждой ачивки.
+// Обратный поиск игнорирует условия выборов, поэтому все найденные
+// маршруты помечаются как is_theoretical.
+//
 // Запуск:
 //   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node scripts/computeHintRoutes.js
 //
 // Для персонального предрасчёта одного игрока:
 //   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... USER_ID=23cc3902-... node scripts/computeHintRoutes.js
+//
+// Сухой прогон (без записи в БД):
+//   DRY_RUN=1 ... node scripts/computeHintRoutes.js
 
-import { buildGraph, findPath } from '../src/hintEngine.js';
+import { buildGraph, findReversePath } from '../src/hintEngine.js';
 import { config } from 'dotenv';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
@@ -28,6 +36,7 @@ try {
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const USER_ID = process.env.USER_ID || null;
+const DRY_RUN = process.env.DRY_RUN === '1';
 
 // Отключаем keep-alive, иначе Supabase рвет соединение при серии запросов
 const httpsAgent = new https.Agent({ keepAlive: false });
@@ -37,9 +46,8 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   process.exit(1);
 }
 
-const BATCH_SIZE = 500;
-const MAX_DEPTH = 50;
-const MAX_VISITED = 200_000;
+const BATCH_SIZE = 100;
+const BATCH_DELAY_MS = 300;
 
 async function supabaseFetch(path, options = {}) {
   const url = `${SUPABASE_URL}/rest/v1${path}`;
@@ -80,7 +88,7 @@ async function loadAllChoices() {
 async function loadData() {
   const [nodesRes, achievementsRes] = await Promise.all([
     supabaseFetch('/nodes?select=id,ending_type'),
-    supabaseFetch('/achievements?select=id'),
+    supabaseFetch('/achievements?select=id,medal_tier'),
   ]);
 
   const [nodes, achievements] = await Promise.all([
@@ -102,62 +110,115 @@ async function loadPlayerState(userId) {
   return data[0];
 }
 
+async function loadUnlockedAchievements(userId) {
+  const res = await supabaseFetch(`/user_achievements?user_id=eq.${userId}&select=achievement_id`);
+  const data = await res.json();
+  return new Set(data.map(r => r.achievement_id));
+}
+
 async function clearHintRoutes(nodeIds) {
   if (nodeIds && nodeIds.length > 0) {
-    // Удаляем только записи для указанных нод (персональный режим — одна нода)
     const ids = nodeIds.join(',');
     await supabaseFetch(`/hint_routes?node_id=in.(${ids})`, { method: 'DELETE' });
     console.log(`🗑️  Очищены старые маршруты для ${nodeIds.length} нод(ы)`);
   } else {
-    // Полная пересборка
-    await supabaseFetch('/hint_routes', { method: 'DELETE' });
+    // Supabase REST требует WHERE для DELETE; используем фильтр, который охватывает все строки
+    await supabaseFetch('/hint_routes?node_id=not.is.null', { method: 'DELETE' });
     console.log('🗑️  Очищены все старые маршруты');
   }
 }
 
-function computeRoutes({ graph, nodes, achievements }, player) {
+function computeRoutes({ graph, nodes, achievements }, onlyNodeId = null) {
   const routes = [];
-  const playerState = {
-    hp: player.hp ?? 100,
-    story_flags: player.story_flags || [],
-    inventory: player.inventory || [],
-    skills: player.skills || [],
-  };
 
-  for (const node of nodes) {
+  const nodesToProcess = onlyNodeId
+    ? nodes.filter(n => n.id === onlyNodeId)
+    : nodes;
+
+  let processed = 0;
+  const total = nodesToProcess.length * achievements.length;
+
+  for (const node of nodesToProcess) {
     for (const achievement of achievements) {
-      const result = findPath(node.id, playerState, achievement.id, graph, MAX_DEPTH, MAX_VISITED);
-      routes.push({
-        node_id: node.id,
-        achievement_id: achievement.id,
-        next_choice_id: result.nextChoice?.id || null,
-        steps_remaining: result.stepsRemaining,
-        reachable: result.reachable,
-        reason: result.reason || null,
-      });
+      processed++;
+      const start = Date.now();
+
+      const reverse = findReversePath(node.id, achievement.id, graph);
+
+      const route = reverse.reachable
+        ? {
+            node_id: node.id,
+            achievement_id: achievement.id,
+            next_choice_id: reverse.nextChoice?.id || null,
+            steps_remaining: reverse.stepsRemaining,
+            reachable: true,
+            forward_reachable: null,
+            forward_reason: null,
+            is_theoretical: true,
+            reason: 'theoretical_reverse',
+          }
+        : {
+            node_id: node.id,
+            achievement_id: achievement.id,
+            next_choice_id: null,
+            steps_remaining: null,
+            reachable: false,
+            forward_reachable: false,
+            forward_reason: reverse.reason || 'no_path_found',
+            is_theoretical: false,
+            reason: reverse.reason || 'no_path_found',
+          };
+
+      const duration = Date.now() - start;
+      routes.push(route);
+
+      if (processed % 100 === 0 || total <= 26) {
+        console.log(`  [${processed}/${total}] ${achievement.id}: ${route.reachable ? 'theoretical' : route.reason} (${duration}ms)`);
+      }
     }
   }
 
   return routes;
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function upsertRoutes(routes) {
   for (let i = 0; i < routes.length; i += BATCH_SIZE) {
-    const batch = routes.slice(i, i + BATCH_SIZE);
-    const res = await supabaseFetch('/hint_routes', {
-      method: 'POST',
-      headers: {
-        'Prefer': 'resolution=merge-duplicates',
-      },
-      body: JSON.stringify(batch),
-    });
+    if (i > 0) await sleep(BATCH_DELAY_MS);
 
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`Failed to upsert batch: ${text}`);
+    const batch = routes.slice(i, i + BATCH_SIZE);
+    const maxRetries = 3;
+    let lastErr = null;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const res = await supabaseFetch('/hint_routes', {
+          method: 'POST',
+          headers: {
+            'Prefer': 'resolution=merge-duplicates',
+          },
+          body: JSON.stringify(batch),
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`Failed to upsert batch: ${text}`);
+        }
+
+        console.log(`✅ Загружено ${Math.min(i + BATCH_SIZE, routes.length)} / ${routes.length} маршрутов`);
+        lastErr = null;
+        break;
+      } catch (err) {
+        lastErr = err;
+        console.warn(`⚠️ Batch ${i / BATCH_SIZE + 1} attempt ${attempt} failed: ${err.message}`);
+        if (attempt < maxRetries) await sleep(1000 * attempt);
+      }
     }
 
-    console.log(`✅ Загружено ${Math.min(i + BATCH_SIZE, routes.length)} / ${routes.length} маршрутов`);
+    if (lastErr) throw lastErr;
   }
 }
 
@@ -169,30 +230,47 @@ async function main() {
   const { nodes, achievements } = data;
   console.log(`📊 Нод: ${nodes.length}, выборов: ${data.graph.nodeToChoices.size}, ачивок: ${achievements.length}`);
 
-  let player;
   let nodeIdsToClear = null;
+  let onlyNodeId = null;
+  let achievementsToProcess = data.achievements;
 
   if (USER_ID) {
     console.log(`👤 Персональный режим для ${USER_ID}`);
-    player = await loadPlayerState(USER_ID);
+    const player = await loadPlayerState(USER_ID);
+    const unlockedIds = await loadUnlockedAchievements(USER_ID);
+    achievementsToProcess = data.achievements.filter(a => !unlockedIds.has(a.id));
     nodeIdsToClear = [player.current_node_id];
+    onlyNodeId = player.current_node_id;
     console.log(`🎮 Стартовая нода: ${player.current_node_id}`);
+    console.log(`🏅 Неполученных ачивок: ${achievementsToProcess.length}`);
   } else {
-    console.log('🌐 Глобальный режим: пустое начальное состояние');
-    player = { hp: 100, story_flags: [], inventory: [], skills: [] };
+    console.log('🌐 Глобальный режим: обратный поиск для всех нод');
   }
 
-  await clearHintRoutes(nodeIdsToClear);
+  if (!DRY_RUN) {
+    await clearHintRoutes(nodeIdsToClear);
+  } else {
+    console.log('🌵 DRY_RUN: старые маршруты не очищаются');
+  }
 
   console.log('🔎 Предрасчёт маршрутов...');
-  const routes = computeRoutes(data, player);
+  const routes = computeRoutes({ ...data, achievements: achievementsToProcess }, onlyNodeId);
 
-  const reachableCount = routes.filter(r => r.reachable).length;
-  const lockedCount = routes.filter(r => r.reason === 'choice_locked').length;
-  console.log(`📈 Reachable: ${reachableCount}, choice_locked: ${lockedCount}, no_path: ${routes.length - reachableCount - lockedCount}`);
+  const reachableCount = routes.filter(r => r.reachable && !r.is_theoretical).length;
+  const theoreticalCount = routes.filter(r => r.is_theoretical).length;
+  const noPathCount = routes.filter(r => !r.reachable).length;
+  console.log(`📈 Reachable: ${reachableCount}, theoretical: ${theoreticalCount}, no_path: ${noPathCount}`);
 
-  console.log('💾 Сохранение в БД...');
-  await upsertRoutes(routes);
+  if (DRY_RUN) {
+    console.log('🌵 DRY_RUN: записи в БД не производятся');
+    const sample = routes.filter(r => r.reachable).slice(0, 10);
+    for (const r of sample) {
+      console.log(`   ${r.node_id} → ${r.achievement_id}: ${r.is_theoretical ? 'theoretical' : 'reachable'}, next=${r.next_choice_id}`);
+    }
+  } else {
+    console.log('💾 Сохранение в БД...');
+    await upsertRoutes(routes);
+  }
 
   console.log(`🎉 Готово за ${((Date.now() - startTime) / 1000).toFixed(1)}с`);
 }
