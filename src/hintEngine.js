@@ -117,23 +117,38 @@ let _achievementsCache = null;
 let _cacheTs = 0;
 const CACHE_TTL_MS = 60 * 1000; // 1 минута
 
+async function loadAllChoices(env, supabaseFetch) {
+  const all = [];
+  const pageSize = 200;
+  let offset = 0;
+  while (true) {
+    const res = await supabaseFetch(env, `/choices?select=*&limit=${pageSize}&offset=${offset}`);
+    const page = await res.json();
+    if (page.length === 0) break;
+    all.push(...page);
+    if (page.length < pageSize) break;
+    offset += pageSize;
+  }
+  return all;
+}
+
 async function loadGraphAndAchievements(env, supabaseFetch) {
   const now = Date.now();
   if (_graphCache && _achievementsCache && (now - _cacheTs) < CACHE_TTL_MS) {
     return { graph: _graphCache, allAchievements: _achievementsCache };
   }
 
-  const [nodesRes, choicesRes, achRes] = await Promise.all([
+  const [nodesRes, achRes] = await Promise.all([
     supabaseFetch(env, '/nodes?select=id,ending_type'),
-    supabaseFetch(env, '/choices?select=*'),
     supabaseFetch(env, '/achievements?select=*'),
   ]);
 
-  const [nodes, choices, allAchievements] = await Promise.all([
+  const [nodes, allAchievements] = await Promise.all([
     nodesRes.json(),
-    choicesRes.json(),
     achRes.json(),
   ]);
+
+  const choices = await loadAllChoices(env, supabaseFetch);
 
   _graphCache = buildGraph(nodes, choices);
   _achievementsCache = allAchievements;
@@ -367,7 +382,9 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
   }
 
   // Поиск по тиру или ANY.
-  const tiersToTry = targetTier ? [targetTier.toUpperCase()] : ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM'];
+  const tiersToTry = targetTier && targetTier.toUpperCase() !== 'ANY'
+    ? [targetTier.toUpperCase()]
+    : ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM'];
   const cachedHint = findBestCachedRoute(tiersToTry);
   if (cachedHint) {
     return cachedHint;
