@@ -115,7 +115,7 @@ export function buildGraph(nodes, choices) {
 let _graphCache = null;
 let _achievementsCache = null;
 let _cacheTs = 0;
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 минут
+const CACHE_TTL_MS = 60 * 1000; // 1 минута
 
 async function loadGraphAndAchievements(env, supabaseFetch) {
   const now = Date.now();
