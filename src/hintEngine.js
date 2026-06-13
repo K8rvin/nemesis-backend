@@ -281,17 +281,15 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
   }
 
   // Если закреплённая цель недоступна — подбираем новую.
-  // Пробуем несколько целей: если к случайно выбранной нет пути,
-  // исключаем её и выбираем другую, пока не найдём достижимую.
+  // Перебираем все подходящие цели, пока не найдём достижимую.
   const triedIds = [];
   let result = null;
-  const maxAttempts = targetAchievement ? 1 : 3;
 
   if (targetAchievement) {
     triedIds.push(targetAchievement.id);
   }
 
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+  while (true) {
     if (!targetAchievement) {
       targetAchievement = pickTargetAchievement(allAchievements, unlockedIds, targetTier, targetType, graph, triedIds);
     }
