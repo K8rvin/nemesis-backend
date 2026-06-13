@@ -111,6 +111,36 @@ export function buildGraph(nodes, choices) {
   return { nodeToChoices, achievementToChoices, nodeMap };
 }
 
+// Кэш графа и справочника ачивок между запросами в warm-изоляторе Worker.
+let _graphCache = null;
+let _achievementsCache = null;
+let _cacheTs = 0;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 минут
+
+async function loadGraphAndAchievements(env, supabaseFetch) {
+  const now = Date.now();
+  if (_graphCache && _achievementsCache && (now - _cacheTs) < CACHE_TTL_MS) {
+    return { graph: _graphCache, allAchievements: _achievementsCache };
+  }
+
+  const [nodesRes, choicesRes, achRes] = await Promise.all([
+    supabaseFetch(env, '/nodes?select=id,ending_type'),
+    supabaseFetch(env, '/choices?select=*'),
+    supabaseFetch(env, '/achievements?select=*'),
+  ]);
+
+  const [nodes, choices, allAchievements] = await Promise.all([
+    nodesRes.json(),
+    choicesRes.json(),
+    achRes.json(),
+  ]);
+
+  _graphCache = buildGraph(nodes, choices);
+  _achievementsCache = allAchievements;
+  _cacheTs = now;
+  return { graph: _graphCache, allAchievements: _achievementsCache };
+}
+
 function getAchievementType(achievementId, graph) {
   const choices = graph.achievementToChoices.get(achievementId) || [];
   const types = new Set();
@@ -150,17 +180,20 @@ export function pickTargetAchievement(allAchievements, unlockedIds, targetTier, 
   return candidates[index];
 }
 
-export function findPath(startNodeId, player, targetAchievementId, graph, maxDepth = 20) {
+export function findPath(startNodeId, player, targetAchievementId, graph, maxDepth = 15) {
   const startState = clonePlayer(player);
   const queue = [{ nodeId: startNodeId, player: startState, path: [], firstChoice: null }];
   const visited = new Set();
   visited.add(makeStateKey(startNodeId, startState));
 
+  const MAX_VISITED = 10000;
   let bestPartial = null;
 
   while (queue.length > 0) {
     const { nodeId, player: currentPlayer, path, firstChoice } = queue.shift();
-    if (path.length / 2 >= maxDepth) continue;
+    const steps = path.length / 2;
+    if (steps >= maxDepth) continue;
+    if (visited.size > MAX_VISITED) break;
 
     const choices = graph.nodeToChoices.get(nodeId) || [];
 
@@ -174,7 +207,7 @@ export function findPath(startNodeId, player, targetAchievementId, graph, maxDep
           reachable: true,
           path: [...path, choice.id],
           nextChoice: currentFirstChoice,
-          stepsRemaining: path.length / 2 + 1,
+          stepsRemaining: steps + 1,
         };
       }
 
@@ -185,7 +218,7 @@ export function findPath(startNodeId, player, targetAchievementId, graph, maxDep
           reason: 'choice_locked',
           path: [...path],
           nextChoice: currentFirstChoice,
-          stepsRemaining: path.length / 2 + 1,
+          stepsRemaining: steps + 1,
         };
         continue;
       }
@@ -219,7 +252,7 @@ export function findPath(startNodeId, player, targetAchievementId, graph, maxDep
   };
 }
 
-export async function getHint(env, userId, targetTier, targetType, dataProviders) {
+export async function getHint(env, userId, targetTier, targetType, targetAchievementId, dataProviders) {
   const {
     getPlayerState,
     supabaseFetch,
@@ -230,24 +263,29 @@ export async function getHint(env, userId, targetTier, targetType, dataProviders
     return { error: 'Player not found' };
   }
 
-  const [nodesRes, choicesRes, achRes, uaRes] = await Promise.all([
-    supabaseFetch(env, '/nodes?select=*'),
-    supabaseFetch(env, '/choices?select=*'),
-    supabaseFetch(env, '/achievements?select=*'),
+  const [{ graph, allAchievements }, uaRes] = await Promise.all([
+    loadGraphAndAchievements(env, supabaseFetch),
     supabaseFetch(env, `/user_achievements?user_id=eq.${userId}&select=achievement_id`),
   ]);
 
-  const [nodes, choices, allAchievements, uaData] = await Promise.all([
-    nodesRes.json(),
-    choicesRes.json(),
-    achRes.json(),
-    uaRes.json(),
-  ]);
-
-  const graph = buildGraph(nodes, choices);
+  const uaData = await uaRes.json();
   const unlockedIds = uaData.map(r => r.achievement_id);
 
-  const targetAchievement = pickTargetAchievement(allAchievements, unlockedIds, targetTier, targetType, graph);
+  // Если клиент прислал закреплённую цель — пробуем использовать её,
+  // но только пока она не разблокирована и существует.
+  let targetAchievement = null;
+  if (targetAchievementId) {
+    targetAchievement = allAchievements.find(a => a.id === targetAchievementId) || null;
+    if (targetAchievement && unlockedIds.includes(targetAchievement.id)) {
+      targetAchievement = null;
+    }
+  }
+
+  // Если закреплённая цель недоступна — выбираем новую.
+  if (!targetAchievement) {
+    targetAchievement = pickTargetAchievement(allAchievements, unlockedIds, targetTier, targetType, graph);
+  }
+
   if (!targetAchievement) {
     return {
       hint_enabled: true,

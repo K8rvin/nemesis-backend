@@ -528,9 +528,9 @@ app.post('/api/achievements/reset', authMiddleware, async (c) => {
 app.post('/api/hint', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId');
-    const { target_tier, target_type } = await c.req.json();
+    const { target_tier, target_type, target_achievement_id } = await c.req.json();
 
-    const result = await getHint(c.env, userId, target_tier, target_type, {
+    const result = await getHint(c.env, userId, target_tier, target_type, target_achievement_id, {
       getPlayerState,
       supabaseFetch,
     });
