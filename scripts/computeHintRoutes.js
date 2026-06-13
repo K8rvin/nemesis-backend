@@ -128,7 +128,7 @@ async function clearHintRoutes(nodeIds) {
   }
 }
 
-function computeRoutes({ graph, nodes, achievements }, onlyNodeId = null) {
+function computeRoutes({ graph, nodes, achievements }, player = null, onlyNodeId = null) {
   const routes = [];
 
   const nodesToProcess = onlyNodeId
@@ -143,7 +143,7 @@ function computeRoutes({ graph, nodes, achievements }, onlyNodeId = null) {
       processed++;
       const start = Date.now();
 
-      const reverse = findReversePath(node.id, achievement.id, graph);
+      const reverse = findReversePath(node.id, achievement.id, graph, 100, player);
 
       const route = reverse.reachable
         ? {
@@ -233,10 +233,11 @@ async function main() {
   let nodeIdsToClear = null;
   let onlyNodeId = null;
   let achievementsToProcess = data.achievements;
+  let player = null;
 
   if (USER_ID) {
     console.log(`👤 Персональный режим для ${USER_ID}`);
-    const player = await loadPlayerState(USER_ID);
+    player = await loadPlayerState(USER_ID);
     const unlockedIds = await loadUnlockedAchievements(USER_ID);
     achievementsToProcess = data.achievements.filter(a => !unlockedIds.has(a.id));
     nodeIdsToClear = [player.current_node_id];
@@ -254,7 +255,7 @@ async function main() {
   }
 
   console.log('🔎 Предрасчёт маршрутов...');
-  const routes = computeRoutes({ ...data, achievements: achievementsToProcess }, onlyNodeId);
+  const routes = computeRoutes({ ...data, achievements: achievementsToProcess }, player, onlyNodeId);
 
   const reachableCount = routes.filter(r => r.reachable && !r.is_theoretical).length;
   const theoreticalCount = routes.filter(r => r.is_theoretical).length;

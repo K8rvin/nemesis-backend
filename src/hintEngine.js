@@ -364,7 +364,7 @@ function buildReverseHintResponse(targetAchievement, reverseResult, player = nul
   };
 }
 
-export function findReversePath(startNodeId, targetAchievementId, graph, maxDepth = 100) {
+export function findReversePath(startNodeId, targetAchievementId, graph, maxDepth = 100, player = null) {
   // Находим choice(ы), который даёт целевую ачивку
   const targetChoices = graph.achievementToChoices.get(targetAchievementId) || [];
   if (targetChoices.length === 0) {
@@ -375,6 +375,16 @@ export function findReversePath(startNodeId, targetAchievementId, graph, maxDept
   const visited = new Set();
 
   for (const targetChoice of targetChoices) {
+    // Если целевой choice требует навык, которого у игрока нет,
+    // считаем ачивку недостижимой (навыки в игре выдаются только в act1).
+    const requiredSkill = targetChoice.conditions?.required_skill;
+    if (requiredSkill && player && !player.skills?.includes(requiredSkill)) continue;
+
+    // Навыки взаимоисключающие: если choice выдаёт навык, отличный от
+    // уже имеющегося у игрока, по нему нельзя идти назад.
+    const addSkill = targetChoice.effects?.add_skill;
+    if (addSkill && player && player.skills?.length > 0 && !player.skills.includes(addSkill)) continue;
+
     const sourceNodeId = targetChoice.node_id;
     const key = `${sourceNodeId}|${targetChoice.id}`;
     if (visited.has(key)) continue;
@@ -402,6 +412,14 @@ export function findReversePath(startNodeId, targetAchievementId, graph, maxDept
 
     const incomingChoices = graph.nodeToIncomingChoices.get(nodeId) || [];
     for (const choice of incomingChoices) {
+      // Исключаем из обратного пути выборы, требующие навык, которого нет у игрока,
+      // а также выборы, которые выдали бы другой навык (навыки взаимоисключающие).
+      const requiredSkill = choice.conditions?.required_skill;
+      if (requiredSkill && player && !player.skills?.includes(requiredSkill)) continue;
+
+      const addSkill = choice.effects?.add_skill;
+      if (addSkill && player && player.skills?.length > 0 && !player.skills.includes(addSkill)) continue;
+
       const prevNodeId = choice.node_id;
       const newPath = [choice.id, ...path];
       const key = `${prevNodeId}|${choice.id}`;
@@ -576,7 +594,7 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
 
     // Если прямой поиск не нашёл путь — пробуем обратный (теоретический).
     if (!result.reachable && result.reason === 'no_path_found') {
-      const reverse = findReversePath(player.current_node_id, targetAchievement.id, graph);
+      const reverse = findReversePath(player.current_node_id, targetAchievement.id, graph, 100, player);
       if (reverse.reachable) {
         return buildReverseHintResponse(targetAchievement, reverse, player);
       }
@@ -656,7 +674,7 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
       if (!tiersToTry.includes(tier)) continue;
       if (targetType && targetType !== 'any' && getAchievementType(achievement.id, graph) !== targetType) continue;
 
-      const reverse = findReversePath(player.current_node_id, achievement.id, graph);
+      const reverse = findReversePath(player.current_node_id, achievement.id, graph, 100, player);
       if (!reverse.reachable) continue;
 
       const available = reverse.nextChoice ? filterSingleChoice(reverse.nextChoice, player) : false;
