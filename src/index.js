@@ -320,6 +320,7 @@ app.post('/api/auth/refresh', async (c) => {
 
 // 1. Получить текущую сцену и доступные выборы
 app.get('/api/state', authMiddleware, async (c) => {
+  const requestStart = Date.now();
   try {
     const userId = c.get('userId');
 
@@ -347,15 +348,17 @@ app.get('/api/state', authMiddleware, async (c) => {
     const allChoices = await getChoicesForNode(c.env, currentNode.id);
     const availableChoices = filterChoices(allChoices, player);
 
+    console.log(`[API /api/state] user=${userId} duration=${Date.now() - requestStart}ms`);
     return c.json({ player, node: currentNode, choices: availableChoices });
   } catch (err) {
-    console.error('❌ Error in /api/state:', err.message);
+    console.error(`❌ Error in /api/state after ${Date.now() - requestStart}ms:`, err.message);
     return c.json({ error: 'Failed to load game state', details: err.message }, 500);
   }
 });
 
 // 2. Обработка выбора игрока
 app.post('/api/choice', authMiddleware, async (c) => {
+  const requestStart = Date.now();
   try {
     const userId = c.get('userId');
     const { choiceId } = await c.req.json();
@@ -445,6 +448,7 @@ app.post('/api/choice', authMiddleware, async (c) => {
     const nextAllChoices = await getChoicesForNode(c.env, newNode.id);
     const nextChoices = filterChoices(nextAllChoices, updates);
 
+    console.log(`[API /api/choice] user=${userId} choice=${choiceId} duration=${Date.now() - requestStart}ms`);
     return c.json({
       success: true,
       narrative_override: choice.narrative_override,
@@ -456,7 +460,7 @@ app.post('/api/choice', authMiddleware, async (c) => {
       unlocked_achievement: unlockedAchievement
     });
   } catch (err) {
-    console.error('❌ Error in /api/choice:', err.message);
+    console.error(`❌ Error in /api/choice after ${Date.now() - requestStart}ms:`, err.message);
     return c.json({ error: 'Failed to process choice', details: err.message }, 500);
   }
 });
@@ -526,6 +530,7 @@ app.post('/api/achievements/reset', authMiddleware, async (c) => {
 
 // 5. Умный подсказчик к неполученным ачивкам
 app.post('/api/hint', authMiddleware, async (c) => {
+  const requestStart = Date.now();
   try {
     const userId = c.get('userId');
     const { target_tier, target_type, target_achievement_id } = await c.req.json();
@@ -536,12 +541,14 @@ app.post('/api/hint', authMiddleware, async (c) => {
     });
 
     if (result.error) {
+      console.log(`[API /api/hint] user=${userId} error=${result.error} duration=${Date.now() - requestStart}ms`);
       return c.json({ error: result.error }, 404);
     }
 
+    console.log(`[API /api/hint] user=${userId} tier=${target_tier || 'ANY'} target=${result.target_achievement?.id || 'none'} reachable=${result.reachable} duration=${Date.now() - requestStart}ms`);
     return c.json(result);
   } catch (err) {
-    console.error('❌ Error in /api/hint:', err.message);
+    console.error(`❌ Error in /api/hint after ${Date.now() - requestStart}ms:`, err.message);
     return c.json({ error: 'Failed to build hint', details: err.message }, 500);
   }
 });
