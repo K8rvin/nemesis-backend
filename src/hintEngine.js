@@ -306,34 +306,65 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
     }
   }
 
+  // Если клиент явно закрепил цель — возвращаем результат для неё
+  // (reachable или choice_locked), даже если есть другие достижимые цели.
+  if (targetAchievementId && targetAchievement) {
+    const tierMap = { 'BRONZE': 'ОБЫЧНАЯ', 'SILVER': 'РЕДКАЯ', 'GOLD': 'ЭПИЧЕСКАЯ', 'PLATINUM': 'ЛЕГЕНДАРНАЯ' };
+    return {
+      hint_enabled: true,
+      reachable: result.reachable,
+      reason: result.reason,
+      target_achievement: {
+        ...targetAchievement,
+        rarity: tierMap[targetAchievement.medal_tier?.toUpperCase()] || 'ОБЫЧНАЯ',
+      },
+      next_choice: result.nextChoice
+        ? {
+            id: result.nextChoice.id,
+            label: result.nextChoice.label,
+          }
+        : null,
+      path: result.path,
+      steps_remaining: result.stepsRemaining,
+    };
+  }
+
   const tiersToTry = targetTier
     ? [targetTier.toUpperCase()]
     : ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM'];
 
+  let bestReachable = null;
+  let bestLocked = null;
+
   for (const currentTier of tiersToTry) {
-    if (targetAchievement && (result.reachable || result.reason === 'choice_locked')) break;
+    if (bestReachable && bestReachable.result.stepsRemaining <= 1) break;
 
     while (true) {
-      if (!targetAchievement) {
-        targetAchievement = pickTargetAchievement(allAchievements, unlockedIds, currentTier, targetType, graph, triedIds);
-      }
-      if (!targetAchievement) break;
+      const candidate = pickTargetAchievement(allAchievements, unlockedIds, currentTier, targetType, graph, triedIds);
+      if (!candidate) break;
+      triedIds.push(candidate.id);
 
-      const { maxDepth, maxVisited } = getSearchLimits((targetAchievement.medal_tier || '').toUpperCase());
-      result = findPath(player.current_node_id, player, targetAchievement.id, graph, maxDepth, maxVisited);
+      const { maxDepth, maxVisited } = getSearchLimits((candidate.medal_tier || '').toUpperCase());
+      const res = findPath(player.current_node_id, player, candidate.id, graph, maxDepth, maxVisited);
 
-      // Если путь найден или цель видна, но заблокирована — останавливаемся.
-      if (result.reachable || result.reason === 'choice_locked') {
+      if (res.reachable) {
+        if (!bestReachable || res.stepsRemaining < bestReachable.result.stepsRemaining) {
+          bestReachable = { targetAchievement: candidate, result: res };
+        }
         break;
       }
 
-      // Иначе исключаем эту цель и пробуем следующую.
-      triedIds.push(targetAchievement.id);
-      targetAchievement = null;
+      if (res.reason === 'choice_locked') {
+        if (!bestLocked || res.stepsRemaining < bestLocked.result.stepsRemaining) {
+          bestLocked = { targetAchievement: candidate, result: res };
+        }
+      }
     }
   }
 
-  if (!targetAchievement) {
+  const picked = bestReachable || bestLocked;
+
+  if (!picked) {
     return {
       hint_enabled: true,
       reachable: false,
@@ -342,6 +373,9 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
       next_choice: null,
     };
   }
+
+  targetAchievement = picked.targetAchievement;
+  result = picked.result;
 
   const tierMap = { 'BRONZE': 'ОБЫЧНАЯ', 'SILVER': 'РЕДКАЯ', 'GOLD': 'ЭПИЧЕСКАЯ', 'PLATINUM': 'ЛЕГЕНДАРНАЯ' };
 
