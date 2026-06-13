@@ -163,8 +163,8 @@ function getAchievementType(achievementId, graph) {
   return 'other';
 }
 
-export function pickTargetAchievement(allAchievements, unlockedIds, targetTier, targetType, graph) {
-  let candidates = allAchievements.filter(a => !unlockedIds.includes(a.id));
+export function pickTargetAchievement(allAchievements, unlockedIds, targetTier, targetType, graph, excludeIds = []) {
+  let candidates = allAchievements.filter(a => !unlockedIds.includes(a.id) && !excludeIds.includes(a.id));
 
   if (targetTier) {
     candidates = candidates.filter(a => (a.medal_tier || '').toUpperCase() === targetTier.toUpperCase());
@@ -280,9 +280,57 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
     }
   }
 
-  // Если закреплённая цель недоступна — выбираем новую.
-  if (!targetAchievement) {
-    targetAchievement = pickTargetAchievement(allAchievements, unlockedIds, targetTier, targetType, graph);
+  // Если закреплённая цель недоступна — подбираем новую.
+  // Пробуем несколько целей: если к случайно выбранной нет пути,
+  // исключаем её и выбираем другую, пока не найдём достижимую.
+  const triedIds = [];
+  let result = null;
+  const maxAttempts = targetAchievement ? 1 : 3;
+
+  if (targetAchievement) {
+    triedIds.push(targetAchievement.id);
+  }
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (!targetAchievement) {
+      targetAchievement = pickTargetAchievement(allAchievements, unlockedIds, targetTier, targetType, graph, triedIds);
+    }
+    if (!targetAchievement) break;
+
+    // Для более редких ачивок путь обычно длиннее — даём BFS больше свободы.
+    // PLATINUM оставляем в более жёстких рамках, чтобы не провоцировать таймауты.
+    const tierUpper = (targetAchievement.medal_tier || '').toUpperCase();
+    let maxDepth = 18;
+    let maxVisited = 20000;
+    switch (tierUpper) {
+      case 'BRONZE':
+        maxDepth = 12;
+        maxVisited = 8000;
+        break;
+      case 'SILVER':
+        maxDepth = 20;
+        maxVisited = 25000;
+        break;
+      case 'GOLD':
+        maxDepth = 25;
+        maxVisited = 40000;
+        break;
+      case 'PLATINUM':
+        maxDepth = 15;
+        maxVisited = 12000;
+        break;
+    }
+
+    result = findPath(player.current_node_id, player, targetAchievement.id, graph, maxDepth, maxVisited);
+
+    // Если путь найден или цель видна, но заблокирована — останавливаемся.
+    if (result.reachable || result.reason === 'choice_locked') {
+      break;
+    }
+
+    // Иначе исключаем эту цель и пробуем следующую.
+    triedIds.push(targetAchievement.id);
+    targetAchievement = null;
   }
 
   if (!targetAchievement) {
@@ -294,32 +342,6 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
       next_choice: null,
     };
   }
-
-  // Для более редких ачивок путь обычно длиннее — даём BFS больше свободы.
-  // PLATINUM оставляем в более жёстких рамках, чтобы не провоцировать таймауты.
-  const tierUpper = (targetAchievement.medal_tier || '').toUpperCase();
-  let maxDepth = 18;
-  let maxVisited = 20000;
-  switch (tierUpper) {
-    case 'BRONZE':
-      maxDepth = 12;
-      maxVisited = 8000;
-      break;
-    case 'SILVER':
-      maxDepth = 20;
-      maxVisited = 25000;
-      break;
-    case 'GOLD':
-      maxDepth = 25;
-      maxVisited = 40000;
-      break;
-    case 'PLATINUM':
-      maxDepth = 15;
-      maxVisited = 12000;
-      break;
-  }
-
-  const result = findPath(player.current_node_id, player, targetAchievement.id, graph, maxDepth, maxVisited);
 
   const tierMap = { 'BRONZE': 'ОБЫЧНАЯ', 'SILVER': 'РЕДКАЯ', 'GOLD': 'ЭПИЧЕСКАЯ', 'PLATINUM': 'ЛЕГЕНДАРНАЯ' };
 
