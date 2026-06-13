@@ -280,55 +280,57 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
     }
   }
 
+  function getSearchLimits(tierUpper) {
+    switch (tierUpper) {
+      case 'BRONZE': return { maxDepth: 12, maxVisited: 8000 };
+      case 'SILVER': return { maxDepth: 20, maxVisited: 25000 };
+      case 'GOLD': return { maxDepth: 25, maxVisited: 40000 };
+      case 'PLATINUM': return { maxDepth: 15, maxVisited: 12000 };
+      default: return { maxDepth: 18, maxVisited: 20000 };
+    }
+  }
+
   // Если закреплённая цель недоступна — подбираем новую.
-  // Перебираем все подходящие цели, пока не найдём достижимую.
+  // При запросе "Любая" ищем по редкости от ближних к дальним:
+  // BRONZE → SILVER → GOLD → PLATINUM. Это позволяет быстрее найти
+  // достижимую цель и не тратить время на дальние легендарные сначала.
   const triedIds = [];
   let result = null;
 
   if (targetAchievement) {
     triedIds.push(targetAchievement.id);
+    const { maxDepth, maxVisited } = getSearchLimits((targetAchievement.medal_tier || '').toUpperCase());
+    result = findPath(player.current_node_id, player, targetAchievement.id, graph, maxDepth, maxVisited);
+    if (!result.reachable && result.reason !== 'choice_locked') {
+      targetAchievement = null;
+    }
   }
 
-  while (true) {
-    if (!targetAchievement) {
-      targetAchievement = pickTargetAchievement(allAchievements, unlockedIds, targetTier, targetType, graph, triedIds);
+  const tiersToTry = targetTier
+    ? [targetTier.toUpperCase()]
+    : ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM'];
+
+  for (const currentTier of tiersToTry) {
+    if (targetAchievement && (result.reachable || result.reason === 'choice_locked')) break;
+
+    while (true) {
+      if (!targetAchievement) {
+        targetAchievement = pickTargetAchievement(allAchievements, unlockedIds, currentTier, targetType, graph, triedIds);
+      }
+      if (!targetAchievement) break;
+
+      const { maxDepth, maxVisited } = getSearchLimits((targetAchievement.medal_tier || '').toUpperCase());
+      result = findPath(player.current_node_id, player, targetAchievement.id, graph, maxDepth, maxVisited);
+
+      // Если путь найден или цель видна, но заблокирована — останавливаемся.
+      if (result.reachable || result.reason === 'choice_locked') {
+        break;
+      }
+
+      // Иначе исключаем эту цель и пробуем следующую.
+      triedIds.push(targetAchievement.id);
+      targetAchievement = null;
     }
-    if (!targetAchievement) break;
-
-    // Для более редких ачивок путь обычно длиннее — даём BFS больше свободы.
-    // PLATINUM оставляем в более жёстких рамках, чтобы не провоцировать таймауты.
-    const tierUpper = (targetAchievement.medal_tier || '').toUpperCase();
-    let maxDepth = 18;
-    let maxVisited = 20000;
-    switch (tierUpper) {
-      case 'BRONZE':
-        maxDepth = 12;
-        maxVisited = 8000;
-        break;
-      case 'SILVER':
-        maxDepth = 20;
-        maxVisited = 25000;
-        break;
-      case 'GOLD':
-        maxDepth = 25;
-        maxVisited = 40000;
-        break;
-      case 'PLATINUM':
-        maxDepth = 15;
-        maxVisited = 12000;
-        break;
-    }
-
-    result = findPath(player.current_node_id, player, targetAchievement.id, graph, maxDepth, maxVisited);
-
-    // Если путь найден или цель видна, но заблокирована — останавливаемся.
-    if (result.reachable || result.reason === 'choice_locked') {
-      break;
-    }
-
-    // Иначе исключаем эту цель и пробуем следующую.
-    triedIds.push(targetAchievement.id);
-    targetAchievement = null;
   }
 
   if (!targetAchievement) {
