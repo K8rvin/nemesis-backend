@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { getHint } from './hintEngine.js';
 
 // ==========================================
 // 🎛️ НАСТРОЙКИ ПРИЛОЖЕНИЯ
@@ -520,6 +521,28 @@ app.post('/api/achievements/reset', authMiddleware, async (c) => {
   } catch (err) {
     console.error('❌ Error in /api/achievements/reset:', err.message);
     return c.json({ error: 'Failed to reset achievements', details: err.message }, 500);
+  }
+});
+
+// 5. Умный подсказчик к неполученным ачивкам
+app.post('/api/hint', authMiddleware, async (c) => {
+  try {
+    const userId = c.get('userId');
+    const { target_tier, target_type } = await c.req.json();
+
+    const result = await getHint(c.env, userId, target_tier, target_type, {
+      getPlayerState,
+      supabaseFetch,
+    });
+
+    if (result.error) {
+      return c.json({ error: result.error }, 404);
+    }
+
+    return c.json(result);
+  } catch (err) {
+    console.error('❌ Error in /api/hint:', err.message);
+    return c.json({ error: 'Failed to build hint', details: err.message }, 500);
   }
 });
 
