@@ -12,7 +12,7 @@ function clonePlayer(player) {
   };
 }
 
-function filterSingleChoice(choice, player) {
+export function filterSingleChoice(choice, player) {
   const playerSkills = player.skills || [];
   const storyFlags = player.story_flags || [];
   const playerInventory = player.inventory || [];
@@ -251,6 +251,51 @@ export function findPath(startNodeId, player, targetAchievementId, graph, maxDep
   };
 }
 
+async function loadCachedRoutes(env, supabaseFetch, nodeId) {
+  try {
+    const res = await supabaseFetch(env, `/hint_routes?node_id=eq.${nodeId}`);
+    const data = await res.json();
+    const map = new Map();
+    for (const row of data) {
+      map.set(row.achievement_id, row);
+    }
+    return map;
+  } catch (err) {
+    console.warn('⚠️ Failed to load hint_routes:', err.message);
+    return new Map();
+  }
+}
+
+function buildCachedHintResponse(targetAchievement, route, graph, currentNodeId, player) {
+  const tierMap = { 'BRONZE': 'ОБЫЧНАЯ', 'SILVER': 'РЕДКАЯ', 'GOLD': 'ЭПИЧЕСКАЯ', 'PLATINUM': 'ЛЕГЕНДАРНАЯ' };
+  const choices = graph.nodeToChoices.get(currentNodeId) || [];
+  let nextChoice = route.next_choice_id
+    ? choices.find(c => c.id === route.next_choice_id) || null
+    : null;
+
+  // Если закэшированный next_choice недоступен игроку прямо сейчас,
+  // не возвращаем его как достижимый — пусть fallback посчитает точнее.
+  if (nextChoice && !filterSingleChoice(nextChoice, player)) {
+    nextChoice = null;
+  }
+
+  return {
+    hint_enabled: true,
+    reachable: route.reachable,
+    reason: route.reason,
+    target_achievement: {
+      ...targetAchievement,
+      rarity: tierMap[targetAchievement.medal_tier?.toUpperCase()] || 'ОБЫЧНАЯ',
+    },
+    next_choice: nextChoice
+      ? { id: nextChoice.id, label: nextChoice.label }
+      : null,
+    path: [],
+    steps_remaining: route.steps_remaining,
+    source: 'cache',
+  };
+}
+
 export async function getHint(env, userId, targetTier, targetType, targetAchievementId, dataProviders) {
   const {
     getPlayerState,
@@ -262,9 +307,10 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
     return { error: 'Player not found' };
   }
 
-  const [{ graph, allAchievements }, uaRes] = await Promise.all([
+  const [{ graph, allAchievements }, uaRes, cachedRoutes] = await Promise.all([
     loadGraphAndAchievements(env, supabaseFetch),
     supabaseFetch(env, `/user_achievements?user_id=eq.${userId}&select=achievement_id`),
+    loadCachedRoutes(env, supabaseFetch, player.current_node_id),
   ]);
 
   const uaData = await uaRes.json();
@@ -278,6 +324,53 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
     if (targetAchievement && unlockedIds.includes(targetAchievement.id)) {
       targetAchievement = null;
     }
+  }
+
+  // ===== КЭШИРОВАННЫЕ МАРШРУТЫ =====
+  // Если есть предвычисленный маршрут от текущей ноды — используем его.
+  // Fallback к runtime BFS остаётся для состояний, не покрытых кэшем.
+  function findBestCachedRoute(tiers) {
+    let bestReachable = null;
+    let bestLocked = null;
+
+    for (const achievement of allAchievements) {
+      if (unlockedIds.includes(achievement.id)) continue;
+      const tier = (achievement.medal_tier || '').toUpperCase();
+      if (tiers && !tiers.includes(tier)) continue;
+      if (targetType && targetType !== 'any' && getAchievementType(achievement.id, graph) !== targetType) continue;
+
+      const route = cachedRoutes.get(achievement.id);
+      if (!route) continue;
+
+      if (route.reachable) {
+        if (!bestReachable || route.steps_remaining < bestReachable.route.steps_remaining) {
+          bestReachable = { achievement, route };
+        }
+      } else if (route.reason === 'choice_locked') {
+        if (!bestLocked || route.steps_remaining < bestLocked.route.steps_remaining) {
+          bestLocked = { achievement, route };
+        }
+      }
+    }
+
+    const picked = bestReachable || bestLocked;
+    if (!picked) return null;
+    return buildCachedHintResponse(picked.achievement, picked.route, graph, player.current_node_id, player);
+  }
+
+  // Закреплённая цель: ищем конкретную запись в кэше.
+  if (targetAchievementId && targetAchievement) {
+    const cached = cachedRoutes.get(targetAchievement.id);
+    if (cached) {
+      return buildCachedHintResponse(targetAchievement, cached, graph, player.current_node_id, player);
+    }
+  }
+
+  // Поиск по тиру или ANY.
+  const tiersToTry = targetTier ? [targetTier.toUpperCase()] : ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM'];
+  const cachedHint = findBestCachedRoute(tiersToTry);
+  if (cachedHint) {
+    return cachedHint;
   }
 
   function getSearchLimits(tierUpper) {
@@ -329,9 +422,7 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
     };
   }
 
-  const tiersToTry = targetTier
-    ? [targetTier.toUpperCase()]
-    : ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM'];
+  // tiersToTry уже определён при попытке использовать кэшированные маршруты.
 
   let bestReachable = null;
   let bestLocked = null;

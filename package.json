@@ -12,9 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "hono": "^4.4.8"
+    "hono": "^4.4.8",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
+    "dotenv": "^16.4.5",
     "wrangler": "^4.100.0"
   }
 }
