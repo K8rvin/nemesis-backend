@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { getHint } from './hintEngine.js';
+import { getHint } from './achievementRoutes.js';
 
 // ==========================================
 // 🎛️ НАСТРОЙКИ ПРИЛОЖЕНИЯ
@@ -538,6 +538,7 @@ app.post('/api/hint', authMiddleware, async (c) => {
     const result = await getHint(c.env, userId, target_tier, target_type, target_achievement_id, {
       getPlayerState,
       supabaseFetch,
+      getChoicesForNode,
     });
 
     if (result.error) {

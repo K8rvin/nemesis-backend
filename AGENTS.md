@@ -5,7 +5,7 @@
 Бэкенд развёрнут на **Cloudflare Workers**, фреймворк **Hono**, код — plain JavaScript ESM.
 
 - Точка входа: `src/index.js`.
-- Hint engine вынесен в `src/hintEngine.js`.
+- Подсказчик к ачивкам вынесен в `src/achievementRoutes.js`.
 - База данных — **только Supabase** (локальный PostgreSQL-режим удалён).
 
 ## Команды
@@ -20,25 +20,26 @@ npm run deploy   # деплой в Cloudflare Workers
 ## Hint system
 
 - Эндпоинт: `POST /api/hint`.
+- Бэкенд **не обходит граф** в runtime. Маршруты хранятся в таблице `achievement_routes` и предоставляются извне.
 - Алгоритм:
-  1. Сначала пытается найти прямой путь методом `findPath` (forward BFS с учётом условий и эффектов).
-  2. Если прямой путь не найден, использует `findReversePath` — обратный BFS, игнорирующий условия. Результат помечается флагом `theoretical: true`.
-  3. Предрасчитанные маршруты хранятся в таблице `hint_routes`.
+  1. Загружает готовые маршруты для стартовой ноды (`act1_skills`) из `achievement_routes`.
+  2. Фильтрует неразблокированные ачивки по тиру (или по конкретной цели).
+  3. Выбирает маршрут с минимальным `steps_remaining`.
+  4. Находит текущую позицию игрока в `path` и возвращает ближайший шаг как `next_choice`.
+  5. Если игрок сошёл с маршрута — возвращает `reachable: false, reason: 'off_route'`.
 
 ## Скрипты
 
-- `scripts/computeHintRoutes.js` — предрасчёт `hint_routes`.
-  - Глобальный режим: `node scripts/computeHintRoutes.js` (все ноды × все ачивки).
-  - Персональный режим: `USER_ID=... node scripts/computeHintRoutes.js`.
-  - Сухой прогон: `DRY_RUN=1 ... node scripts/computeHintRoutes.js`.
-- `scripts/testHintEngineLocal.js` — локальный unit-тест hint engine без БД.
-- `scripts/checkAchievability.js` — быстрая проверка теоретической достижимости ачивок.
-- `scripts/testHintForUser.js` — forward BFS для конкретного пользователя.
-- `scripts/testGetHint.js` — end-to-end тест `/api/hint`.
+- `scripts/importAchievementRoutes.js` — загрузка готовых маршрутов в `achievement_routes`.
+  - `SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... ROUTES_FILE=./achievement_routes.json node scripts/importAchievementRoutes.js`
+  - Входной файл — JSON-массив объектов `{ start_node_id, achievement_id, path: [choice_id, ...] }`.
+- `scripts/computeHintRoutes.js` — устаревший скрипт предрасчёта `hint_routes`. Больше не используется основным приложением.
+- `scripts/testHintEngineLocal.js`, `scripts/checkAchievability.js`, `scripts/testHintForUser.js`, `scripts/testGetHint.js` — устаревшие тестовые скрипты, зависящие от `src/hintEngine.js`.
 
 ## Миграции
 
 Файлы миграций лежат в `migrations/` и применяются вручную через SQL Editor Supabase:
 
-- `migrations/001_create_hint_routes.sql` — создание таблицы `hint_routes`.
-- `migrations/002_hint_routes_add_forward.sql` — добавление колонок `forward_reachable`, `forward_reason`, `is_theoretical`.
+- `migrations/001_create_hint_routes.sql` — создание устаревшей таблицы `hint_routes`.
+- `migrations/002_hint_routes_add_forward.sql` — добавление колонок к `hint_routes`.
+- `migrations/003_create_achievement_routes.sql` — создание таблицы `achievement_routes` для хранения готовых маршрутов от стартовой ноды к ачивкам.
