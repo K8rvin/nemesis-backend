@@ -199,7 +199,9 @@ export async function getHint(env, userId, targetTier, _targetType, targetAchiev
   // Загружаем объекты выборов из маршрута, чтобы найти текущую позицию игрока
   const choicesById = await loadChoicesForPath(env, supabaseFetch, path);
 
-  // Ищем первый выбор в маршруте, который доступен с текущей ноды
+  // Ищем выбор в маршруте, который доступен с текущей ноды.
+  // Если в маршруте на текущей ноде несколько выборов (например, зашли, забрали предмет,
+  // вернулись), берём первый доступный — ранее выполненные шаги уже скрыты условиями.
   let nextChoice = null;
   let stepsFromHere = null;
 
@@ -208,9 +210,18 @@ export async function getHint(env, userId, targetTier, _targetType, targetAchiev
     if (!choice) continue;
     if (choice.node_id !== player.current_node_id) continue;
 
-    nextChoice = choice;
-    stepsFromHere = path.length - i;
-    break;
+    // Запоминаем первый выбор на ноде как fallback (чтобы показать требования, если все заблокированы)
+    if (!nextChoice) {
+      nextChoice = choice;
+      stepsFromHere = path.length - i;
+    }
+
+    // Если нашли доступный выбор — используем его
+    if (filterSingleChoice(choice, clonePlayer(player))) {
+      nextChoice = choice;
+      stepsFromHere = path.length - i;
+      break;
+    }
   }
 
   // Если игрок не находится на маршруте
