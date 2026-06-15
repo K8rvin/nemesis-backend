@@ -64,8 +64,14 @@ export function filterSingleChoice(choice, player) {
   }
   if (conds.flag_forbidden && storyFlags.includes(conds.flag_forbidden)) return false;
 
-  if (conds.item_required && !playerInventory.includes(conds.item_required)) return false;
-  if (conds.item_not_required && playerInventory.includes(conds.item_not_required)) return false;
+  if (conds.item_required) {
+    const items = Array.isArray(conds.item_required) ? conds.item_required : [conds.item_required];
+    if (!items.every(it => playerInventory.includes(it))) return false;
+  }
+  if (conds.item_not_required) {
+    const items = Array.isArray(conds.item_not_required) ? conds.item_not_required : [conds.item_not_required];
+    if (items.some(it => playerInventory.includes(it))) return false;
+  }
 
   return true;
 }

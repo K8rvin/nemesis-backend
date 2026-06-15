@@ -182,7 +182,10 @@ function filterChoices(allChoices, player) {
       if (flags.every(f => storyFlags.includes(f))) return false;
     }
     if (conds.flag_forbidden && storyFlags.includes(conds.flag_forbidden)) return false;
-    if (conds.item_required && !playerInventory.includes(conds.item_required)) return false;
+    if (conds.item_required) {
+      const items = Array.isArray(conds.item_required) ? conds.item_required : [conds.item_required];
+      if (!items.every(it => playerInventory.includes(it))) return false;
+    }
 
     return true;
   });
