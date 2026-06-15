@@ -13,6 +13,12 @@ const TIER_NAME_MAP = {
   'PLATINUM': 'ЛЕГЕНДАРНАЯ',
 };
 
+function asArray(val) {
+  if (val === undefined || val === null) return [];
+  if (Array.isArray(val)) return val;
+  return [val];
+}
+
 function withRarity(achievement) {
   if (!achievement) return null;
   return {
@@ -199,18 +205,47 @@ export async function getHint(env, userId, targetTier, _targetType, targetAchiev
   // Загружаем объекты выборов из маршрута, чтобы найти текущую позицию игрока
   const choicesById = await loadChoicesForPath(env, supabaseFetch, path);
 
-  // Ищем выбор в маршруте, который доступен с текущей ноды.
-  // Если в маршруте на текущей ноде несколько выборов (например, зашли, забрали предмет,
-  // вернулись), берём первый доступный — ранее выполненные шаги уже скрыты условиями.
+  // Определяем, как далеко игрок продвинулся по маршруту, по его состоянию.
+  // Для каждого шага накапливаем флаги/предметы/навыки, которые даёт маршрут.
+  // Прогресс — последний шаг, все эффекты которого уже есть у игрока.
+  let progress = -1;
+  let cumulativeSkills = new Set();
+  let cumulativeFlags = new Set();
+  let cumulativeItems = new Set();
+
+  for (let i = 0; i < path.length; i++) {
+    const choice = choicesById.get(path[i]);
+    if (choice) {
+      const eff = choice.effects || {};
+      asArray(eff.add_skill).forEach(s => cumulativeSkills.add(s));
+      asArray(eff.add_flag).forEach(f => cumulativeFlags.add(f));
+      asArray(eff.add_item).forEach(it => cumulativeItems.add(it));
+    }
+
+    const hasAll =
+      [...cumulativeSkills].every(s => player.skills?.includes(s)) &&
+      [...cumulativeFlags].every(f => player.story_flags?.includes(f)) &&
+      [...cumulativeItems].every(it => player.inventory?.includes(it));
+
+    if (hasAll) {
+      progress = i;
+    } else {
+      break;
+    }
+  }
+
+  // Ищем следующий доступный выбор в маршруте после прогресса на текущей ноде.
+  // Если в маршруте на ноде несколько выборов (например, зашли, забрали предмет, вернулись),
+  // прогресс по состоянию гарантирует, что мы не отправим игрока назад за уже полученным.
   let nextChoice = null;
   let stepsFromHere = null;
 
-  for (let i = 0; i < path.length; i++) {
+  for (let i = progress + 1; i < path.length; i++) {
     const choice = choicesById.get(path[i]);
     if (!choice) continue;
     if (choice.node_id !== player.current_node_id) continue;
 
-    // Запоминаем первый выбор на ноде как fallback (чтобы показать требования, если все заблокированы)
+    // Запоминаем первый выбор на ноде после прогресса как fallback
     if (!nextChoice) {
       nextChoice = choice;
       stepsFromHere = path.length - i;
