@@ -222,14 +222,18 @@ export async function getHint(env, userId, targetTier, _targetType, targetAchiev
       asArray(eff.add_item).forEach(it => cumulativeItems.add(it));
     }
 
+    const hasAnyEffects = cumulativeSkills.size > 0 || cumulativeFlags.size > 0 || cumulativeItems.size > 0;
     const hasAll =
       [...cumulativeSkills].every(s => player.skills?.includes(s)) &&
       [...cumulativeFlags].every(f => player.story_flags?.includes(f)) &&
       [...cumulativeItems].every(it => player.inventory?.includes(it));
 
-    if (hasAll) {
+    // Прогресс учитываем только когда маршрут уже что-то дал игроку.
+    // Первый выбор (например, выбор навыка) сам по себе ничего не даёт —
+    // его эффект приходит на следующем transition-выборе.
+    if (hasAll && hasAnyEffects) {
       progress = i;
-    } else {
+    } else if (!hasAll) {
       break;
     }
   }
