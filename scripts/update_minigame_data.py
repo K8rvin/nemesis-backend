@@ -96,7 +96,7 @@ MINIGAME_POINTS = [
     {"choice_id": "ch_3_hart_exploit", "gesture": "pattern_lock", "pattern_sequence": "1-2-3-5-7", "node_id": "act3_hart_lab", "act": 3, "location": "Бункер Доктора Харт"},
     {"choice_id": "ch_4_engines_pda_win", "gesture": "pattern_lock", "pattern_sequence": "7-4-1-2-3", "node_id": "act4_engine_deck", "act": 4, "location": "Палуба Двигателей"},
     {"choice_id": "ch_2_med_to_locked_cabinet", "gesture": "swipe_right", "node_id": "act2_med_point", "act": 2, "location": "Спасательный пост"},
-    {"choice_id": "ch_5_showdown_hack", "gesture": "pattern_lock", "pattern_sequence": "1-5-9-3-7", "node_id": "act5_bridge_showdown", "act": 5, "location": "Командный Мостик"},
+    {"choice_id": "ch_5_showdown_hack", "gesture": "pattern_lock", "pattern_sequence": "1-5-8-9-6", "node_id": "act5_bridge_showdown", "act": 5, "location": "Командный Мостик"},
     {"choice_id": "ch_1_cargo_to_sealed_container", "gesture": "swipe_down", "node_id": "act1_cargo_subdeck", "act": 1, "location": "Грузовой подъярус / Шахта лифта"},
 ]
 
