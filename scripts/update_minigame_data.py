@@ -7,9 +7,11 @@
 1. Добавляет effects.minigame + effects.failure_choice_id для 12 точек.
 2. Добавляет conditions.flag_forbidden = <choice_id>_failed, чтобы скрыть
    оригинальный выбор после провала.
-3. Создаёт failure-ноды и failure-выборы, которые ставят флаг провала
-   и возвращают игрока в исходный хаб.
-4. Создаёт два новых запертых объекта: мед-шкаф (акт 2) и гермоконтейнер (акт 1).
+3. Создаёт скрытые failure-выборы, которые ставят флаг провала и остаются
+   в той же ноде (игрок не видит отдельного экрана провала, выбор просто
+   исчезает).
+4. Удаляет устаревшие failure-ноды и return-выборы, если они есть.
+5. Создаёт два новых запертых объекта: мед-шкаф (акт 2) и гермоконтейнер (акт 1).
 
 Запуск:
     cd nemesis-backend
@@ -89,121 +91,36 @@ MINIGAME_POINTS = [
     {"choice_id": "ch_1_cargo_to_sealed_container", "gesture": "swipe_down"},
 ]
 
-# ---------------------------------------------------------------------------
-# Существующие ноды для failure-возвратов (act берём из этих нод)
-# ---------------------------------------------------------------------------
 ORIGINAL_NODES = {
-    "ch_1_cargo_shortcut": {"node_id": "act1_cargo_subdeck", "act": 1, "location": "Грузовой подъярус / Шахта лифта"},
-    "ch_1_skip_to_act4": {"node_id": "act1_hub_workbench", "act": 1, "location": "Палуба отходов"},
-    "ch_1_hub_loot_crowbar": {"node_id": "act1_hub_junk", "act": 1, "location": "Палуба отходов"},
-    "ch_2_hub_to_secret": {"node_id": "act2_corridors_rooms", "act": 2, "location": "Коридоры кают"},
-    "ch_2_lounge_to_security": {"node_id": "act2_recreation_room", "act": 2, "location": "Комната отдыха персонала"},
-    "ch_3_hub_to_ai": {"node_id": "act3_hub", "act": 3, "location": "Центральный отсек Немезида"},
-    "ch_3_hub_to_lore": {"node_id": "act3_hub", "act": 3, "location": "Центральный отсек Немезида"},
-    "ch_3_hart_exploit": {"node_id": "act3_hart_lab", "act": 3, "location": "Бункер Доктора Харт"},
-    "ch_4_engines_pda_win": {"node_id": "act4_engine_deck", "act": 4, "location": "Палуба Двигателей"},
-    "ch_2_med_to_locked_cabinet": {"node_id": "act2_med_point", "act": 2, "location": "Спасательный пост"},
-    "ch_5_showdown_hack": {"node_id": "act5_bridge_showdown", "act": 5, "location": "Командный Мостик"},
-    "ch_1_cargo_to_sealed_container": {"node_id": "act1_cargo_subdeck", "act": 1, "location": "Грузовой подъярус / Шахта лифта"},
+    "ch_1_cargo_shortcut": "act1_cargo_subdeck",
+    "ch_1_skip_to_act4": "act1_hub_workbench",
+    "ch_1_hub_loot_crowbar": "act1_hub_junk",
+    "ch_2_hub_to_secret": "act2_corridors_rooms",
+    "ch_2_lounge_to_security": "act2_recreation_room",
+    "ch_3_hub_to_ai": "act3_hub",
+    "ch_3_hub_to_lore": "act3_hub",
+    "ch_3_hart_exploit": "act3_hart_lab",
+    "ch_4_engines_pda_win": "act4_engine_deck",
+    "ch_2_med_to_locked_cabinet": "act2_med_point",
+    "ch_5_showdown_hack": "act5_bridge_showdown",
+    "ch_1_cargo_to_sealed_container": "act1_cargo_subdeck",
 }
-
-FAILURE_NARRATIVES = {
-    "ch_1_cargo_shortcut": (
-        "Ты пытаешься поддеть массивный засов, но плоская пружина замка лопается. "
-        "Механизм ворот грузового лифта мёртво застывает в закрытом положении. "
-        "Срез через шахту больше недоступен."
-    ),
-    "ch_1_skip_to_act4": (
-        "Ты заводишь лом в щель аварийного люка, но срываешь резьбу запора. "
-        "Люк герметично запечатан — прямой путь в энергоблок теперь закрыт."
-    ),
-    "ch_1_hub_loot_crowbar": (
-        "Обломки обшивки слишком глубоко врезались в перекрытия. "
-        "Ты повреждаешь последние крепления, и завал окончательно закрывает доступ к лому."
-    ),
-    "ch_2_hub_to_secret": (
-        "Круговой замок двери СБ не отзывается. После неудачной попытки механизм "
-        "активировал внутренний блокиратор — дверь заклинена."
-    ),
-    "ch_2_lounge_to_security": (
-        "Ты дергаешь ручку стойки администратора, но замок соскакивает с паза. "
-        "Ящик заперт навсегда, путь в офисы СБ перекрыт."
-    ),
-    "ch_3_hub_to_ai": (
-        "Консоль Ядра ИИ отвергла мастер-код. Сработала защита: терминал заблокирован, "
-        "и попытка взлома больше невозможна."
-    ),
-    "ch_3_hub_to_lore": (
-        "Архивный терминал отверг попытку взлома. Жёсткий диск ушёл в защитный режим, "
-        "и доступ к логам утерян."
-    ),
-    "ch_3_hart_exploit": (
-        "КПК Директора подключён, но Харт успела активировать ручную блокировку. "
-        "Терминал интеркома выгорел, удалённый перехват Изолята невозможен."
-    ),
-    "ch_4_engines_pda_win": (
-        "Мастер-код не принят повреждённым ИИ двигателей. Блокировка сервоприводов "
-        "усилилась, и ручной сброс через КПК больше недоступен."
-    ),
-    "ch_2_med_to_locked_cabinet": (
-        "Ты перегнул плоскую пружину замка, и электромеханизм мёртво зажал засов. "
-        "Мед-шкаф теперь закрыт навсегда — повторный взлом бесполезен."
-    ),
-    "ch_5_showdown_hack": (
-        "Защитный протокол мостика отразил атаку. Турели встали в боевой режим, "
-        "а порт КПК расплавлен — взлом обороны невозможен."
-    ),
-    "ch_1_cargo_to_sealed_container": (
-        "Ты сорвал резьбу запорного механизма. Контейнер герметично запечатан — "
-        "без специального оборудования его уже не открыть."
-    ),
-}
-
-
-def build_failure_node(choice_id):
-    info = ORIGINAL_NODES[choice_id]
-    return {
-        "id": f"fail_{choice_id}",
-        "act": info["act"],
-        "location_name": info["location"],
-        "title": "ВЗЛОМ ПРОВАЛЕН",
-        "narrative": FAILURE_NARRATIVES[choice_id],
-        "thought": "Повторная попытка бесполезна. Нужно искать другой путь.",
-        "image_prompt": "sci-fi broken lock jammed mechanism red warning lights dark corridor",
-        "is_start_node": False,
-        "is_ending": False,
-        "ending_type": None,
-        "image_url": None,
-        "image_generated": False,
-    }
 
 
 def build_failure_choice(choice_id):
-    info = ORIGINAL_NODES[choice_id]
+    """Скрытый failure-выбор: остаёмся в текущей ноде, ставим флаг провала."""
     failed_flag = f"{choice_id}_failed"
     return {
         "id": f"{choice_id}_fail",
-        "node_id": info["node_id"],
-        "target_node_id": f"fail_{choice_id}",
+        "node_id": ORIGINAL_NODES[choice_id],
+        "target_node_id": ORIGINAL_NODES[choice_id],
         "label": "⛔ Взлом не удался",
         "narrative_override": None,
-        "conditions": {"flag_required": failed_flag},
+        # flag_forbidden делает выбор невидимым всегда (до и после провала).
+        # Flutter вызывает его напрямую по failure_choice_id.
+        "conditions": {"flag_forbidden": failed_flag},
         "effects": {"add_flag": failed_flag},
         "sort_order": 99,
-    }
-
-
-def build_return_choice(choice_id):
-    info = ORIGINAL_NODES[choice_id]
-    return {
-        "id": f"{choice_id}_return",
-        "node_id": f"fail_{choice_id}",
-        "target_node_id": info["node_id"],
-        "label": "↩️ Вернуться",
-        "narrative_override": None,
-        "conditions": {},
-        "effects": {},
-        "sort_order": 1,
     }
 
 
@@ -313,6 +230,13 @@ NEW_LOCKED_CHOICES = [
 
 
 def main():
+    print("Очистка устаревших failure-нод и return-выборов...")
+    old_failure_nodes = [f"fail_{p['choice_id']}" for p in MINIGAME_POINTS]
+    old_return_choices = [f"{p['choice_id']}_return" for p in MINIGAME_POINTS]
+    old_failure_choices = [f"{p['choice_id']}_fail" for p in MINIGAME_POINTS]
+    supabase_request("DELETE", f"/rest/v1/choices?id=in.({','.join(old_return_choices + old_failure_choices)})")
+    supabase_request("DELETE", f"/rest/v1/nodes?id=in.({','.join(old_failure_nodes)})")
+
     print("Загрузка текущих выборов...")
     ids = [p["choice_id"] for p in MINIGAME_POINTS]
     path = f"/rest/v1/choices?id=in.({','.join(ids)})&select=id,conditions,effects"
@@ -336,28 +260,17 @@ def main():
         print(f"  PATCH {choice_id}")
         supabase_request("PATCH", patch_path, payload)
 
-    # 2. Создаём failure-ноды
-    failure_nodes = [build_failure_node(p["choice_id"]) for p in MINIGAME_POINTS]
-    print(f"Создание {len(failure_nodes)} failure-нод...")
-    supabase_request(
-        "POST",
-        "/rest/v1/nodes?on_conflict=id",
-        failure_nodes,
-        extra_headers={"Prefer": "resolution=merge-duplicates"},
-    )
-
-    # 3. Создаём failure-выборы и возвратные выборы
+    # 2. Создаём/обновляем скрытые failure-выборы (без failure-нод и возвратов)
     failure_choices = [build_failure_choice(p["choice_id"]) for p in MINIGAME_POINTS]
-    return_choices = [build_return_choice(p["choice_id"]) for p in MINIGAME_POINTS]
-    print(f"Создание {len(failure_choices)} failure-выборов и {len(return_choices)} возвратов...")
+    print(f"Создание/обновление {len(failure_choices)} скрытых failure-выборов...")
     supabase_request(
         "POST",
         "/rest/v1/choices?on_conflict=id",
-        failure_choices + return_choices,
+        failure_choices,
         extra_headers={"Prefer": "resolution=merge-duplicates"},
     )
 
-    # 4. Создаём новые запертые ноды
+    # 3. Создаём новые запертые ноды
     print(f"Создание {len(NEW_LOCKED_NODES)} новых запертых нод...")
     supabase_request(
         "POST",
@@ -366,7 +279,7 @@ def main():
         extra_headers={"Prefer": "resolution=merge-duplicates"},
     )
 
-    # 5. Создаём выборы к новым запертым нодам
+    # 4. Создаём выборы к новым запертым нодам
     print(f"Создание {len(NEW_LOCKED_CHOICES)} выборов к запертым нодам...")
     supabase_request(
         "POST",
