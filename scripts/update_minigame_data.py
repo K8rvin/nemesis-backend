@@ -24,8 +24,15 @@
 import json
 import os
 import re
+import sys
 import urllib.request
 import urllib.error
+
+
+# Защита от UnicodeEncodeError в Windows-консолях с не-UTF-8 кодировкой.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
 
 
 def load_dev_vars(path=".dev.vars"):
