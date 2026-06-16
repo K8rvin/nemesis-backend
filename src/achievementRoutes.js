@@ -2,7 +2,7 @@
 // 🗺️ ACHIEVEMENT ROUTES — загрузка готовых маршрутов из БД
 // ==========================================
 
-const START_NODE_ID = 'act1_skills';
+const START_NODE_ID = 'act1_start';
 
 const TIER_ORDER = ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM'];
 

@@ -32,7 +32,7 @@ try {
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const ROUTES_FILE = process.env.ROUTES_FILE || resolve(process.cwd(), 'achievement_routes.json');
-const START_NODE_ID = process.env.START_NODE_ID || 'act1_skills';
+const START_NODE_ID = process.env.START_NODE_ID || 'act1_start';
 const DRY_RUN = process.env.DRY_RUN === '1';
 const BATCH_SIZE = 100;
 const BATCH_DELAY_MS = 300;
