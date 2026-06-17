@@ -272,6 +272,21 @@ export async function getHint(env, userId, targetTier, _targetType, targetAchiev
 
   // Если игрок не находится на маршруте
   if (!nextChoice) {
+    // Если текущая нода совпадает с финальной нодой маршрута — цель достигнута
+    const finalChoice = choicesById.get(path[path.length - 1]);
+    if (finalChoice && finalChoice.target_node_id === player.current_node_id) {
+      return {
+        hint_enabled: true,
+        reachable: true,
+        reason: null,
+        goal_reached: true,
+        target_achievement: withRarity(achievement),
+        path,
+        next_choice: null,
+        steps_remaining: 0,
+      };
+    }
+
     return {
       hint_enabled: true,
       reachable: false,
