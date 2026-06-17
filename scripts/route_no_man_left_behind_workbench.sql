@@ -78,7 +78,7 @@ INSERT INTO public.achievement_routes (
     "trans_choice_ch_5_start_next",
     "ch_5_showdown_battery",
     "trans_choice_ch_5_showdown_battery",
-    "ch_5_b_ending_3"
+    "ch_5_b_ending_3_workbench"
   ]'::jsonb,
   'ch_1_start_to_skills',
   0,
