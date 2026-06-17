@@ -1,0 +1,8 @@
+ch_4_engines_isolate_exploit -> trans_ch_4_engines_isolate_exploit ☣️ [БИО-МЕХАНИКА] Залить Изолят Омега в био-сенсоры заклинивших клапанов
+  cond: {'item_required': 'Изолят Омега'}
+ch_4_engines_pda_win -> trans_ch_4_engines_pda_win 💾 [ВЗЛОМ] Применить КПК Директора для принудительного сброса блокировки двигателей
+  cond: {'item_required': 'КПК Директора', 'flag_forbidden': 'ch_4_engines_pda_win_failed'}
+ch_4_engines_manual_burn -> trans_ch_4_engines_manual_burn ⚡ [ОПАСНО] Замкнуть реле зажигания вручную через оголенный силовой кабель
+  cond: {}
+ch_engine_end -> trans_ch_engine_end ⚡ Активировать аварийный импульс
+  cond: {'flag_required': 'engine_start'}

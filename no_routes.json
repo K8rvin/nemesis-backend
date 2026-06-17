@@ -1,0 +1,152 @@
+[
+  {
+    "id": "ach_speedrun",
+    "title": "Скорострел",
+    "medal_tier": "BRONZE"
+  },
+  {
+    "id": "ach_say_cheese",
+    "title": "Улыбочку!",
+    "medal_tier": "BRONZE"
+  },
+  {
+    "id": "ach_mother_teresa",
+    "title": "Мать Тереза",
+    "medal_tier": "SILVER"
+  },
+  {
+    "id": "ach_newton_approves",
+    "title": "Ньютон одобряет",
+    "medal_tier": "SILVER"
+  },
+  {
+    "id": "ach_red_button",
+    "title": "А что она делает?",
+    "medal_tier": "SILVER"
+  },
+  {
+    "id": "ach_smuggler_route",
+    "title": "Контрабандист",
+    "medal_tier": "GOLD"
+  },
+  {
+    "id": "ach_vent_rat",
+    "title": "Вентиляционная крыса",
+    "medal_tier": "GOLD"
+  },
+  {
+    "id": "ach_no_man_left_behind",
+    "title": "Своих не бросаем",
+    "medal_tier": "GOLD"
+  },
+  {
+    "id": "ach_david_vs_goliath",
+    "title": "Давид против Голиафа",
+    "medal_tier": "GOLD"
+  },
+  {
+    "id": "space_wanderer",
+    "title": "Космический дальнобойщик",
+    "medal_tier": "GOLD"
+  },
+  {
+    "id": "chronos_master",
+    "title": "Повелитель времени",
+    "medal_tier": "SILVER"
+  },
+  {
+    "id": "infected_mind",
+    "title": "Скрытая угроза",
+    "medal_tier": "GOLD"
+  },
+  {
+    "id": "heavy_mechanic",
+    "title": "Экзо-Инженер",
+    "medal_tier": "GOLD"
+  },
+  {
+    "id": "ach_chemical_gourmet",
+    "title": "Гурман химпрома",
+    "medal_tier": "BRONZE"
+  },
+  {
+    "id": "ach_food_poisoning",
+    "title": "Пищевое отравление века",
+    "medal_tier": "BRONZE"
+  },
+  {
+    "id": "ach_boss_death",
+    "title": "Разорван на куски",
+    "medal_tier": "SILVER"
+  },
+  {
+    "id": "ach_reactor_fall",
+    "title": "Падение в реактор",
+    "medal_tier": "SILVER"
+  },
+  {
+    "id": "ach_time_paradox",
+    "title": "Парадокс времени",
+    "medal_tier": "SILVER"
+  },
+  {
+    "id": "ach_corp_ending",
+    "title": "Призрак Авангарда",
+    "medal_tier": "GOLD"
+  },
+  {
+    "id": "ach_sacrifice_ending",
+    "title": "Иерихонское сожжение",
+    "medal_tier": "GOLD"
+  },
+  {
+    "id": "ach_blood_trail",
+    "title": "След из крови",
+    "medal_tier": "BRONZE"
+  },
+  {
+    "id": "ach_scrap_perfectionist",
+    "title": "Хламовый перфекционист",
+    "medal_tier": "BRONZE"
+  },
+  {
+    "id": "ach_abandon_tobias",
+    "title": "Каждый сам за себя",
+    "medal_tier": "BRONZE"
+  },
+  {
+    "id": "ach_hart_deal",
+    "title": "Сделка с дьяволом",
+    "medal_tier": "SILVER"
+  },
+  {
+    "id": "ach_hart_enemy",
+    "title": "Враг науки",
+    "medal_tier": "SILVER"
+  },
+  {
+    "id": "ach_patriarch_sneak",
+    "title": "Тень в вентиляции",
+    "medal_tier": "SILVER"
+  },
+  {
+    "id": "ach_patriarch_blind",
+    "title": "Слепой часовщик",
+    "medal_tier": "SILVER"
+  },
+  {
+    "id": "ach_full_toolkit",
+    "title": "Швейцарский нож",
+    "medal_tier": "GOLD"
+  },
+  {
+    "id": "ach_hydro_shortcut",
+    "title": "Крысиный обход",
+    "medal_tier": "SILVER"
+  },
+  {
+    "id": "ach_toxicosis",
+    "title": "Зелёный защитник",
+    "medal_tier": "BRONZE"
+  }
+]

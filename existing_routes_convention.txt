@@ -1,0 +1,5 @@
+ach_lucky_bastard len 27 last trans_choice_ch_5_b_ending_5
+ach_steel_cocoon len 36 last ch_5_terminal_chrono_fix
+ach_swarm_lord len 32 last ch_5_b_ending_8
+eternal_passenger len 14 last ch_4_vault_to_ending
+ach_savior_ending len 39 last trans_choice_ch_4_engines_isolate_exploit

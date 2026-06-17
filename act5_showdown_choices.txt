@@ -1,0 +1,15 @@
+ch_5_showdown_absurd -> trans_ch_5_showdown_absurd
+  label: 🔴 Проигнорировать турели, прыгнуть в роскошное капитанское кресло и нажать большую красную кнопку
+  cond: {}
+ch_5_showdown_ref -> trans_ch_5_showdown_ref
+  label: ⚡ [РЕФЛЕКСЫ] Совершить тактический подкат под лазерными лучами и перерубить кабель питания
+  cond: {'required_skill': 'REF'}
+ch_5_showdown_tobias -> trans_ch_5_showdown_tobias
+  label: 🤝 [ТОБИАС] Приказать раненому напарнику прикрыть тебя из штурмовой винтовки
+  cond: {'flag_required': 'tobias_saved'}
+ch_5_showdown_hack -> trans_ch_5_showdown_hack
+  label: 💻 [ВЗЛОМ] Использовать КПК Директора для удаленного отключения оборонного протокола
+  cond: {'item_required': 'КПК Директора', 'flag_forbidden': 'ch_5_showdown_hack_failed'}
+ch_5_showdown_yolo -> trans_ch_5_showdown_yolo
+  label: 🏃 Попробовать прорваться напролом к терминалу под шквальным огнем
+  cond: {}
