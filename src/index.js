@@ -59,7 +59,7 @@ async function supabaseFetch(env, path, options = {}, retries = 3, baseDelay = 1
   const url = `${env.SUPABASE_URL}/rest/v1${path}`;
   const fetchOptions = {
     ...options,
-    headers: { 'Connection': 'close', ...getDefaultHeaders(env), ...(options.headers || {}) },
+    headers: { ...getDefaultHeaders(env), ...(options.headers || {}) },
   };
 
   for (let attempt = 1; attempt <= retries; attempt++) {

@@ -211,62 +211,43 @@ export async function getHint(env, userId, targetTier, _targetType, targetAchiev
   // Загружаем объекты выборов из маршрута, чтобы найти текущую позицию игрока
   const choicesById = await loadChoicesForPath(env, supabaseFetch, path);
 
-  // Определяем, как далеко игрок продвинулся по маршруту, по его состоянию.
-  // Для каждого шага накапливаем флаги/предметы/навыки, которые даёт маршрут.
-  // Прогресс — последний шаг, все эффекты которого уже есть у игрока.
+  // Определяем, как далеко игрок продвинулся по маршруту.
+  // Симулируем прохождение маршрута шаг за шагом. Шаг считается пройденным, если
+  // после него смоделированное состояние совместимо с состоянием игрока
+  // (все полученные навыки/флаги/предметы есть у игрока) и смоделированная нода
+  // совпадает с текущей нодой игрока. Это позволяет корректно обрабатывать
+  // возвраты к уже посещённым нодам.
   let progress = -1;
-  let cumulativeSkills = new Set();
-  let cumulativeFlags = new Set();
-  let cumulativeItems = new Set();
+  let simSkills = new Set();
+  let simFlags = new Set();
+  let simItems = new Set();
+  let simNode = START_NODE_ID;
 
   for (let i = 0; i < path.length; i++) {
     const choice = choicesById.get(path[i]);
-    if (choice) {
-      const eff = choice.effects || {};
-      asArray(eff.add_skill).forEach(s => cumulativeSkills.add(s));
-      asArray(eff.add_flag).forEach(f => cumulativeFlags.add(f));
-      asArray(eff.add_item).forEach(it => cumulativeItems.add(it));
-    }
+    if (!choice) continue;
 
-    // Прогресс фиксируем только по шагам, которые сами дают эффекты
-    // (навык, флаг или предмет), и эти эффекты уже есть у игрока.
-    // Transition-выборы и возвраты без эффектов не продвигают прогресс —
-    // они определяются следующим значимым шагом.
-    const choiceEffects = choice ? {
-      skills: new Set(asArray(choice.effects?.add_skill)),
-      flags: new Set(asArray(choice.effects?.add_flag)),
-      items: new Set(asArray(choice.effects?.add_item)),
-    } : { skills: new Set(), flags: new Set(), items: new Set() };
+    const eff = choice.effects || {};
+    asArray(eff.add_skill).forEach(s => simSkills.add(s));
+    asArray(eff.add_flag).forEach(f => simFlags.add(f));
+    asArray(eff.add_item).forEach(it => simItems.add(it));
+    asArray(eff.remove_flags).forEach(f => simFlags.delete(f));
+    asArray(eff.remove_item).forEach(it => simItems.delete(it));
 
-    const hasChoiceEffects =
-      choiceEffects.skills.size > 0 ||
-      choiceEffects.flags.size > 0 ||
-      choiceEffects.items.size > 0;
+    simNode = choice.target_node_id || simNode;
 
-    const hasAllChoiceEffects =
-      [...choiceEffects.skills].every(s => player.skills?.includes(s)) &&
-      [...choiceEffects.flags].every(f => player.story_flags?.includes(f)) &&
-      [...choiceEffects.items].every(it => player.inventory?.includes(it));
+    const stateMatches =
+      simNode === player.current_node_id &&
+      [...simSkills].every(s => player.skills?.includes(s)) &&
+      [...simFlags].every(f => player.story_flags?.includes(f)) &&
+      [...simItems].every(it => player.inventory?.includes(it));
 
-    if (hasChoiceEffects && hasAllChoiceEffects) {
+    if (stateMatches) {
       progress = i;
-    }
-
-    // Если накопленные эффекты маршрута уже не совпадают с состоянием игрока —
-    // он отклонился от пути дальше.
-    const hasAllCumulative =
-      [...cumulativeSkills].every(s => player.skills?.includes(s)) &&
-      [...cumulativeFlags].every(f => player.story_flags?.includes(f)) &&
-      [...cumulativeItems].every(it => player.inventory?.includes(it));
-
-    if (!hasAllCumulative) {
-      break;
     }
   }
 
   // Ищем следующий доступный выбор в маршруте после прогресса на текущей ноде.
-  // Если в маршруте на ноде несколько выборов (например, зашли, забрали предмет, вернулись),
-  // прогресс по состоянию гарантирует, что мы не отправим игрока назад за уже полученным.
   let nextChoice = null;
   let stepsFromHere = null;
 
