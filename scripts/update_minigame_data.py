@@ -98,6 +98,13 @@ MINIGAME_POINTS = [
     {"choice_id": "ch_2_med_to_locked_cabinet", "gesture": "swipe_right", "node_id": "act2_med_point", "act": 2, "location": "Спасательный пост"},
     {"choice_id": "ch_5_showdown_hack", "gesture": "pattern_lock", "pattern_sequence": "1-5-8-9-6", "node_id": "act5_bridge_showdown", "act": 5, "location": "Командный Мостик"},
     {"choice_id": "ch_1_cargo_to_sealed_container", "gesture": "swipe_down", "node_id": "act1_cargo_subdeck", "act": 1, "location": "Грузовой подъярус / Шахта лифта"},
+    {"choice_id": "ch_1_trap_stl_clean", "gesture": "swipe_diagonal_up", "node_id": "act1_trap", "act": 1, "location": "Гидравлический шлюз"},
+    {"choice_id": "ch_2_hydro_bypass_oil", "gesture": "swipe_right", "node_id": "act2_hydroponics", "act": 2, "location": "Оранжерея гидропоники"},
+    {"choice_id": "ch_3_nest_hck", "gesture": "pattern_lock", "pattern_sequence": "2-4-6-8-5", "node_id": "act3_nest_quest", "act": 3, "location": "Гнездо Реактора"},
+    {"choice_id": "ch_3_boss_ref", "gesture": "swipe_right", "node_id": "act3_boss_pat", "act": 3, "location": "Крио-лаборатория"},
+    {"choice_id": "ch_4_to_cryo_stasis", "gesture": "pattern_lock", "pattern_sequence": "1-2-3-6-9", "node_id": "act4_cryo_regen", "act": 4, "location": "Магистрали Охлаждения"},
+    {"choice_id": "ch_4_start_to_vault", "gesture": "pattern_lock", "pattern_sequence": "3-5-7-8-9", "node_id": "act4_start", "act": 4, "location": "Энергоблок"},
+    {"choice_id": "ch_5_showdown_crowbar", "gesture": "circle", "node_id": "act5_bridge_showdown", "act": 5, "location": "Командный Мостик"},
 ]
 
 FAILURE_NARRATIVES = {
@@ -149,6 +156,34 @@ FAILURE_NARRATIVES = {
     "ch_1_cargo_to_sealed_container": (
         "Ты сорвал резьбу запорного механизма. Контейнер герметично запечатан — "
         "без специального оборудования его уже не открыть."
+    ),
+    "ch_1_trap_stl_clean": (
+        "Масло попало не в пазы, а прямо на перчатки. Ты поскальзываешься, и створка "
+        "грохочет так, что слышно по всему отсеку. Скрытный проход больше невозможен."
+    ),
+    "ch_2_hydro_bypass_oil": (
+        "Масло оказалось слишком густым и замёрзшим. Засов не сдвинулся ни на миллиметр, "
+        "а люк заклинило навсегда — обход через гидропонику больше недоступен."
+    ),
+    "ch_3_nest_hck": (
+        "Программная экстракция сорвалась на финальном этапе. Штамм активировал защитный "
+        "протокол, и доступ к образцу Изолята утерян."
+    ),
+    "ch_3_boss_ref": (
+        "Ты промахнулся мимо слуховых мембран. Резак выскользнул из рук, и Патриарх уже "
+        "разворачивается к тебе — этот приём больше не сработает."
+    ),
+    "ch_4_to_cryo_stasis": (
+        "Ключ-карта Фарадея отвергнута системой анабиоза. Протокол капсулы ушёл в блокировку, "
+        "и путь в глубокий сон запечатан."
+    ),
+    "ch_4_start_to_vault": (
+        "Скрытая панель отвергла попытку доступа. Защита Секретного Крио-Архива активирована, "
+        "и путь в Vault больше не открыть."
+    ),
+    "ch_5_showdown_crowbar": (
+        "Лом застрял в сервоприводе, но не сломал механизм. Турель продолжает вращаться, "
+        "и этот трюк больше невозможен."
     ),
 }
 

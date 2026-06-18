@@ -429,6 +429,17 @@ app.post('/api/choice', authMiddleware, async (c) => {
         flag: 'ach_full_toolkit_unlocked',
         items: ['Откалиброванный Магнитометр', 'Тяжелый лом', 'Канцелярские зажимы', 'Сломанный Хронометр', 'КПК Директора', 'Сломанный Сервопривод'],
       },
+      {
+        id: 'ach_lore_historian',
+        flag: 'ach_lore_historian_unlocked',
+        required_flags: ['visited_lore_pad', 'visited_lore_papers', 'visited_core_terminal'],
+      },
+      {
+        id: 'ach_clean_bill',
+        flag: 'ach_clean_bill_unlocked',
+        absent_flags: ['открытое_кровотечение', 'травма_контузия', 'травма_токсикоз'],
+        trigger_removed_flags: ['открытое_кровотечение', 'травма_контузия', 'травма_токсикоз'],
+      },
     ];
 
     let unlockedAchievement = null;
@@ -436,7 +447,14 @@ app.post('/api/choice', authMiddleware, async (c) => {
     const oldInventory = player.inventory || [];
     const newInventory = updates.inventory || [];
     const addedItems = newInventory.filter(it => !oldInventory.includes(it));
-    if (addedItems.length > 0 && COLLECTION_ACHIEVEMENTS.length > 0) {
+
+    const oldFlags = player.story_flags || [];
+    const newFlags = updates.story_flags || [];
+    const addedFlags = newFlags.filter(f => !oldFlags.includes(f));
+    const removedFlags = oldFlags.filter(f => !newFlags.includes(f));
+
+    const hasAnyCollectionTrigger = addedItems.length > 0 || addedFlags.length > 0 || removedFlags.length > 0;
+    if (hasAnyCollectionTrigger && COLLECTION_ACHIEVEMENTS.length > 0) {
       const achIds = COLLECTION_ACHIEVEMENTS.map(a => a.id).join(',');
       const unlockedRes = await supabaseFetch(c.env, `/user_achievements?user_id=eq.${userId}&achievement_id=in.(${achIds})&select=achievement_id`);
       const unlockedData = await unlockedRes.json();
@@ -444,8 +462,23 @@ app.post('/api/choice', authMiddleware, async (c) => {
 
       for (const col of COLLECTION_ACHIEVEMENTS) {
         if (unlockedIds.has(col.id)) continue;
-        const hasAll = col.items.every(it => newInventory.includes(it));
-        if (hasAll) {
+
+        let satisfied = true;
+
+        if (col.items) {
+          if (!col.items.every(it => newInventory.includes(it))) satisfied = false;
+        }
+        if (satisfied && col.required_flags) {
+          if (!col.required_flags.every(f => newFlags.includes(f))) satisfied = false;
+        }
+        if (satisfied && col.absent_flags) {
+          if (col.absent_flags.some(f => newFlags.includes(f))) satisfied = false;
+        }
+        if (satisfied && col.trigger_removed_flags) {
+          if (!col.trigger_removed_flags.some(f => removedFlags.includes(f))) satisfied = false;
+        }
+
+        if (satisfied) {
           const flags = updates.story_flags || [];
           if (!flags.includes(col.flag)) flags.push(col.flag);
           updates.story_flags = flags;
