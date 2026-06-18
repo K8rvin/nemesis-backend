@@ -1,7 +1,7 @@
 -- Маршрут к ачивке PLATINUM "Своих не бросаем?.." (ach_no_man_left_behind_bad).
 -- Печальная концовка: Тобиас спасён, но в "Западне на краю света" получает смертельное ранение,
--- прикрывая оператора (ch_5_showdown_tobias). В терминале финальный выбор ch_5_b_ending_3_bad
--- запускает печальный протокол "Альянс" при наличии Квантового Носителя или Запасного аккумулятора.
+-- прикрывая оператора. Выбор ch_5_showdown_tobias сразу ведёт к ending_3_bad
+-- при наличии Квантового Носителя или Запасного аккумулятора.
 
 INSERT INTO public.achievement_routes (
   start_node_id,
@@ -62,9 +62,7 @@ INSERT INTO public.achievement_routes (
     "trans_choice_ch_4_reactor_stabilize",
     "ch_5_start_next",
     "trans_choice_ch_5_start_next",
-    "ch_5_showdown_tobias",
-    "trans_choice_ch_5_showdown_tobias",
-    "ch_5_b_ending_3_bad"
+    "ch_5_showdown_tobias"
   ]'::jsonb,
   'ch_1_start_to_skills',
   0,
