@@ -267,13 +267,15 @@ export async function getHint(env, userId, targetTier, _targetType, targetAchiev
     // Запоминаем первый выбор на ноде после прогресса как fallback
     if (!nextChoice) {
       nextChoice = choice;
-      stepsFromHere = path.length - i;
+      const remainingChoices = path.slice(i).filter(id => choicesById.has(id));
+      stepsFromHere = remainingChoices.length;
     }
 
     // Если нашли доступный выбор — используем его
     if (filterSingleChoice(choice, clonePlayer(player))) {
       nextChoice = choice;
-      stepsFromHere = path.length - i;
+      const remainingChoices = path.slice(i).filter(id => choicesById.has(id));
+      stepsFromHere = remainingChoices.length;
       break;
     }
   }
