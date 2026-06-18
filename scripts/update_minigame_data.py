@@ -4,17 +4,19 @@
 Массовое обновление данных мини-игр взлома/вскрытия в Supabase.
 
 Что делает:
-1. Задаёт effects.minigame + effects.failure_choice_id для 12 точек.
-   - Терминалы/КПК используют pattern_lock с уникальной effects.pattern_sequence.
-   - Механические действия — свайпы/круг.
+1. Задаёт effects.minigame для точек взлома (терминалы/КПК — pattern_lock,
+   механические действия — свайпы/круг). Убирает устаревшее поле
+   effects.failure_choice_id.
 2. Создаёт failure-ноды fail_<choice_id> с текстами провала.
-3. Создаёт скрытые failure-выборы *_fail, которые ставят флаг _failed
-   и ведут в failure-ноду.
-4. Создаёт return-выборы *_return "Продолжить" из failure-ноды обратно
+3. Создаёт return-выборы *_return "Продолжить" из failure-ноды обратно
    в исходную ноду.
-5. Добавляет conditions.flag_forbidden = <choice_id>_failed в оригинальные
+4. Добавляет conditions.flag_forbidden = <choice_id>_failed в оригинальные
    выборы, чтобы скрыть их после провала.
+5. Удаляет устаревшие failure-выборы с лейблом "⛔ Взлом не удался".
 6. Создаёт два новых запертых объекта: мед-шкаф и гермоконтейнер.
+
+Провал мини-игры обрабатывается отдельным эндпоинтом /api/minigame/failure
+(без отдельного choice-ряда).
 
 Запуск:
     cd nemesis-backend
@@ -27,6 +29,7 @@ import re
 import sys
 import urllib.request
 import urllib.error
+from urllib.parse import quote
 
 
 # Защита от UnicodeEncodeError в Windows-консолях с не-UTF-8 кодировкой.
@@ -205,20 +208,6 @@ def build_failure_node(point):
     }
 
 
-def build_failure_choice(point):
-    failed_flag = f"{point['choice_id']}_failed"
-    return {
-        "id": f"{point['choice_id']}_fail",
-        "node_id": point["node_id"],
-        "target_node_id": f"fail_{point['choice_id']}",
-        "label": "⛔ Взлом не удался",
-        "narrative_override": None,
-        "conditions": {"flag_forbidden": failed_flag, "hidden": True},
-        "effects": {"add_flag": failed_flag},
-        "sort_order": 99,
-    }
-
-
 def build_return_choice(point):
     return {
         "id": f"{point['choice_id']}_return",
@@ -284,7 +273,6 @@ NEW_LOCKED_CHOICES = [
         },
         "effects": {
             "minigame": "swipe_right",
-            "failure_choice_id": "ch_2_med_to_locked_cabinet_fail",
             "add_flag": "med_cabinet_looted",
             "add_item": "Полевой стимулятор",
             "add_hp": 30,
@@ -313,7 +301,6 @@ NEW_LOCKED_CHOICES = [
         },
         "effects": {
             "minigame": "swipe_down",
-            "failure_choice_id": "ch_1_cargo_to_sealed_container_fail",
             "add_flag": "cargo_container_looted",
             "add_item": "Запасной аккумулятор",
         },
@@ -348,7 +335,7 @@ def main():
         failed_flag = f"{choice_id}_failed"
         conditions["flag_forbidden"] = failed_flag
         effects["minigame"] = point["gesture"]
-        effects["failure_choice_id"] = f"{choice_id}_fail"
+        effects.pop("failure_choice_id", None)
         if point.get("pattern_sequence"):
             effects["pattern_sequence"] = point["pattern_sequence"]
         else:
@@ -367,14 +354,17 @@ def main():
         extra_headers={"Prefer": "resolution=merge-duplicates"},
     )
 
-    # 3. Создаём/обновляем failure- и return-выборы
-    failure_choices = [build_failure_choice(p) for p in MINIGAME_POINTS]
+    # 3. Удаляем старые failure-выборы (если остались) и создаём/обновляем return-выборы
+    print("Удаление устаревших failure-выборов...")
+    failure_label = quote("⛔ Взлом не удался", safe="")
+    supabase_request("DELETE", f"/rest/v1/choices?label=eq.{failure_label}")
+
     return_choices = [build_return_choice(p) for p in MINIGAME_POINTS]
-    print(f"Создание/обновление {len(failure_choices)} failure- и {len(return_choices)} return-выборов...")
+    print(f"Создание/обновление {len(return_choices)} return-выборов...")
     supabase_request(
         "POST",
         "/rest/v1/choices?on_conflict=id",
-        failure_choices + return_choices,
+        return_choices,
         extra_headers={"Prefer": "resolution=merge-duplicates"},
     )
 

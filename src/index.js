@@ -176,8 +176,6 @@ function filterChoices(allChoices, player) {
     const effects = choice.effects || {};
 
     // Скрытые failure-выборы мини-игр не показываются в UI
-    if (conds.hidden === true) return false;
-
     if (conds.required_skill && !playerSkills.includes(conds.required_skill)) return false;
     if (effects.add_skill && playerSkills.includes(effects.add_skill)) return false;
     if (conds.flag_required) {
@@ -551,6 +549,64 @@ app.post('/api/choice', authMiddleware, async (c) => {
   } catch (err) {
     console.error(`❌ Error in /api/choice after ${Date.now() - requestStart}ms:`, err.message);
     return c.json({ error: 'Failed to process choice', details: err.message }, 500);
+  }
+});
+
+// 2a. Обработка провала мини-игры (failure-выборы удалены из БД)
+app.post('/api/minigame/failure', authMiddleware, async (c) => {
+  const requestStart = Date.now();
+  try {
+    const userId = c.get('userId');
+    const { choiceId } = await c.req.json();
+    if (!choiceId) return c.json({ error: 'Missing choiceId' }, 400);
+
+    const choiceRes = await supabaseFetch(c.env, `/choices?id=eq.${choiceId}`);
+    const choice = (await choiceRes.json())[0];
+    if (!choice) return c.json({ error: 'Choice not found' }, 404);
+
+    const effects = choice.effects || {};
+    if (!effects.minigame) {
+      return c.json({ error: 'Choice is not a minigame' }, 400);
+    }
+
+    const player = await getPlayerState(c.env, userId);
+    if (!player) return c.json({ error: 'Player not found' }, 404);
+
+    const lang = normalizeLang(c.req.header('Accept-Language'));
+    const failNodeId = `fail_${choiceId}`;
+    const failedFlag = `${choiceId}_failed`;
+
+    const storyFlags = [...(player.story_flags || [])];
+    if (!storyFlags.includes(failedFlag)) storyFlags.push(failedFlag);
+
+    const updates = {
+      ...player,
+      current_node_id: failNodeId,
+      story_flags: storyFlags,
+    };
+
+    await updatePlayerState(c.env, userId, updates);
+
+    const failNode = await getNode(c.env, failNodeId, lang);
+    if (!failNode) return c.json({ error: 'Failure node not found' }, 404);
+
+    const allChoices = await getChoicesForNode(c.env, failNodeId, lang);
+    const availableChoices = filterChoices(allChoices, updates);
+
+    console.log(`[API /api/minigame/failure] user=${userId} choice=${choiceId} duration=${Date.now() - requestStart}ms`);
+    return c.json({
+      success: true,
+      narrative_override: null,
+      node: failNode,
+      choices: availableChoices,
+      player: updates,
+      is_ending: failNode.is_ending || false,
+      ending_type: failNode.ending_type || null,
+      unlocked_achievement: null,
+    });
+  } catch (err) {
+    console.error(`❌ Error in /api/minigame/failure after ${Date.now() - requestStart}ms:`, err.message);
+    return c.json({ error: 'Failed to process minigame failure', details: err.message }, 500);
   }
 });
 
