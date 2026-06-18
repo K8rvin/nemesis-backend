@@ -392,6 +392,10 @@ app.post('/api/choice', authMiddleware, async (c) => {
 
     const effects = choice.effects || {};
     const updates = { ...player };
+    // Клонируем массивы, чтобы отслеживать добавленные/удалённые элементы
+    updates.inventory = [...(player.inventory || [])];
+    updates.story_flags = [...(player.story_flags || [])];
+    updates.skills = [...(player.skills || [])];
 
     if (effects.apply_damage) updates.hp = Math.max(0, updates.hp - effects.apply_damage);
     if (effects.add_hp) updates.hp = Math.min(100, updates.hp + effects.add_hp);
