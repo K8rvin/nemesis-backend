@@ -422,12 +422,47 @@ app.post('/api/choice', authMiddleware, async (c) => {
     updates.skills = currentSkills;
     updates.skill_primary = currentSkills[0] || null;
 
+    // --- Автопроверка коллекционных ачивок ---
+    const COLLECTION_ACHIEVEMENTS = [
+      {
+        id: 'ach_full_toolkit',
+        flag: 'ach_full_toolkit_unlocked',
+        items: ['Откалиброванный Магнитометр', 'Тяжелый лом', 'Канцелярские зажимы', 'Сломанный Хронометр', 'КПК Директора', 'Сломанный Сервопривод'],
+      },
+    ];
+
+    let unlockedAchievement = null;
+
+    const oldInventory = player.inventory || [];
+    const newInventory = updates.inventory || [];
+    const addedItems = newInventory.filter(it => !oldInventory.includes(it));
+    if (addedItems.length > 0 && COLLECTION_ACHIEVEMENTS.length > 0) {
+      const achIds = COLLECTION_ACHIEVEMENTS.map(a => a.id).join(',');
+      const unlockedRes = await supabaseFetch(c.env, `/user_achievements?user_id=eq.${userId}&achievement_id=in.(${achIds})&select=achievement_id`);
+      const unlockedData = await unlockedRes.json();
+      const unlockedIds = new Set(unlockedData.map(r => r.achievement_id));
+
+      for (const col of COLLECTION_ACHIEVEMENTS) {
+        if (unlockedIds.has(col.id)) continue;
+        const hasAll = col.items.every(it => newInventory.includes(it));
+        if (hasAll) {
+          const flags = updates.story_flags || [];
+          if (!flags.includes(col.flag)) flags.push(col.flag);
+          updates.story_flags = flags;
+
+          await unlockAchievement(c.env, userId, col.id);
+          const ach = await getAchievement(c.env, col.id, lang);
+          if (ach) unlockedAchievement = ach;
+        }
+      }
+    }
+    // ---
+
     updates.current_node_id = choice.target_node_id;
     await updatePlayerState(c.env, userId, updates);
 
-    // Логика обработки ачивки
-    let unlockedAchievement = null;
-    if (effects.unlock_achievement) {
+    // Логика обработки явной ачивки из выбора (если не была выдана автопроверкой)
+    if (effects.unlock_achievement && (!unlockedAchievement || unlockedAchievement.id !== effects.unlock_achievement)) {
       await unlockAchievement(c.env, userId, effects.unlock_achievement);
       const ach = await getAchievement(c.env, effects.unlock_achievement, lang);
       if (ach) {
