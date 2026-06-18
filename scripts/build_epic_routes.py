@@ -182,7 +182,7 @@ TARGETS = [
     ("ach_corp_ending", "ch_5_b_ending_1", True),
     ("ach_sacrifice_ending", "ch_5_b_ending_2", True),
     ("infected_mind", "ch_5_b_ending_4", True),
-    ("ach_david_vs_goliath", "ch_3_boss_kill_to_hub", True),
+    ("ach_david_vs_goliath", "ch_3_boss_fight", True),
     ("space_wanderer", "ch_2_launch_capsule", True),
     ("heavy_mechanic", "ch_1_repair_servo", True),
     ("ach_full_toolkit", "ch_3_hub_toolkit_broken", False),

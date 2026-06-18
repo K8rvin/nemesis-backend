@@ -87,7 +87,7 @@ def supabase_request(method, path, payload=None, extra_headers=None):
 # ---------------------------------------------------------------------------
 MINIGAME_POINTS = [
     {"choice_id": "ch_1_cargo_shortcut", "gesture": "swipe_right", "node_id": "act1_cargo_subdeck", "act": 1, "location": "Грузовой подъярус / Шахта лифта"},
-    {"choice_id": "ch_1_skip_to_act4", "gesture": "swipe_right", "node_id": "act1_hub_workbench", "act": 1, "location": "Палуба отходов"},
+    {"choice_id": "ch_1_skip_to_act4", "gesture": "swipe_right", "node_id": "act1_cargo_subdeck", "act": 1, "location": "Грузовой подъярус / Шахта лифта"},
     {"choice_id": "ch_1_hub_loot_crowbar", "gesture": "swipe_diagonal_up", "node_id": "act1_hub_junk", "act": 1, "location": "Палуба отходов"},
     {"choice_id": "ch_2_hub_to_secret", "gesture": "circle", "node_id": "act2_corridors_rooms", "act": 2, "location": "Коридоры кают"},
     {"choice_id": "ch_2_lounge_to_security", "gesture": "swipe_down", "node_id": "act2_recreation_room", "act": 2, "location": "Комната отдыха персонала"},

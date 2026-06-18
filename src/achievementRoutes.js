@@ -157,6 +157,21 @@ export async function getHint(env, userId, targetTier, _targetType, targetAchiev
 
   // Если клиент прислал конкретную цель — используем её вне зависимости от тира
   if (targetAchievementId) {
+    // Если цель уже разблокирована — сообщаем, что цель достигнута
+    if (unlockedIds.has(targetAchievementId)) {
+      const achievement = achievementById.get(targetAchievementId);
+      return {
+        hint_enabled: true,
+        reachable: true,
+        reason: null,
+        goal_reached: true,
+        target_achievement: localizeAchievement(achievement, lang) || null,
+        next_choice: null,
+        path: [],
+        steps_remaining: 0,
+      };
+    }
+
     const target = candidates.find(c => c.achievement.id === targetAchievementId);
     if (target) {
       candidates = [target];
