@@ -175,6 +175,9 @@ function filterChoices(allChoices, player) {
     const conds = choice.conditions || {};
     const effects = choice.effects || {};
 
+    // Скрытые failure-выборы мини-игр не показываются в UI
+    if (conds.hidden === true) return false;
+
     if (conds.required_skill && !playerSkills.includes(conds.required_skill)) return false;
     if (effects.add_skill && playerSkills.includes(effects.add_skill)) return false;
     if (conds.flag_required) {

@@ -32,6 +32,9 @@ export function filterSingleChoice(choice, player) {
   const conds = choice.conditions || {};
   const effects = choice.effects || {};
 
+  // Скрытые failure-выборы мини-игр не участвуют в маршрутах
+  if (conds.hidden === true) return false;
+
   if (conds.required_skill && !playerSkills.includes(conds.required_skill)) return false;
   if (effects.add_skill && playerSkills.includes(effects.add_skill)) return false;
 

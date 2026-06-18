@@ -213,7 +213,7 @@ def build_failure_choice(point):
         "target_node_id": f"fail_{point['choice_id']}",
         "label": "⛔ Взлом не удался",
         "narrative_override": None,
-        "conditions": {"flag_forbidden": failed_flag},
+        "conditions": {"flag_forbidden": failed_flag, "hidden": True},
         "effects": {"add_flag": failed_flag},
         "sort_order": 99,
     }
