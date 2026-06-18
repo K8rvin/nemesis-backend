@@ -4,3 +4,5 @@ node_modules/
 .wrangler/
 dist/
 .DS_Store
+.venv/
+data/translation_cache.json

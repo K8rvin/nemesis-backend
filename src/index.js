@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { getHint } from './achievementRoutes.js';
+import { normalizeLang, localizeNode, localizeChoice, localizeAchievement } from './localization.js';
 
 // ==========================================
 // 🎛️ НАСТРОЙКИ ПРИЛОЖЕНИЯ
@@ -124,14 +125,21 @@ async function updatePlayerState(env, userId, updates) {
   await res.text(); // Освобождаем сокет
 }
 
-async function getNode(env, nodeId) {
+async function getNode(env, nodeId, lang) {
   const res = await supabaseFetch(env, `/nodes?id=eq.${nodeId}`);
-  return (await res.json())[0];
+  return localizeNode((await res.json())[0], lang);
 }
 
-async function getChoicesForNode(env, nodeId) {
+async function getChoicesForNode(env, nodeId, lang) {
   const res = await supabaseFetch(env, `/choices?node_id=eq.${nodeId}&order=sort_order.asc`);
-  return await res.json();
+  const choices = await res.json();
+  return choices.map(c => localizeChoice(c, lang));
+}
+
+async function getAchievements(env, lang) {
+  const res = await supabaseFetch(env, '/achievements?order=medal_tier.asc,title.asc');
+  const data = await res.json();
+  return data.map(a => localizeAchievement(a, lang));
 }
 
 async function unlockAchievement(env, userId, achievementId) {
@@ -143,10 +151,10 @@ async function unlockAchievement(env, userId, achievementId) {
   if (res) await res.text(); // Освобождаем сокет Supabase!
 }
 
-async function getAchievement(env, achievementId) {
+async function getAchievement(env, achievementId, lang) {
   const res = await supabaseFetch(env, `/achievements?id=eq.${achievementId}`);
   const data = await res.json();
-  return data[0];
+  return localizeAchievement(data[0], lang);
 }
 
 // Изображения теперь встроены в Flutter-клиент (assets/images/).
@@ -343,12 +351,13 @@ app.get('/api/state', authMiddleware, async (c) => {
     }
 
     const skillsArr = player.skills || [];
-    player.skill_primary = skillsArr[0] || 'КАЛИБРОВКА';
+    player.skill_primary = skillsArr[0] || null;
 
-    const currentNode = await getNode(c.env, player.current_node_id);
+    const lang = normalizeLang(c.req.header('Accept-Language'));
+    const currentNode = await getNode(c.env, player.current_node_id, lang);
     if (!currentNode) return c.json({ error: 'Current node not found in DB' }, 404);
 
-    const allChoices = await getChoicesForNode(c.env, currentNode.id);
+    const allChoices = await getChoicesForNode(c.env, currentNode.id, lang);
     const availableChoices = filterChoices(allChoices, player);
 
     console.log(`[API /api/state] user=${userId} duration=${Date.now() - requestStart}ms`);
@@ -374,6 +383,8 @@ app.post('/api/choice', authMiddleware, async (c) => {
 
     let player = await getPlayerState(c.env, userId);
     if (!player) return c.json({ error: 'Player not found' }, 404);
+
+    const lang = normalizeLang(c.req.header('Accept-Language'));
 
     const effects = choice.effects || {};
     const updates = { ...player };
@@ -405,7 +416,7 @@ app.post('/api/choice', authMiddleware, async (c) => {
       currentSkills.push(effects.add_skill);
     }
     updates.skills = currentSkills;
-    updates.skill_primary = currentSkills[0] || 'КАЛИБРОВКА';
+    updates.skill_primary = currentSkills[0] || null;
 
     updates.current_node_id = choice.target_node_id;
     await updatePlayerState(c.env, userId, updates);
@@ -414,13 +425,9 @@ app.post('/api/choice', authMiddleware, async (c) => {
     let unlockedAchievement = null;
     if (effects.unlock_achievement) {
       await unlockAchievement(c.env, userId, effects.unlock_achievement);
-      const ach = await getAchievement(c.env, effects.unlock_achievement);
+      const ach = await getAchievement(c.env, effects.unlock_achievement, lang);
       if (ach) {
-        const tierMap = { 'BRONZE': 'ОБЫЧНАЯ', 'SILVER': 'РЕДКАЯ', 'GOLD': 'ЭПИЧЕСКАЯ', 'PLATINUM': 'ЛЕГЕНДАРНАЯ' };
-        unlockedAchievement = {
-          ...ach,
-          rarity: tierMap[ach.medal_tier?.toUpperCase()] || 'ОБЫЧНАЯ'
-        };
+        unlockedAchievement = ach;
       }
     }
 
@@ -446,9 +453,9 @@ app.post('/api/choice', authMiddleware, async (c) => {
       });
     }
 
-    const newNode = await getNode(c.env, choice.target_node_id);
+    const newNode = await getNode(c.env, choice.target_node_id, lang);
     if (!newNode) return c.json({ error: 'Target node missing from database' }, 404);
-    const nextAllChoices = await getChoicesForNode(c.env, newNode.id);
+    const nextAllChoices = await getChoicesForNode(c.env, newNode.id, lang);
     const nextChoices = filterChoices(nextAllChoices, updates);
 
     console.log(`[API /api/choice] user=${userId} choice=${choiceId} duration=${Date.now() - requestStart}ms`);
@@ -496,8 +503,8 @@ app.get('/api/achievements', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId');
 
-    const achRes = await supabaseFetch(c.env, '/achievements?order=medal_tier.asc,title.asc');
-    const allAchievements = await achRes.json();
+    const lang = normalizeLang(c.req.header('Accept-Language'));
+    const allAchievements = await getAchievements(c.env, lang);
 
     const uaRes = await supabaseFetch(c.env, `/user_achievements?user_id=eq.${userId}&select=achievement_id`);
     const uaData = await uaRes.json();
@@ -538,10 +545,14 @@ app.post('/api/hint', authMiddleware, async (c) => {
     const userId = c.get('userId');
     const { target_tier, target_type, target_achievement_id } = await c.req.json();
 
+    const lang = normalizeLang(c.req.header('Accept-Language'));
     const result = await getHint(c.env, userId, target_tier, target_type, target_achievement_id, {
       getPlayerState,
       supabaseFetch,
       getChoicesForNode,
+      lang,
+      localizeAchievement,
+      localizeChoice,
     });
 
     if (result.error) {

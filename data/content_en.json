@@ -1,0 +1,2850 @@
+{
+  "nodes": {
+    "trans_ch_5_bridge_omega_detection": {
+      "location_name": "Transition",
+      "title": "Critical error",
+      "narrative": "The bridge's security scanners instantly flash crimson. The AI's robotic voice echoes through the compartment: \"Attention. Omega spores have been detected in the subject's body. Cleanup protocol has been activated.\" Ceiling turrets turn towards you before you can say anything...",
+      "thought": "I'm damned."
+    },
+    "trans_ch_5_showdown_absurd": {
+      "location_name": "Transition",
+      "title": "Red button",
+      "narrative": "Instead of looking for cover, you run to the captain's chair and hit the red button with a laugh.",
+      "thought": "Dementia and courage!"
+    },
+    "act2_med_locked_cabinet": {
+      "location_name": "Rescue post",
+      "title": "LOCKED MEDICAL CABINET",
+      "narrative": "Behind the main applicator there is a narrow cabinet with an electromechanical lock. After successful hacking, the door opens with a loud click. Inside is a whole set of field stimulators and bandages with hemostatic gel.",
+      "thought": "These supplies will greatly improve my chances."
+    },
+    "trans_ch_1_cargo_loot_servo": {
+      "location_name": "Transition",
+      "title": "Android analysis",
+      "narrative": "Using the suit's basic tools, you carefully open the robot's knee joint and remove the Broken Servo. Heavy, but valuable.",
+      "thought": "Useful find."
+    },
+    "trans_ch_1_escape_injured_next": {
+      "location_name": "Transition",
+      "title": "Breakout price",
+      "narrative": "Clutching the bloody bandage, you take a deep breath and cross the threshold of the airlock. Every step is a throbbing pain, but you can’t stop.",
+      "thought": "Crap! Hurt! We urgently need to find a medical center."
+    },
+    "trans_ch_1_hub_to_lore": {
+      "location_name": "Transition",
+      "title": "Search by the wall",
+      "narrative": "You move to the far wall, where the shadows are especially thick. Under the layer of dust and debris there may be something hidden that sheds light on what happened.",
+      "thought": "What did they leave here?"
+    },
+    "trans_ch_1_hub_to_lounge": {
+      "location_name": "Transition",
+      "title": "Path to the Recreation Room",
+      "narrative": "You cross the threshold of the airlock and the atmosphere instantly changes. Ahead of you is a rest room, where, perhaps, the echo of the crew’s past life still lingers.",
+      "thought": "I'll check what's inside."
+    },
+    "trans_ch_1_hub_to_trap": {
+      "location_name": "Transition",
+      "title": "Approach to the gateway",
+      "narrative": "You are approaching a massive door. The mechanism makes a threatening grinding noise, hinting that simple passage here is impossible.",
+      "thought": "We'll have to improvise."
+    },
+    "trans_ch_1_start_to_skills": {
+      "location_name": "Transition",
+      "title": "Start calibration",
+      "narrative": "You press the initialize button. The screen flashes green and the suit begins a deep scan of your neural impulses for calibration.",
+      "thought": "It's time to decide on a role."
+    },
+    "trans_ch_1_trap_eng_clean": {
+      "location_name": "Transition",
+      "title": "Careful dismantling",
+      "narrative": "You expertly cut off the stubborn beam. The airlock doors hiss apart, opening a clear path out.",
+      "thought": "Clean work."
+    },
+    "trans_ch_1_trap_force_injured": {
+      "location_name": "Transition",
+      "title": "Breakthrough",
+      "narrative": "You take a breath and squeeze into the narrow gap with a running start. The sharp metal mercilessly tears through the protective layer of the suit, digging into the flesh.",
+      "thought": "Crap! Hurt! We urgently need to find a medical center."
+    },
+    "trans_ch_2_corridors_to_search": {
+      "location_name": "Transition",
+      "title": "Search the corridor",
+      "narrative": "You slow down, carefully inspecting the floor and walls. In the chaos of an evacuation, people often lose valuables.",
+      "thought": "The devil is in the details."
+    },
+    "trans_ch_2_do_selfie": {
+      "location_name": "Transition",
+      "title": "Cyber ​​vanity",
+      "narrative": "You activate the surveillance camera and strike a beautiful pose. The flash illuminates the room for a split second, drawing attention from the darkness.",
+      "thought": "The world needs to see this!"
+    },
+    "trans_ch_2_leave_to_act3": {
+      "location_name": "Transition",
+      "title": "Descent to the Bio-Laboratory",
+      "narrative": "The elevator doors close and the cabin begins its descent with a dull rumble. You are preparing to meet the unknown of the bio-complex.",
+      "thought": "One against all."
+    },
+    "act2_security_offices": {
+      "location_name": "SB offices",
+      "title": "SECURITY SERVICE ARCHIVE",
+      "narrative": "You infiltrate the destroyed security command post. Surprisingly, the terminals' backup power is still working. On the table is a Swarm Provider (Exo-Link) and a printed Station Ventilation Diagram.",
+      "thought": "The ventilation scheme looks promising. Perhaps you can crawl along it to the very top..."
+    },
+    "act1_cargo_sealed_container": {
+      "location_name": "Cargo sub-tier / Elevator shaft",
+      "title": "HERMAL CONTAINER",
+      "narrative": "There is a massive sealed container with a damaged lock against the wall of the sub-tier. After precise opening, the lid swings back, releasing a cloud of inert gas. Inside there is a working battery for the spacesuit and a package of radiation plates.",
+      "thought": "Useful trash. Might come in handy."
+    },
+    "trans_ch_2_save_to_act3": {
+      "location_name": "Transition",
+      "title": "Rescue Tobias",
+      "narrative": "With effort, you drag the groaning Tobias into the elevator. The doors close, cutting him off from his pursuers.",
+      "thought": "We will get out together."
+    },
+    "trans_ch_2_secret_take_cutter": {
+      "location_name": "Transition",
+      "title": "Removal of the Plasma Cutter",
+      "narrative": "You attach a heavy weapon to the suit's magnetic grip. It's heavy and clumsy, but its power is enough to burn through even tank armor.",
+      "thought": "Now I have the power."
+    },
+    "trans_ch_2_secret_take_pda": {
+      "location_name": "Transition",
+      "title": "Seizure of the PDA",
+      "narrative": "You pick up the heavy tablet. The status appears on the screen: Administrator Master Access. With this you can try to hack the Hart system.",
+      "thought": "Key to the system."
+    },
+    "trans_ch_3_boss_drink_oil": {
+      "location_name": "Transition",
+      "title": "Stomach Lubricant",
+      "narrative": "In a panic before the Patriarch, you decide to drink Synthetic Oil, hoping that your insides will be covered with a protective film. The oil instantly solidifies in your esophagus.",
+      "thought": "What an idiot I am."
+    },
+    "trans_ch_3_boss_eng": {
+      "location_name": "Transition",
+      "title": "Shorting cables",
+      "narrative": "You quickly rip the insulation off the nearest cable and throw it into the puddle under the monster's feet. The discharge shoots upward, stunning the creature.",
+      "thought": "Engineering decides."
+    },
+    "trans_ch_3_boss_fight": {
+      "location_name": "Transition",
+      "title": "Application of Plasma Cutter",
+      "narrative": "You activate the plasma cutter. A blinding beam cuts through the darkness of the laboratory, aiming straight at the creature's chest.",
+      "thought": "The time has come."
+    },
+    "fail_ch_1_cargo_to_sealed_container": {
+      "location_name": "Cargo sub-tier / Elevator shaft",
+      "title": "HACK FAILED",
+      "narrative": "You have stripped the threads of the locking mechanism. The container is hermetically sealed and cannot be opened without special equipment.",
+      "thought": "Trying again is useless. We need to look for another way."
+    },
+    "trans_ch_3_boss_stl": {
+      "location_name": "Transition",
+      "title": "Distraction of the Patriarch",
+      "narrative": "You silently take out a piece of metal and throw it into the opposite corner. The Patriarch turns sharply towards the sound.",
+      "thought": "Silence is my weapon."
+    },
+    "trans_ch_3_boss_to_stealth": {
+      "location_name": "Transition",
+      "title": "Stealth menu",
+      "narrative": "You hold your breath and go into stealth mode, assessing your escape routes.",
+      "thought": "The shadow is my best ally."
+    },
+    "trans_ch_3_boss_yolo": {
+      "location_name": "Transition",
+      "title": "Reckless Rush",
+      "narrative": "You throw all caution to the wind and run forward. This is pure recklessness.",
+      "thought": "I hope you'll be lucky."
+    },
+    "fail_ch_1_cargo_shortcut": {
+      "location_name": "Cargo sub-tier / Elevator shaft",
+      "title": "HACK FAILED",
+      "narrative": "You try to pry the massive bolt, but the flat spring of the lock breaks. The freight elevator gate mechanism freezes dead in the closed position. The cut through the shaft is no longer available.",
+      "thought": "Trying again is useless. We need to look for another way."
+    },
+    "fail_ch_1_skip_to_act4": {
+      "location_name": "Waste deck",
+      "title": "HACK FAILED",
+      "narrative": "You drive a crowbar into the crack of the emergency hatch, but break the thread of the lock. The hatch is hermetically sealed - the direct path to the power unit is now closed.",
+      "thought": "Trying again is useless. We need to look for another way."
+    },
+    "fail_ch_1_hub_loot_crowbar": {
+      "location_name": "Waste deck",
+      "title": "HACK FAILED",
+      "narrative": "The fragments of the cladding cut too deeply into the ceilings. You damage the last fastenings, and the blockage completely blocks access to the crowbar.",
+      "thought": "Trying again is useless. We need to look for another way."
+    },
+    "fail_ch_2_hub_to_secret": {
+      "location_name": "Cabin corridors",
+      "title": "HACK FAILED",
+      "narrative": "The circular lock of the SB door does not respond. After an unsuccessful attempt, the mechanism activated the internal lock - the door was jammed.",
+      "thought": "Trying again is useless. We need to look for another way."
+    },
+    "fail_ch_2_lounge_to_security": {
+      "location_name": "Staff break room",
+      "title": "HACK FAILED",
+      "narrative": "You pull the handle of the reception desk, but the lock slips off the groove. The box is locked forever, the path to the Security Service offices is blocked.",
+      "thought": "Trying again is useless. We need to look for another way."
+    },
+    "fail_ch_3_hub_to_ai": {
+      "location_name": "Central compartment Nemesis",
+      "title": "HACK FAILED",
+      "narrative": "You enter a sequence, but the terminal discards it. Protection has worked: The AI ​​core is locked, and hacking is no longer possible.",
+      "thought": "Trying again is useless. We need to look for another way."
+    },
+    "fail_ch_3_hub_to_lore": {
+      "location_name": "Central compartment Nemesis",
+      "title": "HACK FAILED",
+      "narrative": "The archive terminal rejected the graphic key. The hard drive went into protective mode, and access to the logs was lost.",
+      "thought": "Trying again is useless. We need to look for another way."
+    },
+    "fail_ch_3_hart_exploit": {
+      "location_name": "Doctor Hart's Bunker",
+      "title": "HACK FAILED",
+      "narrative": "The Director's PDA is connected, but Hart managed to activate the manual lock. The intercom terminal has burned out, and remote interception of the Isolate is impossible.",
+      "thought": "Trying again is useless. We need to look for another way."
+    },
+    "trans_ch_3_hart_accept": {
+      "location_name": "Transition",
+      "title": "Acceptance of terms and conditions",
+      "narrative": "You nod at the camera. The path to the reactor compartment is open, and you go there knowing the risks.",
+      "thought": "I do what I have to do."
+    },
+    "trans_ch_3_hart_exploit": {
+      "location_name": "Transition",
+      "title": "Remote interception",
+      "narrative": "You connect the Director's PDA to the intercom terminal. Hart's face pales as the automatic gateway security system obeys your command. Technical drones, bypassing her will, extract Isolate Omega from the depths of the reactor and deliver it to the airlock right at your feet. You didn't have to go down into the nest!",
+      "thought": "The hacker wins."
+    },
+    "trans_ch_3_hub_to_hart": {
+      "location_name": "Transition",
+      "title": "Approach to the bunker",
+      "narrative": "You approach the massive bunker door. The intercom comes alive, awaiting your presence.",
+      "thought": "Let's talk, doctor."
+    },
+    "fail_ch_4_engines_pda_win": {
+      "location_name": "Engine Deck",
+      "title": "HACK FAILED",
+      "narrative": "The master code was not accepted by the damaged engine AI. Servo locking has become stronger and manual reset via PDA is no longer available.",
+      "thought": "Trying again is useless. We need to look for another way."
+    },
+    "fail_ch_2_med_to_locked_cabinet": {
+      "location_name": "Rescue post",
+      "title": "HACK FAILED",
+      "narrative": "You bent the flat spring of the lock, and the electric mechanism clamped the bolt dead. The medical cabinet is now closed forever - hacking again is useless.",
+      "thought": "Trying again is useless. We need to look for another way."
+    },
+    "fail_ch_5_showdown_hack": {
+      "location_name": "Command Bridge",
+      "title": "HACK FAILED",
+      "narrative": "The bridge's security protocol repelled the attack. The turrets are in combat mode, and the PDA port is melted—breaking the defense is impossible.",
+      "thought": "Trying again is useless. We need to look for another way."
+    },
+    "trans_ch_5_showdown_crowbar": {
+      "location_name": "Transition",
+      "title": "Crowbar in the turret mechanism",
+      "narrative": "You jam the Heavy Crowbar into the gap of the rotary servo of the nearest turret. The metal grinds, the engine stalls, and the cannon freezes, its barrel resting against the adjacent turret. The secondary explosion sends sparks flying, but passage to the terminal is clear.",
+      "thought": "The good old lever is better than any electronics."
+    },
+    "trans_ch_3_hub_to_lore": {
+      "location_name": "Transition",
+      "title": "Hacking the terminal",
+      "narrative": "You connect to the terminal. The screen flashes, offering access to classified archives.",
+      "thought": "Let's find out the truth."
+    },
+    "trans_ch_3_hub_to_med": {
+      "location_name": "Transition",
+      "title": "Path to the medical cabinet",
+      "narrative": "You head towards the medicine cabinet, hoping to find something that will heal your wounds.",
+      "thought": "I need to heal."
+    },
+    "trans_ch_5_showdown_battery": {
+      "location_name": "Transition",
+      "title": "Shield Pulse",
+      "narrative": "You grab the Spare Battery and plug it into the emergency socket on your chest plate. For a split second, the kinetic shield flares, deflecting the first volley of lasers. Under the cover of that single splash, you rush to the center console.",
+      "thought": "One charge is enough for exactly one jerk."
+    },
+    "trans_ch_3_med_back": {
+      "location_name": "Transition",
+      "title": "Exit from the medical station",
+      "narrative": "Closing the closet, you return to the center of the hub, feeling a little better.",
+      "thought": "I'm fine now."
+    },
+    "ending_3_bad": {
+      "location_name": "Shuttle cockpit",
+      "title": "LAST ORDER",
+      "narrative": "You drag Tobias into the destroyed shuttle cabin. Behind the portholes are the last flashes of plasma and the roar of creatures. The enemy is rushing from the stern, and there is no time to think. “Tobias, cover me,” you say. He nods, exhales hoarsely, and raises the barrel. Shots. Scream. Heavy fire covers the cabin; A few bullets pierce your shoulder, but Tobias takes most of the charge. When you get to the launch pad, he's already on the floor, mortally wounded but still breathing. You grab him by the arm and drag him towards the exit. The shuttle lifts off. Tobias doesn't move.",
+      "thought": "You gave the order. He complied. Now you carry it further."
+    },
+    "trans_ch_3_nest_hug_monster": {
+      "location_name": "Transition",
+      "title": "Blind Mercy",
+      "narrative": "She moves her mustache so funny! She's probably just scared in this dark nest...",
+      "thought": "She's so cute..."
+    },
+    "ending_7": {
+      "location_name": "Planet under the station",
+      "title": "🏆 ENDING: STEEL COCOON",
+      "narrative": "Three months after the fall of Nemesis, a corporation search party discovers a charred but surviving engineering cryo-pod at the epicenter of the crater. The mechanisms click open. You go outside, your mind is clear, the corporation chip is dead, and your memory is completely back.",
+      "thought": "..."
+    },
+    "act4_climb_power": {
+      "location_name": "elevator shaft",
+      "title": "ENERGY REDISTRIBUTION",
+      "narrative": "The suit's systems make it possible to redirect emergency energy to one of the subsystems to overcome obstacles.",
+      "thought": "The choice is yours."
+    },
+    "trans_ch_3_reactor_escape_clean": {
+      "location_name": "Transition",
+      "title": "Escape through the ventilation",
+      "narrative": "Choking from the smoke, you knock out the air duct grate and crawl into the elevator shafts. A dull explosion is heard behind - the reactor sector is isolated forever.",
+      "thought": "Barely made it."
+    },
+    "trans_ch_3_start_to_cryo": {
+      "location_name": "Transition",
+      "title": "Entrance to the cryo-compartment",
+      "narrative": "You cross the threshold of the cryogenic compartment. The temperature instantly drops and the breath turns to steam.",
+      "thought": "It's cold here."
+    },
+    "trans_ch_4_climb_universal_fallback": {
+      "location_name": "Transition",
+      "title": "Standard lift",
+      "narrative": "You are not burdened with wounded comrades and heavy equipment from past acts. Your goal is simply to survive and get to the reactor compartment. You start to climb.",
+      "thought": "Just survive."
+    },
+    "trans_ch_4_gravity_test": {
+      "location_name": "Transition",
+      "title": "Gravity check",
+      "narrative": "Curiosity takes over. You throw a heavy key to test how gravity works in this anomalous zone.",
+      "thought": "Physics is a funny thing."
+    },
+    "act3_boss_stealth": {
+      "location_name": "Cryo laboratory",
+      "title": "SECRET ACTIONS",
+      "narrative": "You assess the situation, trying not to make a sound. The blind Patriarch reacts to any vibration in the air.",
+      "thought": "You need to act quietly or use deception."
+    },
+    "act3_boss_combat": {
+      "location_name": "Cryo laboratory",
+      "title": "COMBAT TACTICS",
+      "narrative": "A direct confrontation with the Patriarch is suicidal, but you can use the environment and weapons.",
+      "thought": "You need to hit exactly the vulnerable spots."
+    },
+    "trans_ch_2_hub_to_rec": {
+      "location_name": "Transition",
+      "title": "Entrance to the Recreation Room",
+      "narrative": "The crunch of glass under boots echoes down the corridor. You enter the crew's former resting place.",
+      "thought": "I'll check what's left here."
+    },
+    "trans_ch_4_phase2_fall_tobias": {
+      "location_name": "Transition",
+      "title": "Catastrophe",
+      "narrative": "The overload becomes unbearable. Without additional power in the hydraulics or passive servos, your knees break with a terrible sound. Under the wild cry of your partner, you both fall into the abyss.",
+      "thought": "I couldn't..."
+    },
+    "trans_ch_4_reactor_to_engines_srv": {
+      "location_name": "Transition",
+      "title": "Path through supply",
+      "narrative": "Tightening the spacesuit straps and ignoring warnings about the toxicity of the fuel, you forcefully break down the hatch and squeeze into the corridors of the maneuvering complex. Your experience tells me that if you activate the engines, the fall will stop.",
+      "thought": "Nature obeys force."
+    },
+    "trans_ch_5_showdown_tobias": {
+      "location_name": "Transition",
+      "title": "Order to Tobias",
+      "narrative": "Tobias, overcoming the hellish pain from his lost leg, slides off your shoulders and throws up the captured machine gun: “Run to the console, Marcus! I'll take down these damn guns! While he is pouring lead on the turrets, taking retaliatory hits on his body armor, you break through to the terminal.",
+      "thought": "We will get out together."
+    },
+    "trans_ch_2_hub_to_tobias": {
+      "location_name": "Transition",
+      "title": "Entrance to the radio room",
+      "narrative": "Someone's hoarse breathing can be heard through the communication interference. You decisively open the door to the radio room.",
+      "thought": "Who's there?"
+    },
+    "trans_ch_1_repair_servo": {
+      "location_name": "Transition",
+      "title": "Servo drive repair",
+      "narrative": "Using engineering tools, you tinker with the servo. The hydraulics of the legs are rumbling quite - the load-carrying capacity of the spacesuit has been significantly increased!",
+      "thought": "Now I can carry more."
+    },
+    "trans_ch_5_showdown_hack": {
+      "location_name": "Transition",
+      "title": "Hacking Defense",
+      "narrative": "You promptly connect the Director's secure PDA, found in Act 2, to the service port of the gateway. Corporate Master Codes instantly take over priority. The laser turrets turn off with a squeal and retract back into their slots. The path to the main terminal is clear.",
+      "thought": "The hacker wins."
+    },
+    "trans_ch_5_showdown_ref": {
+      "location_name": "Transition",
+      "title": "Tactical tackle",
+      "narrative": "Your augmentations and combat experience as a stormtrooper work flawlessly. You fall onto the slippery metal floor, flying under a grid of heat rays. With one precise blow from a heavy tool, you rip out the main power cable from the distribution board by the roots. The bridge plunges into emergency twilight, defense systems go out.",
+      "thought": "Reflexes did not disappoint."
+    },
+    "act1_lore_pad": {
+      "location_name": "Waste deck",
+      "title": "ENGINEER BLAKE'S TABLET",
+      "narrative": "Among the rubble you find the chief engineer's broken PDA. The log file reads: “They broke through from the bio-labs into the residential sector in minutes. Weapons do not take them, they adapt... We are welding the disposal gates to give the others time. If you are reading this, run to the reactor.\"",
+      "thought": "They? Who was he talking about? It appears that the accident at the station was not caused by a technical failure."
+    },
+    "act2_lore_newspaper": {
+      "location_name": "Cabin corridors",
+      "title": "NEWSPAPER PIECE",
+      "narrative": "On the floor lies a printout of the corporate newsletter: “Dr. Elizabeth Hart announced the successful completion of the first phase of Project Omega. The mutagen showed 100% survival rate on experimental tissues...\"",
+      "thought": "Project Omega. This means they created those creatures."
+    },
+    "act2_secret_office": {
+      "location_name": "Residential sector",
+      "title": "🚪 OFFICE OF THE HEAD OF SB",
+      "narrative": "You open a jammed airlock door using an emergency crowbar. Inside there are traces of a hasty evacuation, broken monitors and stains of dried blood. However, the security chief's safe is slightly open. On the table lies the Station Director's protected PDA and a heavy industrial miner's plasma cutter, fully charged.",
+      "thought": "It’s worth searching everything here quickly before the security systems completely block this sector."
+    },
+    "trans_ch_5_showdown_yolo": {
+      "location_name": "Transition",
+      "title": "Reckless Rush",
+      "narrative": "You don't have the right tools or tactical advantage. You just run forward through open space. The turret laser markers instantly converge on your chest. A volley of plasma burns right through your suit, throwing your lifeless body back into the shaft.",
+      "thought": "I hope you'll be lucky."
+    },
+    "trans_ch_5_start_next": {
+      "location_name": "Transition",
+      "title": "Approach to the terminal",
+      "narrative": "You take the plunge towards the central terminal. The entire story of your survival has led to this moment.",
+      "thought": "My entire chain of decisions led to this."
+    },
+    "trans_ch_2_hub_to_med": {
+      "location_name": "Transition",
+      "title": "The path to the medical post",
+      "narrative": "You approach a flashing green cross on the wall. The hope of a quick healing gives me strength.",
+      "thought": "The wounds need to be healed."
+    },
+    "trans_ch_1_explore_to_junk": {
+      "location_name": "Transition",
+      "title": "Searching in the rubble",
+      "narrative": "You approach a pile of twisted metal. The smell of ozone and rust hits your nose. You'll have to dig around to find anything useful.",
+      "thought": "I hope there is something of value here."
+    },
+    "trans_ch_1_trap_luck_clean": {
+      "location_name": "Transition",
+      "title": "Random combination",
+      "narrative": "Incredibly, the relay shorted exactly as it should! The lock clicked and completely cleared the passage.",
+      "thought": "Fortune is on my side today."
+    },
+    "trans_ch_1_trap_stl_clean": {
+      "location_name": "Transition",
+      "title": "Silent passage",
+      "narrative": "You carefully lubricate the grooves of the sash with oil and silently slip into the resulting gap, without making a sound.",
+      "thought": "Silence is my weapon."
+    },
+    "trans_ch_1_skill_eng": {
+      "location_name": "Transition",
+      "title": "Profile selection: Engineer",
+      "narrative": "You confirm your choice in the suit interface. The neural network redistributes resources, and you feel how new technical reflexes and knowledge emerge in your memory.",
+      "thought": "Now I see right through the system."
+    },
+    "trans_ch_2_bypass_act3_4": {
+      "location_name": "Transition",
+      "title": "Ventilation breakthrough",
+      "narrative": "The duct map did not disappoint. You climb into a narrow pipe and, bypassing Doctor Hart's bio-laboratories and the exploding reactor, crawl right under the dashboard of the Command Bridge!",
+      "thought": "Messy, but effective."
+    },
+    "trans_ch_2_corridors_to_rooms": {
+      "location_name": "Transition",
+      "title": "Inspection of compartments",
+      "narrative": "You head towards a row of pressure doors. Each of them can hide both salvation and a new threat.",
+      "thought": "I'll check every door."
+    },
+    "trans_ch_2_bypass_to_bridge": {
+      "location_name": "Transition",
+      "title": "Ascent to the bridge",
+      "narrative": "The difficult climb in conditions of increasing gravity is behind us. In front of you is a service panel, behind which the final section begins.",
+      "thought": "Almost there."
+    },
+    "trans_ch_2_get_clips": {
+      "location_name": "Transition",
+      "title": "Search for clamps",
+      "narrative": "Among the pile of papers you find a pack of durable steel office clips. Why do you need them? Who knows.",
+      "thought": "Maybe they will come in handy."
+    },
+    "trans_ch_2_hub_to_hydro": {
+      "location_name": "Transition",
+      "title": "Login to Hydroponics",
+      "narrative": "You open the airlock and thick, damp fog rushes out. The smell of rotten leaves and chemicals fills the helmet.",
+      "thought": "It smells like the jungle in here."
+    },
+    "trans_ch_2_hub_to_lore": {
+      "location_name": "Transition",
+      "title": "Studying papers",
+      "narrative": "You crouch down and pick up the crumpled piece of paper. The ink is a little smeared, but the text is still readable.",
+      "thought": "What does it say here?"
+    },
+    "trans_ch_1_skill_luck": {
+      "location_name": "Transition",
+      "title": "Profile Selection: Luck",
+      "narrative": "You confirm your choice in the suit interface. The neural network redistributes resources, and you feel your intuition sharpen to the limit.",
+      "thought": "Fortune favors the brave."
+    },
+    "trans_ch_1_skill_ref": {
+      "location_name": "Transition",
+      "title": "Profile Selection: Assault",
+      "narrative": "You confirm your choice in the suit interface. The neural network redistributes resources, and you feel how new combat reflexes emerge in your memory.",
+      "thought": "Ready for battle."
+    },
+    "trans_ch_1_skill_srv": {
+      "location_name": "Transition",
+      "title": "Profile Selection: Survival",
+      "narrative": "You confirm your choice in the suit interface. The neural network redistributes resources, and you feel the senses necessary for survival intensify.",
+      "thought": "Nature will teach me how to survive."
+    },
+    "trans_ch_1_skill_stl": {
+      "location_name": "Transition",
+      "title": "Profile Selection: Scout",
+      "narrative": "You confirm your choice in the suit interface. The neural network redistributes resources, and you feel how new stealth skills emerge in your memory.",
+      "thought": "The shadow is my best ally."
+    },
+    "trans_ch_1_skip_to_act4": {
+      "location_name": "Transition",
+      "title": "Elevator shaft hacking",
+      "narrative": "Using engineering knowledge and the sheer power of a crowbar, you pry open the doors of an old elevator shaft. Power cables go down.",
+      "thought": "Great maneuver. Saving time is everything."
+    },
+    "trans_ch_2_hydro_srv": {
+      "location_name": "Transition",
+      "title": "Cutting a corridor",
+      "narrative": "Using your innate knowledge of extreme flora, you accurately prune the supporting nodes of mutated vines. They fall powerlessly, freeing up a clear passage to the main elevator.",
+      "thought": "Nature submits to knowledge."
+    },
+    "trans_ch_2_hydro_stl": {
+      "location_name": "Transition",
+      "title": "Hidden passage",
+      "narrative": "You freeze, matching the rhythm of your steps to the slow pulsations of the plants. Your suit slips under the blind vines without touching a single poisonous thorn.",
+      "thought": "Silence is my weapon."
+    },
+    "trans_ch_2_launch_capsule": {
+      "location_name": "Transition",
+      "title": "Manual reset",
+      "narrative": "The lever gives in with a terrible grinding noise. The automation shoots the container into the icy abyss. You are free.",
+      "thought": "The risk is worth it."
+    },
+    "trans_ch_2_loot_chronometer": {
+      "location_name": "Transition",
+      "title": "Finding a Chronometer",
+      "narrative": "Among the shards of quartz glass you find a strange prototype of a pocket device. It flickers with a soft blue light, defying the laws of physics. You take it away.",
+      "thought": "What kind of technology is this?"
+    },
+    "trans_ch_2_lounge_to_security": {
+      "location_name": "Transition",
+      "title": "Search for SB key",
+      "narrative": "You walk around the counter and find the key card. The doors to the Security Service office click open in front of you.",
+      "thought": "Luck is on my side."
+    },
+    "trans_ch_2_med_back": {
+      "location_name": "Transition",
+      "title": "Exit from the medical station",
+      "narrative": "You take the last ampoules and leave the medical station. The wounds are healed, it's time to move on.",
+      "thought": "I'm fine now."
+    },
+    "trans_ch_2_rec_drink_oil": {
+      "location_name": "Transition",
+      "title": "Cryogenic sip",
+      "narrative": "Yielding to a mad impulse, you open the valve of your helmet and take a sip of the thick blue liquid. The cold immediately constricts my throat.",
+      "thought": "What an idiot I am."
+    },
+    "trans_ch_2_rec_take_oil": {
+      "location_name": "Transition",
+      "title": "Oil withdrawal",
+      "narrative": "You carefully pour the remaining thick blue oil into an airtight container on the suit's belt. Now you have an excellent technical lubricant.",
+      "thought": "Useful find."
+    },
+    "trans_ch_2_rec_to_hydro": {
+      "location_name": "Transition",
+      "title": "Opening the gateway",
+      "narrative": "You turn the valve of the adjacent airlock. The mechanism resists, but gives in, opening the way to hydroponics.",
+      "thought": "I hope it's safe there."
+    },
+    "trans_ch_2_sabotage_escape": {
+      "location_name": "Transition",
+      "title": "Container preparation",
+      "narrative": "You use the Heavy Plasma Cutter to cut the fuses on the airlock, and your survival skills help you calculate the minimum supply of oxygen in the container.",
+      "thought": "The risk is worth it."
+    },
+    "trans_ch_2_security_take_items": {
+      "location_name": "Transition",
+      "title": "Seizure of security items",
+      "narrative": "You take the Swarm Provider (Exo-Link) and load the Ventilation Circuit into the PDA. Now you see the entire network of hidden air ducts of the station.",
+      "thought": "Great find."
+    },
+    "trans_ch_2_start_next": {
+      "location_name": "Transition",
+      "title": "Entrance to the residential sector",
+      "narrative": "You are taking the first step deeper into the residential sector. Тишина здесь давит на уши, а странные жилы на стенах пульсируют в такт твоему сердцу.",
+      "thought": "Stay alert."
+    },
+    "act5_bridge": {
+      "location_name": "Command Bridge",
+      "title": "CHECKING SYSTEMS AND STATUS",
+      "narrative": "You approach the main communications terminal. The on-board computer begins scanning your inventory, status flags and election history to generate an evacuation protocol.",
+      "thought": "It's time to draw the line..."
+    },
+    "trans_ch_2_tobias_bleed_fail": {
+      "location_name": "Transition",
+      "title": "The smell of blood",
+      "narrative": "You feel the warmth spreading down your leg. A quiet, hungry hiss comes from the darkness of the ventilation. The creature came to the smell.",
+      "thought": "Damn, I'm bleeding..."
+    },
+    "trans_ch_2_tobias_leave": {
+      "location_name": "Transition",
+      "title": "Single route",
+      "narrative": "You leave Tobias in the radio room, locking the security door behind you at his request. Your speed is maximum, but the cats are scratching your soul.",
+      "thought": "I must survive."
+    },
+    "trans_ch_2_tobias_save": {
+      "location_name": "Transition",
+      "title": "Heavy burden",
+      "narrative": "You lift the wounded Tobias onto your shoulders. He groans in pain, his weight greatly slows down your movements, and the suit’s sensors warn of increased energy consumption.",
+      "thought": "We will get out together."
+    },
+    "trans_ch_3_boss_annihilate": {
+      "location_name": "Transition",
+      "title": "Destruction of the Patriarch",
+      "narrative": "You activate the plasma cutter at full power. The blinding beam burns through the chitin and tissue of the monster. The creature falls dead. From her skull you extract the surviving Quantum Swarm Provider!",
+      "thought": "I did it."
+    },
+    "trans_ch_3_boss_bleed_fail": {
+      "location_name": "Transition",
+      "title": "The smell of blood",
+      "narrative": "A drop of blood falls on the metal floor. The Patriarch turns his head sharply, his membranes vibrating from your scent. He smelled you instantly.",
+      "thought": "Damn, I'm bleeding..."
+    },
+    "trans_ch_3_boss_kill_to_hub": {
+      "location_name": "Transition",
+      "title": "Step through the remains",
+      "narrative": "You step over the charred body of the Patriarch. The air smells of ozone and burnt flesh. The way is clear.",
+      "thought": "I did it."
+    },
+    "trans_ch_3_boss_luck": {
+      "location_name": "Transition",
+      "title": "Incredible luck",
+      "narrative": "Incredible accident! The creature takes a blind step to the side, and its clawed paw lands directly on a sparkling high-voltage cable. A terrible discharge of current throws the Blind Patriarch back into the darkness, giving you precious time to rush to the nest.",
+      "thought": "Fortune is on my side today."
+    },
+    "trans_ch_3_boss_ref": {
+      "location_name": "Transition",
+      "title": "Membrane cutting",
+      "narrative": "You make a lightning lunge. The blade of the cutter rips open the creature's auditory membranes, depriving it of its main sense.",
+      "thought": "Reflexes did not disappoint."
+    },
+    "trans_ch_3_boss_srv": {
+      "location_name": "Transition",
+      "title": "Masking with pheromones",
+      "narrative": "You quickly break the emergency container and smear the caustic mucus of a dead Swarm specimen all over your suit. The Patriarch moves his blind muzzle just a couple of centimeters from your helmet, noisily inhaling air, but, uttering a guttural roar, he turns around and goes into the ventilation. The path is clear.",
+      "thought": "Nature submits to knowledge."
+    },
+    "trans_ch_3_choice_hart": {
+      "location_name": "Transition",
+      "title": "Deal with Hart",
+      "narrative": "You pass the container through the gateway. Hart nods, and the mechanism gives you the promised Quantum Carrier.",
+      "thought": "A deal is a deal."
+    },
+    "trans_ch_3_choice_self": {
+      "location_name": "Transition",
+      "title": "Strain introduction",
+      "narrative": "With trembling hands, you bring the injector to the port on your neck. The cold spreads through the veins, burning away the corporate code.",
+      "thought": "I'll get my memory back."
+    },
+    "trans_ch_3_choice_vent": {
+      "location_name": "Transition",
+      "title": "Ventilation release",
+      "narrative": "You hit the flask with force against the ventilation grille. Violet gas instantly rushes into the mines, filling the station.",
+      "thought": "Burn everything with a blue flame."
+    },
+    "trans_ch_3_cryo_proceed": {
+      "location_name": "Transition",
+      "title": "Step into the cryo-compartment",
+      "narrative": "You take a step into the frosty fog. Frost-covered capsules reflect the light of your lantern like the eyes of ghosts.",
+      "thought": "Stay alert."
+    },
+    "act4_climb_phase2": {
+      "location_name": "Elevator Shaft (Upper Tier)",
+      "title": "GRAVITATIONAL SHIFT",
+      "narrative": "There are a few meters left to the reactor deck pressure seal, but suddenly the left elevator holding cable breaks. The station tilts sharply to one side, artificial gravity goes crazy, trying to tear you away from the wall and throw you into the plasma vent below.",
+      "thought": "My hands... the suit's hydraulics are at their limit. If I carry Tobias, the load is lethal."
+    },
+    "ending_2": {
+      "location_name": "Command Bridge",
+      "title": "🏆 ENDING: BURNING OF JERICHO",
+      "narrative": "You overloaded the reactor and destroyed Isolate Omega. A powerful EMP flash burns out all the station’s servers, the chip in your head and completely erases the Swarm virus. The Nemesis station turns into a giant fiery meteor and completely burns up in the dense layers of the atmosphere along with you. The corporation will never get these weapons.",
+      "thought": "I'm dying as a man. Omega's secret will die with me."
+    },
+    "act4_cryo_regen": {
+      "location_name": "Cooling lines",
+      "title": "CRYO-CAPSULE OF REGENERATION",
+      "narrative": "In the technical gateway you find a medical cryopod for engineers. It is fully functional. The internal AI offers to perform express surgery and heal all physical wounds, but this will take time.",
+      "thought": "The capsule will cure me, but I will lose precious minutes. The station is falling faster."
+    },
+    "ending_3": {
+      "location_name": "Rescue Shuttle",
+      "title": "🏆 ENDING: ALLIANCE PROTOCOL",
+      "narrative": "An incredible outcome. You saved Tobias, outsmarted Hart, took the Quantum Carrier, and healed yourself. The Vanguard shuttle leaves at full speed towards a distant rebel colony. A wounded but alive Tobias sits next to you in the co-pilot's seat. You have all the corporation's secrets in your hands, ready to be published on the free web.",
+      "thought": "We will show the whole world what they did here... we will start this war."
+    },
+    "act3_start": {
+      "location_name": "Bio-Labs",
+      "title": "ENTRANCE TO THE BIO-COMPLEX",
+      "narrative": "The complex's heavy pressure doors part, releasing a cloud of icy steam. The HUD interface turns yellow warning: a critical level of biological threat has been detected. Shards of ampoules and frozen organic matter crunch underfoot.",
+      "thought": "It smells like formaldehyde and rotten meat. Dr. Hart is somewhere inside."
+    },
+    "act4_climb": {
+      "location_name": "elevator shaft",
+      "title": "VERTICAL LIFT",
+      "narrative": "The main bridge to the reactor has been destroyed. The only way is to climb up the dilapidated vertical shaft of a technical elevator. Pieces of sheathing and sparks fly towards you, and thick smoke rises from below.",
+      "thought": "Physically it will be difficult. I hope my legs can handle this load."
+    },
+    "trans_ch_3_med_heal": {
+      "location_name": "Transition",
+      "title": "Application of a regenerator",
+      "narrative": "You inject the regenerator. Pleasant warmth spreads throughout the body, healing wounds and clearing consciousness.",
+      "thought": "Great medicine."
+    },
+    "trans_ch_3_nest_hck": {
+      "location_name": "Transition",
+      "title": "Software extraction",
+      "narrative": "You connect the decoder to the console. Codes run across the screen, neatly extracting strain data without biomass alarm.",
+      "thought": "Clean work."
+    },
+    "ending_9_space_drift": {
+      "location_name": "🌌 Open Space",
+      "title": "ENDING #9: SPACE hulk",
+      "narrative": "The container breaks away from the dying Nemesis with a roar. The lights of explosions flash behind - the station is falling apart. You are flying in an icy void, walled up in an iron box. The suspended animation sensors are activated. You fall asleep, hoping that in a couple of hundred years this container will be picked up by a passing cargo ship... Humanity has been saved from the infection, but at what cost?",
+      "thought": "You escaped alone, leaving the station to fate."
+    },
+    "act4_cryo_vault": {
+      "location_name": "❄️ Secret Cryo-Archive",
+      "title": "ANBIOSED TOMB",
+      "narrative": "You find yourself in an isolated deep-frozen compartment. Colonist prototypes are stored here. The computer is fine. You can use one of the capsules to put yourself into suspended animation and wait out the disaster.",
+      "thought": "If the station falls, the capsule will protect you. But who will dig you up?"
+    },
+    "ending_10_cryo_sleep": {
+      "location_name": "🌌 Frozen Nemesis",
+      "title": "ENDING #10: ETERNAL PASSENGER",
+      "narrative": "The capsule closes with a hiss. Icy gas fills my lungs. You fall asleep. Nemesis Station falls to the planet, turning into a pile of rubble, but your reinforced cryo-cocoon withstands the impact. Centuries pass. Omega spores are dying of starvation. Your capsule continues to lie under a layer of radioactive ash...",
+      "thought": "You have outlived everyone. But they were left absolutely alone."
+    },
+    "trans_ch_3_nest_luck": {
+      "location_name": "Transition",
+      "title": "Blind luck",
+      "narrative": "You decide to take a risk. While you are reaching for the flask, the reactor systems malfunction, and a couple of flashes of fire scare away the biomass. You manage to snatch the Isolate out without a single scratch!",
+      "thought": "Fortune is on my side today."
+    },
+    "act4_fall": {
+      "location_name": "elevator shaft",
+      "title": "💀 FALL INTO THE REACTOR",
+      "narrative": "A body weakened by wounds or overload from the wounded Tobias played a fatal role. The hand fell from the icy cable. You flew down into the glowing flames of the damaged plasma circuit of the reactor. Death was instant.",
+      "thought": "...critical error... suit integrity 0%..."
+    },
+    "trans_ch_cryo_end_trigger": {
+      "location_name": "Transition",
+      "title": "Start freezing",
+      "narrative": "You lie down inside, batten down the hatch and press the start button. Coldness instantly envelops the consciousness.",
+      "thought": "Let the station fall."
+    },
+    "act4_start": {
+      "location_name": "Cooling lines",
+      "title": "POWER UNIT: ENTRY POINT",
+      "narrative": "The Power Unit sector greets you with a deafening roar of escaping steam. The reactor cooling lines have been destroyed. The station has entered the dense layers of the atmosphere, and the orange glow of the burning hull is blazing outside the porthole windows. The force of gravity is growing every minute.",
+      "thought": "If I don't make it to the reactor hall, the station will fall apart in the air before I even reach the rescue shuttle."
+    },
+    "act4_reactor_choice": {
+      "location_name": "Reactor Hall",
+      "title": "HEART OF THE STATION",
+      "narrative": "You break into the reactor control room. The huge plasma core is unstable, magnetic traps spark. The control console is locked by the station's AI security protocols.",
+      "thought": "I have two options: try to stabilize the reactor to slow the fall, or completely overload the circuit with a powerful electromagnetic pulse."
+    },
+    "act5_start": {
+      "location_name": "Command Bridge",
+      "title": "FINAL FRONTIER",
+      "narrative": "The elevator doors open right on the station's Command Bridge. Through the panoramic windows one can see the planet's huge atmosphere engulfed in flames. The station vibrates so much that the metal groans. In the center of the bridge is the main terminal and the Avangard rescue shuttle.",
+      "thought": "That's all. The finale of the journey. Now the fate of the data, the station, and my own will be decided."
+    },
+    "trans_ch_3_nest_ref": {
+      "location_name": "Transition",
+      "title": "Swift Dash",
+      "narrative": "Your reaction saves your life. In a split second you grab the flask, and when the biomass suddenly awakens and throws out bone spikes, you do a perfect somersault back, escaping with only fear.",
+      "thought": "Reflexes did not disappoint."
+    },
+    "trans_ch_3_nest_srv": {
+      "location_name": "Transition",
+      "title": "Manual extraction",
+      "narrative": "You grab the flask and tear it from living flesh. The acidic mucus burns your gloves, but you hold on to the reward.",
+      "thought": "Nature obeys force."
+    },
+    "trans_ch_3_nest_stl": {
+      "location_name": "Transition",
+      "title": "Silent extraction",
+      "narrative": "Using the suit's hidden modules, you glide smoothly between the pulsating veins. Your movements are quieter than a sigh. You carefully remove the flask with the Isolate without disturbing any of the larvae.",
+      "thought": "Silence is my weapon."
+    },
+    "trans_ch_4_climb_magnetometer": {
+      "location_name": "Transition",
+      "title": "Using the Magnetometer",
+      "narrative": "The device clearly registers field fluctuations. You calculate a completely safe corridor and proceed to the engine controls without any skill checks.",
+      "thought": "Technology saves lives."
+    },
+    "trans_ch_4_climb_power_hydraulics": {
+      "location_name": "Transition",
+      "title": "Drive overload",
+      "narrative": "The suit's hydraulics respond with a powerful roar. Your lifting capacity and pushing power are now doubled. An excellent base for carrying heavy loads.",
+      "thought": "Now I'm stronger."
+    },
+    "act3_reactor_overload": {
+      "location_name": "Station Core",
+      "title": "🚨 CRITICAL OVERLOAD",
+      "narrative": "You overloaded the reactor and destroyed Isolate Omega. The cooling systems instantly turned off, the plasma circuit was destabilized. The room is filled with a blinding light, emergency sirens are deafening, and the automation tightly blocks the sector's pressure doors. Time passes by seconds, the radiation background is rapidly growing, burning out the electronics of the spacesuit.",
+      "thought": "We urgently need to look for a workaround through technical collectors, before the corridors turn into a branch of the sun."
+    },
+    "act4_death_gravity": {
+      "location_name": "Cooling lines",
+      "title": "DEATH: NEWTON'S LAW",
+      "narrative": "Finding yourself in a zone of abnormally high gravity in front of the reactor, you decide to test the laws of physics and throw up a heavy wrench at 32. Under the influence of 5G, the wrench returns back at the speed of a bullet, piercing your headlamp along with your skull.",
+      "thought": "...Cranio-cerebral injury incompatible with life..."
+    },
+    "trans_ch_4_climb_power_magnets": {
+      "location_name": "Transition",
+      "title": "Maximizing Magnets",
+      "narrative": "The magnetic relays snap onto the shaft guides with such force that you almost get pinned against the wall. It's almost impossible to get you out of here now.",
+      "thought": "Now I'm chained to the wall."
+    },
+    "trans_ch_4_climb_power_shields": {
+      "location_name": "Transition",
+      "title": "Shield activation",
+      "narrative": "You're redirecting power to the baffles. A faint flickering field flashes around the suit. The speed of movement decreases, but you are protected from external blows.",
+      "thought": "Now I'm protected."
+    },
+    "trans_ch_4_climb_servo_godmode": {
+      "location_name": "Transition",
+      "title": "Climbing with Tobias",
+      "narrative": "Your suit's modified hydraulics can easily handle the weight of your wounded partner. You confidently and quickly walk up the cables of the mine, ignoring the gravitational blows.",
+      "thought": "We will get out together."
+    },
+    "trans_ch_4_climb_solo_skip": {
+      "location_name": "Transition",
+      "title": "Speed ​​climb",
+      "narrative": "You have passed the central sections of the station. You have no wounded behind you, but there is no place to expect support from. You activate the suit's magnetic grips.",
+      "thought": "One against gravity."
+    },
+    "trans_ch_4_cryo_absurd": {
+      "location_name": "Transition",
+      "title": "Absurd check",
+      "narrative": "You decide to check whether the temperature of liquid nitrogen is really that low. Your tongue instantly freezes tightly to the metal. While trying to free yourself, you accidentally pull the emergency pressure valve. A jet of liquid nitrogen instantly turns Marcus into an ice statue, which crashes into fragments.",
+      "thought": "What an idiot I am."
+    },
+    "trans_ch_4_engines_isolate_exploit": {
+      "location_name": "Transition",
+      "title": "Biomechanics",
+      "narrative": "Crazy idea! You break the ampoule with Isolate directly into the hydraulic receiver. The aggressive mutagen instantly reacts with traces of the Swarm's organics, causing the jammed bio-growths on the pistons to convulsively contract and release the metal. The valves open, releasing the plasma accelerators!",
+      "thought": "Brilliant and crazy."
+    },
+    "trans_ch_4_engines_manual_burn": {
+      "location_name": "Transition",
+      "title": "Manual closing",
+      "narrative": "You don't have access keys. You tear off the protective casing and grab with your hands the cables under voltage of thousands of volts. A terrible electric shock throws you to the floor, burning out the internal systems of the suit and damaging the nervous system, but the spark reaches the injectors - the engines start!",
+      "thought": "The pain is worth it."
+    },
+    "trans_ch_4_to_engine_deck": {
+      "location_name": "Transition",
+      "title": "Breakthrough to engines",
+      "narrative": "You ignore the reactor and rush towards the engines. Your engineering expertise allows you to redirect the flow of antimatter.",
+      "thought": "Engineering decides."
+    },
+    "ending_4": {
+      "location_name": "Station Core",
+      "title": "🏆 ENDING: BIO-INTEGRATION",
+      "narrative": "You refused to destroy the chip and reached a critical level of toxicosis and infection. On the Command Bridge, your human consciousness finally fades away. The Omega Virus completely rearranges your synapses. You are no longer Marcus Raine. You are the only Mind of the Swarm. The station falls on an inhabited planet, and inside it beat the hearts of thousands of Morphs ready to land. The station will become a capsule of infection of the new world.",
+      "thought": "WE... ARE... WE EXIST... WE GO..."
+    },
+    "trans_ch_4_engines_pda_win": {
+      "location_name": "Transition",
+      "title": "Hacking engines",
+      "narrative": "You connect a secure PDA to the main injector. The Director's master key instantly shuts up the station's crazy AI. The automation unlocks the servos, the heavy pistons slide into place, and the engines begin the braking cycle as normal. You're safe.",
+      "thought": "The hacker wins."
+    },
+    "trans_ch_4_phase2_hydraulics_win": {
+      "location_name": "Transition",
+      "title": "Hydraulic squeezing",
+      "narrative": "The suit's motors howl heart-rendingly, the indicators glow crimson, but the powerful leg drives can withstand Tobias' monstrous mass. With a powerful jerk, you throw yourself and your partner onto the hard floor of the reactor hall.",
+      "thought": "We did it."
+    },
+    "trans_ch_4_phase2_luck_win": {
+      "location_name": "Transition",
+      "title": "Blind luck",
+      "narrative": "Incredible! The whipped steel cable wraps around the torn beam right under your feet, forming a temporary bridge. You quickly step over the dangerous area.",
+      "thought": "Fortune is on my side today."
+    },
+    "trans_ch_4_phase2_magboots_win": {
+      "location_name": "Transition",
+      "title": "Fixation with magnets",
+      "narrative": "Whether it's the activated energy of magnets or your engineered Magnetic Boots, the soles are tightly welded to the rail. You don't care about the gravity shift. After calmly waiting out the vibration, you reach the top.",
+      "thought": "Now I'm chained to the wall."
+    },
+    "trans_ch_4_phase2_solo_clean": {
+      "location_name": "Transition",
+      "title": "Final push",
+      "narrative": "Since you are traveling light and not burdened by a wounded officer, your basic strength is enough to ignore the tilt of the station and deftly climb into the open reactor airlock.",
+      "thought": "One against gravity."
+    },
+    "trans_ch_4_reactor_stabilize": {
+      "location_name": "Transition",
+      "title": "Core stabilization",
+      "narrative": "You redirect energy flows, stabilizing the magnetic field. The core stops pulsing menacingly.",
+      "thought": "Engineering decides."
+    },
+    "trans_ch_4_reactor_to_engines_eng": {
+      "location_name": "Transition",
+      "title": "Network reconfiguration",
+      "narrative": "You're reconfiguring the distribution network. The HUD navigates the route through the emergency sewer to the southern boosters. There is still a chance to save the station itself!",
+      "thought": "Engineering decides."
+    },
+    "trans_ch_engine_end": {
+      "location_name": "Transition",
+      "title": "Pulse activation",
+      "narrative": "Your hands find the main switch. You pull it down, sending one last pulse into the engines.",
+      "thought": "The station has been saved."
+    },
+    "trans_ch_4_regen_use": {
+      "location_name": "Transition",
+      "title": "Capsule activation",
+      "narrative": "You go into the capsule. The mechanical arms begin an emergency healing procedure, ignoring alarms that the station is falling.",
+      "thought": "Treatment comes first."
+    },
+    "trans_ch_4_start_to_climb": {
+      "location_name": "Transition",
+      "title": "Beginning of the climb",
+      "narrative": "You cling to the first ledge in the shaft. A grueling vertical climb lies ahead.",
+      "thought": "One against gravity."
+    },
+    "trans_ch_4_start_to_regen": {
+      "location_name": "Transition",
+      "title": "Login to tech. compartment",
+      "narrative": "You turn into the side technical compartment. The silhouette of a cryo-capsule is visible ahead.",
+      "thought": "Maybe this will save me."
+    },
+    "trans_ch_4_to_cryo_stasis": {
+      "location_name": "Transition",
+      "title": "Launching suspended animation",
+      "narrative": "Secure access codes put the capsule into autonomous disaster survival mode. Systems isolate you from the outside world.",
+      "thought": "Let the station fall."
+    },
+    "act2_tobias_feed_result": {
+      "location_name": "Radio room",
+      "title": "UNEXPECTED HELP",
+      "narrative": "Tobias unwraps the packaging with difficulty, looks at the ancient candy bar with disbelief, but still takes a bite. “It’s disgusting... but thank you, Marcus,” he croaks, and this strange gesture lifts his spirit. Finding his strength, he tightens his grip on the tourniquet on your leg, effectively stopping your bleeding.",
+      "thought": "The bleeding has stopped. Much better."
+    },
+    "trans_ch_5_start_next_bypass": {
+      "location_name": "Transition",
+      "title": "Approach to the terminal (Hidden path)",
+      "narrative": "You take the decisive step towards the central terminal, emerging from the ventilation shaft directly onto the bridge. The entire story of your survival has led to this moment.",
+      "thought": "My entire chain of decisions led to this."
+    },
+    "trans_ch_1_explore_to_workbench": {
+      "location_name": "Transition",
+      "title": "Inspection of the workbench",
+      "narrative": "Your eyes catch on the familiar outlines of the instruments. You head towards the workbench, feeling that there is something useful you can do here.",
+      "thought": "Great place to work."
+    },
+    "act3_boss_distract_result": {
+      "location_name": "Cryo laboratory",
+      "title": "SUCCESSFUL SABOTICE",
+      "narrative": "You forcefully throw the chemical-soaked candy bar into the far corner of the laboratory. The package hits the bulkhead with a crash. The sharp, sickening smell of synthetics instantly overpowers your smell. The Patriarch turns around sharply, his auditory membranes vibrating. Letting out a guttural roar, the meat tank rushes into the darkness behind the rustling wrapper. The path to the nest is clear.",
+      "thought": "I deceived him. Now you can sneak past."
+    },
+    "act5_bridge_showdown_ai": {
+      "location_name": "Command Bridge",
+      "title": "TRAP: CLEANING PROTOCOL",
+      "narrative": "You take a step onto the panoramic deck, but the airlock behind you is tightly blocked. The center console screen flashes purple. Twin laser turrets of the security system hum from the ceiling niches. The robotic voice of the frantic onboard AI echoes throughout the compartment: “Attention. An unregistered biological threat has been detected. Cleanup protocol activated.\"",
+      "thought": "The situation is critical. The bridge's protective shields are down and the turrets are targeting me. You need to act in seconds."
+    },
+    "trans_ch_2_hydro_bypass_oil": {
+      "location_name": "Transition",
+      "title": "Hatch lubrication",
+      "narrative": "You pour thick blue oil generously into the corroded grooves of the cargo hatch. The metal gives in with a grinding sound, revealing a deep technical shaft. In the dark passage below, the outlines of the Power Unit can be discerned.",
+      "thought": "Great maneuver."
+    },
+    "act2_death_oil": {
+      "location_name": "Staff break room",
+      "title": "💀 DEATH: CRYOGENIC SIP",
+      "narrative": "Ignoring common sense and the warnings of the on-board computer, you unscrew the cap of the canister and take a deep sip of expired Cryo-Shield oil, hoping to “clean the filters” or quench your thirst. The chemical instantly reacts with warm organic matter. The synthetic liquid crystallizes right in your esophagus, turning your insides into a monolithic piece of fragile chemical ice. The suit detects tissue rupture and cardiac arrest.",
+      "thought": "The biometrics broadcast has been interrupted. Marcus Rein died due to excessive culinary curiosity."
+    },
+    "act4_gravity_bait_result": {
+      "location_name": "Cooling lines",
+      "title": "THE CLEARED PATH",
+      "narrative": "You place the candy bar on the floor in a zone of abnormal gravity. Dozens of small parasitic morphs instantly crawl out of the ventilation cracks, attracted by the smell of food. Before they can reach the bait, they fall under the influence of 5G. There is a nasty, wet crunch, and the path ahead is cleared of a living threat. You can begin your climb safely.",
+      "thought": "Cruel but effective. The way is clear."
+    },
+    "act3_death_boss": {
+      "location_name": "Cryo laboratory",
+      "title": "💀 TORN INTO PIECES",
+      "narrative": "You have no argument against the pure rage of mutation. The blind Patriarch turned out to be faster and more merciless. Your suit is torn like paper, and your consciousness fades away under the crunch of your own bones.",
+      "thought": "So stupid... Omega... broadcast lost..."
+    },
+    "act3_boss_kill": {
+      "location_name": "Cryo laboratory",
+      "title": "🔥 DEATH OF THE PATRIARCH",
+      "narrative": "With a deafening roar, a heavy plasma beam cuts through the icy air and burns right through the chitinous shell of the creature. The Patriarch lets out a terrible, choking scream and falls onto the frost-covered floor, leaking a thick blue substance. His paws make a final convulsive movement and fall silent. The path through the cryo-bay is completely clear.",
+      "thought": "I did it... I destroyed this creature. Now in the elevator shafts from below no one will press in."
+    },
+    "act2_corridors_rooms": {
+      "location_name": "Cabin corridors",
+      "title": "ADJACENT COMPARTMENTS",
+      "narrative": "Doors of leading compartments of the residential sector. Medical post, rest room and locked security office.",
+      "thought": "Where to look?"
+    },
+    "trans_ch_1_explore_to_snacks": {
+      "location_name": "Transition",
+      "title": "Path to the machine",
+      "narrative": "The flickering neon of a broken machine gun beckons like a beacon in this darkness. You take a few steps towards him, hoping for a miracle.",
+      "thought": "Hunger is not a thing."
+    },
+    "act5_death_button": {
+      "location_name": "Captain's Chair",
+      "title": "DEATH: THE RED BUTTON BECOMES",
+      "narrative": "Among the chaos and sparkling panels, you notice an armored compartment in the armrest of the captain's chair. Under the protective glass is a huge, glossy red button with a skull and the inscription “DO NOT PRESS”. \n    Yielding to an irresistible childish curiosity, you break the glass with a crowbar and hit it with your palm as hard as you can. \n    A melancholic AI voice is heard: “Emergency bridge interior annihilation system activated.” The floor under your feet opens up, and you and your chair are thrown straight into outer space, towards the burning atmosphere. But I pressed it!",
+      "thought": "...registration of the fall of a body... acceleration of free fall... space vacuum..."
+    },
+    "act3_med_bay": {
+      "location_name": "Central compartment Nemesis",
+      "title": "🔬 LABORATORY MEDICAL CABINET",
+      "narrative": "You open the surviving first aid panel. Inside, capsules with an army neuro-regenerator glow sterilely. This composition is able to heal deep wounds and neutralize toxins in the blood.",
+      "thought": "An excellent chance to heal wounds and relieve concussion or toxicosis."
+    },
+    "act1_death_snack": {
+      "location_name": "Waste Deck/Service Corridor",
+      "title": "💀 DEATH: TOXIC SHOCK",
+      "narrative": "Hunger and panic take over. You tear off the visor of your helmet and greedily bite into a candy bar that is over ten years old. It tastes like dry cardboard with a hint of copper. A second later your stomach explodes with hellish pain. Due to the depressurization of the laboratories, the confectionery fats inside the machine became an ideal breeding ground for Omega spores. You fall to your knees as purple bio-threads begin to sprout from your mouth and nose.",
+      "thought": "...biological death of the carrier... the chip is deactivated..."
+    },
+    "act2_death_selfie": {
+      "location_name": "Rest room",
+      "title": "DEATH: CYBER VANITY",
+      "narrative": "You decide that in the face of the imminent destruction of the station, the world must see your courageous face. You turn on the diagnostic terminal at full power and take a selfie with the flash. The bright light instantly attracts three Jumper Morphs from the ventilation. The last frame turned out blurry.",
+      "thought": "...camera damaged...user disabled..."
+    },
+    "act1_escape_injured": {
+      "location_name": "Transition corridor",
+      "title": "BREAKTHROUGH PRICE",
+      "narrative": "You squeeze through the narrow gap with all your might. A wild grinding sound is heard - the sharp edge of the skin easily rips through the composite fabric of your spacesuit and cuts deep into your thigh. Clutching the wound with your hand, you fall out into the next sector. Blood oozes from the hole.",
+      "thought": "Crap! Hurt! The status on the suit panel is OPEN BLEEDING. We urgently need to find a medical center."
+    },
+    "act1_hub_workbench": {
+      "location_name": "Waste deck",
+      "title": "ENGINEERING WORKBENCH",
+      "narrative": "Improvised table with tools and parts. Here you can repair your equipment or prepare a workaround.",
+      "thought": "A great place to apply your technical skills."
+    },
+    "act2_med_point": {
+      "location_name": "Rescue post",
+      "title": "EMERGENCY MEDICAL STATION B-12",
+      "narrative": "The wall-mounted medical unit survived. You break the protective plastic and activate the automatic applicator. A robotic needle injects coagulants and seals the damaged layer of your suit with a thermal patch.",
+      "thought": "The bleeding has stopped. Much better. Now you can move on."
+    },
+    "act2_recreation_room": {
+      "location_name": "Staff break room",
+      "title": "Abandoned comfort",
+      "narrative": "You enter the former crew leisure center. Plastic cups are scattered everywhere, poker tables are overturned, and a panoramic virtual screen flickers with broken pixels, simulating an old Earth forest. A technical support service cabinet is open in the corner. Drops of thick, blue-fluorescent oil flowed from the broken canister onto the floor. The label is barely legible: “Cryo-Shield.” The expiration date expired before you arrived at the station.",
+      "thought": "It smells like old plastic and chemicals. This oil can probably be used as a lubricant. The main thing is not to ingest it."
+    },
+    "act2_hydroponics": {
+      "location_name": "Hydroponic greenhouse",
+      "title": "CARNIVOROUS GARDEN",
+      "narrative": "The hermetic door gives in with a creak, and the damp, suffocating smell of rot and blooming spores hits you in the face. Due to the leakage of bio-mutagen, ordinary hydroponic trays turned into nightmarish thickets. Giant pulsating vines entwined the metal floor beams, and caustic sap dripped from the stems. At the very end of the bio-zone, behind a tangle of vines, you see a massive jammed cargo hatch leading vertically down.",
+      "thought": "These plants react to the heat of the spacesuit and move barely noticeably. It won't be easy to get through here, but this jammed hatch clearly leads somewhere bypassing the main decks."
+    },
+    "act2_tobias_leave": {
+      "location_name": "Transition gateway",
+      "title": "SINGLE ROUTE",
+      "narrative": "You leave Tobias in the radio room, locking the security door behind you at his request. Your speed is maximum, but the cats are scratching your soul. You go out to the elevator of the bio-complex.",
+      "thought": "I must survive at all costs. The station is losing altitude."
+    },
+    "act2_death_time_paradox": {
+      "location_name": "⏳ Time loop",
+      "title": "CONTINUUM ERROR",
+      "narrative": "You tried to use the Chronometer too late, when reality had already collapsed. Time is in a loop. You are doomed to relive the last second of your life forever.",
+      "thought": "You shouldn't play with technologies whose nature you don't know."
+    },
+    "act2_start": {
+      "location_name": "Residential sector (Entrance)",
+      "title": "QUARTER B-12",
+      "narrative": "You find yourself in the residential sector. Life should be in full swing here, but the corridors are littered with abandoned things. Strange dark veins of organic origin stretch along the walls. They pulsate barely noticeably.",
+      "thought": "The atmosphere is oppressive. The station is falling, I feel a slight vibration of the floor."
+    },
+    "act1_secret_shuttle": {
+      "location_name": "🚀 Hidden Evacuation Dock",
+      "title": "ABANDONED SHUTTLE CELUS",
+      "narrative": "At the far end of the Waste Deck, behind blocked waterproofing, is an old Celsus-class rescue shuttle. The power systems are turned off, but the body is intact. You can escape here if you can find a way to power the engines.",
+      "thought": "This ship is your chance to leave the station without getting caught up in the madness of the upper decks."
+    },
+    "act2_corridors": {
+      "location_name": "Cabin corridors",
+      "title": "RESIDENTIAL SECTOR HUB",
+      "narrative": "Central deck intersection. To the left is an emergency rescue post, straight ahead are the doors of the radio room, from where intermittent wheezing can be heard over the intercom.",
+      "thought": "It seems there is someone in the radio room. But if I'm bleeding, I should go to the medical station first."
+    },
+    "act2_corridors_search": {
+      "location_name": "Cabin corridors",
+      "title": "SEARCH THE CORRIDOR",
+      "narrative": "The floor is littered with scraps of papers, personal belongings and strange junk.",
+      "thought": "Maybe there is something useful here?"
+    },
+    "act3_core_terminal": {
+      "location_name": "Central compartment Nemesis",
+      "title": "MUTATION DATABASE",
+      "narrative": "You hack into the terminal against the wall. Classified files pop up on the screen. It turns out that Marcus Rein is not just a liquidator. A bio-chip for communicating with the Swarm is implanted in your skull. Your memory was erased so that you would not understand that you are the main weapon of the corporation.",
+      "thought": "Am I... a test subject? Is my whole life a lie? Is there a chip in my head that controls these creatures?!"
+    },
+    "act3_hub": {
+      "location_name": "Central compartment Nemesis",
+      "title": "CENTRAL HUB OF THE LABORATORY",
+      "narrative": "You break through to the central hub of the complex. The orange light of emergency lamps illuminates the surviving medical cabinet B-13 and the fortified hermetic bunker, on which the inscription is lit: “The manager’s office. Dr. E. Hart.\"",
+      "thought": "We need to look around. The med cabinet can save a life if I'm injured."
+    },
+    "act1_hub_explore": {
+      "location_name": "Waste deck",
+      "title": "HUB RESEARCH",
+      "narrative": "You inspect the accessible areas of the Landfill Hub. Ahead you can see heaps of scrap metal, a broken vending machine with candy bars and an improvised engineering workbench.",
+      "thought": "Where to go?"
+    },
+    "act1_hub_snacks": {
+      "location_name": "Waste deck",
+      "title": "BROKEN MACHINE",
+      "narrative": "Old corporate snack dispenser. The glass is broken, revealing the only surviving candy bar inside.",
+      "thought": "It looks doubtful, but hunger is not a problem."
+    },
+    "act2_bypass_tunnel": {
+      "location_name": "Emergency docking gateway",
+      "title": "BYPASS ROUTE",
+      "narrative": "You use the Heavy Plasma Cutter to burn through the jammed seal of the SB ventilation shaft. The suit's sensors record: this technical tunnel leads bypassing the Bio-Labs and the Reactor Compartment directly to the emergency lines of the Command Bridge! However, life support systems are turned off here.",
+      "thought": "Passing here will allow me to save time and avoid meeting Doctor Hart, but I will be left without Isolate."
+    },
+    "act1_trap": {
+      "location_name": "Hydraulic sluice",
+      "title": "JAMMED LEAF",
+      "narrative": "The lock mechanism was tightly jammed by a bent steel beam. Automation is disabled. The pneumatic drive hisses, the sash is opened only thirty centimeters. Behind it is a dark corridor leading to the living decks.",
+      "thought": "I can try to squeeze through, but the edges of the torn metal look damn sharp."
+    },
+    "trans_ch_1_find_magnetometer": {
+      "location_name": "Transition",
+      "title": "Magnetometer Search",
+      "narrative": "Among the wreckage of the navigation boards you find a working Calibrated Magnetometer. This is a specific thing, but it can be useful in the reactor compartment.",
+      "thought": "Useful find."
+    },
+    "act2_tobias_hub": {
+      "location_name": "Radio room",
+      "title": "WOUNDED TOBIAS",
+      "narrative": "Security Officer Tobias sits on the floor next to a broken communications console. His leg is torn off, he clamped the stump with a cable. “Marcus...” he croaks. — The station was blocked by AI. He went crazy from the virus. Dr. Hart... she's in the bio-labs. She has a quantum master key. Take him... I’m not a tenant, don’t drag me.”",
+      "thought": "Tough choice. Leave him here to die or try to drag him to the bio-laboratories?"
+    },
+    "act3_cryo_hub": {
+      "location_name": "Cryo laboratory",
+      "title": "CRYOGENIC COMPARTMENT: AMBUSH",
+      "narrative": "You enter the cryo storage room. The rows of capsules are covered with a thick layer of frost. Suddenly the light flickers and goes out. Automatic locks the doors behind you. In the deathly silence, a heavy, wet grinding of claws is heard from above. It's coming down.",
+      "thought": "Damn, it trapped me here. It senses my presence."
+    },
+    "act3_boss_pat": {
+      "location_name": "Cryo laboratory",
+      "title": "👹 BLIND PATRIARCH",
+      "narrative": "In front of you, a massive three-meter figure of the Patriarch loomed out of the darkness. His body is covered with chitinous growths, and instead of eyes there is solid bone armor. Its auditory membranes pulsate, picking up the slightest vibrations in the air. One wrong move and this meat tank will tear you apart.",
+      "thought": "Don't breathe. If I bleed, I'm done..."
+    },
+    "act3_hart_lab": {
+      "location_name": "Doctor Hart's Bunker",
+      "title": "DOCTOR HART'S OFFICE",
+      "narrative": "The armored intercom screen comes to life. The cold face of Elizabeth Hart looks at you. “Marcus... or should I call you Omega? I know why you are here. You need a quantum carrier to escape. I'll give it away. But first, you go down to the bio-reactor and bring me the Omega Isolate. I need a pure strain of the virus.\"",
+      "thought": "She knows my code name. And she’s clearly not saying something about this antidote."
+    },
+    "act3_nest_quest": {
+      "location_name": "Bio reactor",
+      "title": "REACTOR SOCKET",
+      "narrative": "You go down to the lower tier. Here is the heart of the disaster. The walls are completely covered with living, moving flesh. In the center, inside a dilapidated glass flask, a violet isotope glows - Omega Isolate. Hundreds of small larvae swarm around.",
+      "thought": "Get to the console or tear out the flask by force? You need to act quickly, the biomass reacts to the heat of the spacesuit."
+    },
+    "act3_has_isolate": {
+      "location_name": "Central compartment Nemesis",
+      "title": "CHOICE OF DESTINY: ISOLATE IN HANDS",
+      "narrative": "You return to the hub, holding a container of Omega Isolate. Suddenly, your HUD reveals a hidden log: this strain is not a cure, but the key to the complete subjugation of the Morphs. And the same strain can burn out the corporate chip in your head, returning your memory, but depriving you of communication with the station.",
+      "thought": "What to do? Give it to her? Enter yourself? Or destroy everything here to hell by releasing the virus into the ventilation?"
+    },
+    "act1_hub": {
+      "location_name": "Waste deck",
+      "title": "LANDFILL HUB",
+      "narrative": "After getting out of the starting cell, you find yourself on the Waste Deck. There are piles of deformed scrap, broken drones and containers all around. The only exit from the compartment is blocked by a massive hydraulic airlock flap. A service terminal glows faintly on the wall.",
+      "thought": "We need to find a way to open these doors before the sector loses its pressure completely."
+    },
+    "act1_start": {
+      "location_name": "Recycling gateway",
+      "title": "AWAKENING IN THE DARKNESS",
+      "narrative": "You come to your senses on the icy metal floor. It's dark all around and smells of ozone and burnt wiring. Emergency responder Marcus Raine's suit wheezes as it activates backup life support systems. The dim light of the waste dump flashes overhead. The on-board computer issues a critical warning: the Nemesis orbital station has left orbit and is falling into the planet’s atmosphere. Time has passed.",
+      "thought": "What happened? My head is pounding, and the suit’s sensors show that the sector is completely de-energized."
+    },
+    "act2_tobias_save": {
+      "location_name": "Transition gateway",
+      "title": "HEAVY BURDEN",
+      "narrative": "You lift the wounded Tobias onto your shoulders. He groans in pain, his weight greatly slows down your movements, and the suit’s sensors warn of increased energy consumption on the hydraulics of your legs. Together you get to the elevator of the bio-complex.",
+      "thought": "We'll get out of here together, chumba. Hold on."
+    },
+    "act3_ai_core": {
+      "location_name": "AI Core Central",
+      "title": "RESTART PROTOCOL",
+      "narrative": "You enter the shielded server room. The AI ​​\"ARGUS\" interface flashes crimson: \"A bio-chip carrier has been detected. Dr. Hart has initiated a protocol for disposing of your profile. Would you like to use the Director's PDA to authorize the counter-protocol?\"",
+      "thought": "If I trust the AI, it can help me lock down Hart Labs remotely."
+    },
+    "act3_death_oil": {
+      "location_name": "Cryo laboratory",
+      "title": "DEATH: STOMACH LUBRICANT",
+      "narrative": "In a panic before the Patriarch, you decide to drink Cryo-Shield Synthetic Oil, hoping that your insides will be covered with a protective film against mutations. The oil instantly solidifies in your esophagus, turning your lungs into a monolithic piece of blue plastic.",
+      "thought": "...clogging of the airways with polymers..."
+    },
+    "act1_hub_junk": {
+      "location_name": "Waste deck",
+      "title": "LOTS OF SCRAP METAL",
+      "narrative": "Piles of deformed scrap, broken drones and containers. You can find useful details here if you dig hard enough.",
+      "thought": "You need to be careful, the edges of the casing are sharp."
+    },
+    "act1_skills": {
+      "location_name": "Recycling gateway",
+      "title": "NEURAL NETWORK CALIBRATION",
+      "narrative": "The suit computer requires confirmation of the specialization profile to distribute the remaining battery energy. Your choices will determine what skills are available as you fight for survival on board.",
+      "thought": "You need to choose quickly. Life support systems won't wait."
+    },
+    "act2_escape_capsule": {
+      "location_name": "🌌 Greenhouse Technical Gateway",
+      "title": "PLAN B: DIRECT EVACUATION",
+      "narrative": "The cargo container is depressurized, but its manual accelerators are operational. Having a plasma cutter, you can weld the internal hatch tightly, shoot off the fastenings and throw yourself into outer space, completely ignoring the reactor and the command bridge. This is a one-way ticket with no guarantee of salvation.",
+      "thought": "The risk of dying from suffocation in the void is enormous, but it’s better than becoming food for the Swarm."
+    },
+    "act2_death_blood": {
+      "location_name": "Radio room",
+      "title": "DEATH: A TRAIL OF BLOOD",
+      "narrative": "You've ignored open bleeding for too long. The smell and warmth of your blood left a clear trail along the entire corridor. While you were talking to Tobias, a flock of hungry morph larvae burst out of the ventilation. You fell next to him.",
+      "thought": "Consciousness fades from blood loss and bites..."
+    },
+    "act1_cargo_subdeck": {
+      "location_name": "Cargo sub-tier / Elevator shaft",
+      "title": "ROUGHING SUB-TIER",
+      "narrative": "Having gone down the dilapidated technical stairs, you find yourself on the lower technological platform. The floor underfoot trembles noticeably - the station begins to rub against the upper layers of the atmosphere. A disabled service drone-loader stood frozen against the wall, its hydraulic components covered with a layer of machine oil. A little further you can see the massive, tightly welded gates of the old freight elevator, above which the inscription is lit: DIRECT ACCESS TO THE POWER UNIT.",
+      "thought": "This elevator bypasses the living quarters and laboratories. But to open these gates, you need a serious tool and an understanding of mechanics."
+    },
+    "act1_death_fast": {
+      "location_name": "Waste deck",
+      "title": "DEATH: MORPH JUMPER",
+      "narrative": "The impact of a heavy crowbar on metal echoed throughout the entire ventilation system of the compartment. A pale, multi-legged creature with blade-like jaws silently fell from the darkness of the ceiling. You didn't even have time to scream.",
+      "thought": "...the pulse line is straight... the broadcast is cut off..."
+    },
+    "act3_death_hug": {
+      "location_name": "Cryo laboratory",
+      "title": "DEATH: BLIND MERCY",
+      "narrative": "Under the capsule of suspended animation you notice a small, squeaking Morph larva. She looks so defenseless and sweet. You stretch out your hands to it to stroke it and warm it, but the little one, with the force of a hydraulic press, breaks through the glass of your helmet with its acidic sting.",
+      "thought": "...depressurization of the helmet... toxic liquefaction of the brain..."
+    },
+    "trans_ch_1_hub_eat_snack": {
+      "location_name": "Transition",
+      "title": "Eating a candy bar",
+      "narrative": "Hunger takes over common sense. You open the helmet flap and pop the candy bar into your mouth...",
+      "thought": "I hope this wasn't a fatal mistake..."
+    },
+    "trans_ch_1_hub_loot_crowbar": {
+      "location_name": "Transition",
+      "title": "Search for scrap",
+      "narrative": "You scatter the fragments of the casing and pull out a heavy steel scrap. A true classic of emergency survival.",
+      "thought": "Now I have a tool."
+    },
+    "trans_ch_1_hub_take_servo": {
+      "location_name": "Transition",
+      "title": "Servo pickup",
+      "narrative": "You pick up a heavy industrial servo. It may be possible to repair it or use it to strengthen the hydraulics.",
+      "thought": "Might come in handy later."
+    },
+    "trans_ch_1_hub_take_snack": {
+      "location_name": "Transition",
+      "title": "Removing the candy bar",
+      "narrative": "You pick an ancient corporate candy bar out of the tray. Looks dubious, but might be useful.",
+      "thought": "For a rainy day."
+    },
+    "trans_ch_1_hub_to_cargo": {
+      "location_name": "Transition",
+      "title": "Descent to the subtier",
+      "narrative": "The metal steps creak under your weight. You descend into the oil-smelling abyss of the lower level.",
+      "thought": "I hope there is another way out below."
+    },
+    "trans_ch_1_hub_to_explore": {
+      "location_name": "Transition",
+      "title": "Start of research",
+      "narrative": "You decide to carefully search the accessible areas of the Landfill Hub, dividing your attention between the rubble, the machine gun and the workbench.",
+      "thought": "The devil is in the details."
+    },
+    "trans_ch_1_cargo_shortcut": {
+      "location_name": "Transition",
+      "title": "[MASTER CUT] Opening the elevator gate",
+      "narrative": "You use the Heavy Crowbar as leverage and your engineering knowledge allows you to short out the backup starter. With a terrible grinding sound, the doors part, revealing the dark mouth of the elevator shaft.",
+      "thought": "Great maneuver. Saving time is everything."
+    },
+    "trans_ch_1_loot_servo": {
+      "location_name": "Transition",
+      "title": "Removing the servo drive",
+      "narrative": "Using your technical knowledge, you restore hydraulic servo valves in a minute. This heavy bundle is now in your inventory.",
+      "thought": "The job was done cleanly."
+    },
+    "ending_6": {
+      "location_name": "Orbit of the Planet",
+      "title": "🏆 ENDING: SAVIOR OF NEMESIS",
+      "narrative": "The maneuvering engines roared, shaking the hull. A powerful G-force push throws you onto the dashboard, but the green status lights up on the screens: TRAJECTORY IS STATIC. The Nemesis station stopped falling and froze in a safe circular orbit. Planetary catastrophe averted. The survivors in the habitation blocks are rescued, and the Swarm is sealed in the vacuum of isolated sectors.",
+      "thought": "I did it... The station is saved. The corporation will have to send rescuers, and this time we will have our own conditions."
+    },
+    "ending_8": {
+      "location_name": "Command Bridge/Orbit",
+      "title": "🏆 ENDING #8: MORPH LORD",
+      "narrative": "You plug the Roy Provider into the jack on the back of your head. The cybernetic exo-link flashes neon purple, synchronizing with the hidden bio-chip in your head. Consciousness instantly explodes with terabytes of alien sensory data. You are no longer trapped in a piece of composite suit armor.\n\nYou feel every creature aboard the Nemesis. You see the corridors through the eyes of jumping Morphs, feel the warmth of other people's bodies through the chitinous membranes of the larvae. Roy, who was trying to tear you apart a second ago, freezes. There is no more blind rage in their collective mind - now your voice is heard there. Your order.\n\nUsing mental control, you force hundreds of creatures to climb into the technical compartments and jam the deformed bulkheads and plasma circuits with their bodies. The station's fall is slowing down. You calmly walk past the bio-monsters frozen in bow to the Vanguard rescue shuttle. But it’s not the Quantum Carrier you’re taking with you. You take with you an army ready for expansion. The corporation thought it had created a weapon. They were wrong. They created their new God.",
+      "thought": "I am no longer a tool in their hands. I am the mind that will lead the Swarm forward. Let the corporation try to stop me."
+    },
+    "act5_terminal_final": {
+      "location_name": "Nemesis Main Terminal",
+      "title": "PROTOCOLS OF DESTINY ACTIVATED",
+      "narrative": "The bridge security system is completely broken. The interface of the station's main terminal opens in front of you. The screen is flooded with system logs, access codes and evacuation options. Behind the panoramic glass, the planet already occupies the entire horizon - the station begins to burn in the upper layers of the atmosphere. The Vanguard rescue shuttle is warming up its engines in the dock on the right. Time to make the final choice.",
+      "thought": "My entire chain of decisions led to this moment. There is no turning back. Which protocol to run?"
+    },
+    "act4_cryo_stasis": {
+      "location_name": "Cryo engineer bay",
+      "title": "DEEP ANBIOSIS",
+      "narrative": "You decide to stop the crazy race against time. The station is already burning in the atmosphere. You lie down in a high-strength engineering cryo-pod, batten down the hatch and activate the emergency tissue preservation mode. The capsule is designed to withstand a planetary impact, but awakening is not guaranteed.",
+      "thought": "Let the station fall. The capsule will protect me... or become my coffin."
+    },
+    "ending_1": {
+      "location_name": "Rescue Shuttle",
+      "title": "🏆 ENDING: GHOST OF THE VANGUARD",
+      "narrative": "You successfully stabilized the reactor, preserved human intelligence, and gave up Isolate Hart for the Quantum Carrier. The shuttle undocks from the collapsing station seconds before it explodes. You are flying to the planet, holding corporation data in your hands. You survived, but remained the faithful dog of those who erased your memory.",
+      "thought": "I fulfilled the contract. But who am I now?"
+    },
+    "ending_5": {
+      "location_name": "Rescue Shuttle",
+      "title": "🏆 ENDING: FORTUNE'S SMILE (SECRET)",
+      "narrative": "Relying solely on incredible luck (LUCK skill), you managed to slip through all the traps without engaging in battle with the Patriarch and ignoring the demands of Dr. Heart. The shuttle's automated capsule was shot off due to an accidental wiring failure just before the bridge fell. The data is lost, the station is destroyed, but you're adrift in an escape capsule with a bottle of synthetic whiskey. Rescuers will find you. Absolutely blank slate.",
+      "thought": "I can't believe it worked. I'm damn lucky."
+    },
+    "act4_engine_deck": {
+      "location_name": "Engine Deck",
+      "title": "🚀 MANEUVERING COMPARTMENT SOUTH-OBERON",
+      "narrative": "You're breaking through to the Engine Deck. There is weightlessness and a hellish roar here: the giant pistons of the maneuvering boosters are jammed due to the deformation of the hull. Jets of superheated hydrazine shoot through the technical bridges. The control systems are burned out, but if the ignition is manually started directly from the combustion chamber, the braking pulses will lift the Nemesis back into a stable orbit.",
+      "thought": "To manually reset the circuits, I would have to bypass the AI ​​security protocols or use something that would burn out the lock."
+    },
+    "act5_bridge_showdown": {
+      "location_name": "Command Bridge",
+      "title": "TRAP AT THE END OF THE WORLD",
+      "narrative": "You take a step onto the panoramic deck, but the airlock behind you is tightly blocked. The center console screen flashes purple. Twin laser turrets of the security system hum from the ceiling niches. Suddenly, the cold, static-distorted voice of Doctor Heart comes through the speakers: “You thought I’d release the corporation’s weapons on the shuttle, Marcus? Burn it out.\"",
+      "thought": "The situation is critical. The bridge's protective shields are down and the turrets are targeting me. You need to act in seconds."
+    }
+  },
+  "choices": {
+    "ch_5_bridge_omega_detection": {
+      "label": "⚠️ [🚨 CRITICAL SYSTEM ERROR] Approach the main bridge terminal",
+      "narrative_override": "The bridge's security scanners instantly flash crimson. The AI's robotic voice echoes through the compartment: \"Attention. Omega spores have been detected in the subject's body. Cleanup protocol has been activated.\" Ceiling turrets turn towards you before you can say anything..."
+    },
+    "ch_1_trap_force_injured": {
+      "label": "🏃 Try to squeeze through without tools",
+      "narrative_override": ""
+    },
+    "ch_1_junk_back": {
+      "label": "↩️ Move away from the rubble",
+      "narrative_override": ""
+    },
+    "ch_2_launch_capsule": {
+      "label": "🚀 Pull the manual reset lever and weld the hatch",
+      "narrative_override": "The lever gives in with a terrible grinding noise. The automation shoots the container into the icy abyss. You are free."
+    },
+    "ch_1_escape_injured_next": {
+      "label": "👣Patch the wound and enter the Residential Blocks",
+      "narrative_override": ""
+    },
+    "ch_1_lore_back": {
+      "label": "↩️ Return to the scrap metal rubble",
+      "narrative_override": ""
+    },
+    "ch_2_leave_to_act3": {
+      "label": "🚀 Take the elevator down to the Bio-Laboratory",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_boss_fight": {
+      "label": "➡️ Shoot",
+      "narrative_override": ""
+    },
+    "ch_4_cryo_absurd": {
+      "label": "👅 Lick the icy wall of the cryogenic tank",
+      "narrative_override": "You decide to check whether the temperature of liquid nitrogen is really that low. Your tongue instantly freezes tightly to the metal. While trying to free yourself, you accidentally pull the emergency pressure valve. A jet of liquid nitrogen instantly turns Marcus into an ice statue, which crashes into fragments."
+    },
+    "ch_2_med_locked_cabinet_back": {
+      "label": "↩️ Take everything useful and leave",
+      "narrative_override": ""
+    },
+    "ch_1_cargo_to_sealed_container": {
+      "label": "🔐 [HACK/MOD] Open the sealed container",
+      "narrative_override": ""
+    },
+    "ch_1_cargo_sealed_container_back": {
+      "label": "↩️ Take the battery and go out",
+      "narrative_override": ""
+    },
+    "ch_5_b_ending_5": {
+      "label": "🏆 [SECRET] Trust blind luck at the last moment",
+      "narrative_override": ""
+    },
+    "ch_5_b_ending_8": {
+      "label": "🧬 [EXO-LINK] Use the Swarm Provider and subdue the Morph hivemind",
+      "narrative_override": "You activate the exo interface. A powerful electrical discharge passes through the body, but instead of pain comes absolute, cold control over every biological unit on the station."
+    },
+    "ch_5_showdown_crowbar": {
+      "label": "🔧 [ITEM] Insert a Heavy Crowbar into the turret servo",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_5_showdown_battery": {
+      "label": "➡️ Rush to the terminal under the cover of the shield",
+      "narrative_override": ""
+    },
+    "ch_1_hub_to_trap": {
+      "label": "👣 Approach the jammed hydraulic sluice",
+      "narrative_override": ""
+    },
+    "ch_1_start_to_skills": {
+      "label": "[Continue] Start suit calibration",
+      "narrative_override": ""
+    },
+    "ch_1_trap_eng_clean": {
+      "label": "🔧 [TECHNIQUE] Use a laser cutter to carefully dismantle the beam",
+      "narrative_override": "You expertly cut off the stubborn beam. The airlock doors hiss apart, opening a clear path out."
+    },
+    "ch_1_trap_luck_clean": {
+      "label": "🎲 [LUCK] Press a random key combination on the service panel",
+      "narrative_override": "Incredibly, the relay shorted exactly as it should! The lock clicked and completely cleared the passage."
+    },
+    "ch_4_reactor_overload": {
+      "label": "💥 Overload the reactor circuits for a powerful EMP pulse against the creatures",
+      "narrative_override": ""
+    },
+    "ch_1_hub_to_shuttle": {
+      "label": "🔍 [SECRET] Search the far corner behind the blocked waterproofing",
+      "narrative_override": "You notice a barely visible seam in the trim. Behind it is an old rescue shuttle."
+    },
+    "ch_1_shuttle_back": {
+      "label": "↩️ Systems are dead. Return to Landfill Hub",
+      "narrative_override": "There is no power, the engines do not respond. We'll have to look for another way."
+    },
+    "ch_4_start_to_vault": {
+      "label": "❄️ [SECRET] Stumble upon the hidden panel of the Secret Cryo Archive",
+      "narrative_override": "Among the chaos of destruction, you find an untouched deep-freeze compartment."
+    },
+    "ch_3_reactor_escape_to_bridge": {
+      "label": "🏃 Break through the emergency ventilation airlock to the Command Bridge",
+      "narrative_override": "Choking from smoke and radiation, you get out of the reactor sector straight to the final line."
+    },
+    "ch_4_vault_to_ending": {
+      "label": "💤 Lie down in the capsule and start the survival protocol",
+      "narrative_override": "Let the station fall. The capsule will protect me... or become my coffin."
+    },
+    "ch_1_skill_eng": {
+      "label": "🔧 Select profile: Mechanical engineer",
+      "narrative_override": ""
+    },
+    "ch_1_skill_luck": {
+      "label": "🎲 Select profile: Soldier of fortune",
+      "narrative_override": ""
+    },
+    "ch_1_skill_ref": {
+      "label": "⚡ Select profile: Stormtrooper",
+      "narrative_override": ""
+    },
+    "ch_1_skill_srv": {
+      "label": "☣️ Select profile: Survival Expert",
+      "narrative_override": ""
+    },
+    "ch_1_skill_stl": {
+      "label": "👤 Select profile: Scout-liquidator",
+      "narrative_override": ""
+    },
+    "ch_3_ai_to_act4": {
+      "label": "🚀 The AI ​​obeyed. Heading to the Energy Block",
+      "narrative_override": "The drones delivered Isolate directly to the airlock. Hart Labs is on lockdown. I can move on."
+    },
+    "ch_1_from_trap_to_hub": {
+      "label": "Go back",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_5_showdown_crowbar": {
+      "label": "➡️ Skip past immobilized turrets",
+      "narrative_override": ""
+    },
+    "ch_2_secret_take_cutter": {
+      "label": "🔫 Take the Heavy Plasma Cutter",
+      "narrative_override": "You attach a heavy weapon to the suit's magnetic grip. It's heavy and clumsy, but its power is enough to burn through even tank armor."
+    },
+    "ch_2_hydro_to_bypass": {
+      "label": "🔥 [ITEM] Use Heavy Plasma Cutter on the jammed cargo hatch",
+      "narrative_override": "You burn through the hatch and jump into the shaft, completely bypassing the laboratories and the reactor!"
+    },
+    "ch_3_hub_to_ai": {
+      "label": "💻 [SECRET] Try to hack the central AI Core \"ARGUS\"",
+      "narrative_override": "If I have Director access, I can force the AI ​​to lock down Hart Labs."
+    },
+    "ch_2_med_to_locked_cabinet": {
+      "label": "🔐 [HACK/HACK] Open the locked medical cabinet",
+      "narrative_override": ""
+    },
+    "ch_2_secret_office_back": {
+      "label": "↩️ Return to the corridors of the residential sector",
+      "narrative_override": "You take everything valuable and leave the office, returning to the intersection."
+    },
+    "ch_3_hart_exploit": {
+      "label": "💻 [MOD] Use the Director's PDA to remotely intercept the Isolate",
+      "narrative_override": "You connect the Director's PDA to the intercom terminal. Hart's face pales as the automatic gateway security system obeys your command. Technical drones, bypassing her will, extract Isolate Omega from the depths of the reactor and deliver it to the airlock right at your feet. You didn't have to go down into the nest!"
+    },
+    "ch_2_search_back": {
+      "label": "↩️ Return to the crossroads",
+      "narrative_override": ""
+    },
+    "ch_5_showdown_battery": {
+      "label": "⚡ [ITEM] Use Spare Battery for Shield Pulse",
+      "narrative_override": ""
+    },
+    "ch_4_engines_isolate_exploit": {
+      "label": "☣️ [BIO-MECHANICS] Pour Omega Isolate into the bio-sensors of stuck valves",
+      "narrative_override": "Crazy idea! You break the ampoule with Isolate directly into the hydraulic receiver. The aggressive mutagen instantly reacts with traces of the Swarm's organics, causing the jammed bio-growths on the pistons to convulsively contract and release the metal. The valves open, releasing the plasma accelerators!"
+    },
+    "ch_4_climb_to_power": {
+      "label": "⚡ [MENU] Redistribute spacesuit energy",
+      "narrative_override": ""
+    },
+    "ch_1_cargo_back": {
+      "label": "↩️ Climb back to the Landfill Hub",
+      "narrative_override": "You decide not to take any chances with the old elevator and return to the main deck."
+    },
+    "ch_1_hub_to_lounge": {
+      "label": "🚪 Go through an open gateway",
+      "narrative_override": ""
+    },
+    "ch_5_terminal_chrono_fix": {
+      "label": "🔧 [SECRET] Use Stationery Clips to fix the Chronometer and freeze time",
+      "narrative_override": "You deftly connect the broken internal contacts of the case with ordinary office clips. The chronometer makes a shrill ringing sound. Time around freezes for ten endless seconds. This is enough to seal the cryo-capsule hatch and wait out the impact."
+    },
+    "ch_2_rec_take_oil": {
+      "label": "🧴Search the closet and take away a heavy canister of Cryo-Shield oil",
+      "narrative_override": "You carefully pour the remaining thick blue oil into an airtight container on the suit's belt. Now you have an excellent technical lubricant."
+    },
+    "ch_4_engines_pda_win": {
+      "label": "💾 [HACK/HACK] Use the Director's PDA to forcefully reset the engine lock",
+      "narrative_override": "You connect a secure PDA to the main injector. The Director's master key instantly shuts up the station's crazy AI. The automation unlocks the servos, the heavy pistons slide into place, and the engines begin the braking cycle as normal. You're safe."
+    },
+    "ch_4_engines_manual_burn": {
+      "label": "⚡ [DANGER] Close the ignition relay manually through the exposed power cable",
+      "narrative_override": "You don't have access keys. You tear off the protective casing and grab with your hands the cables under voltage of thousands of volts. A terrible electric shock throws you to the floor, burning out the internal systems of the suit and damaging the nervous system, but the spark reaches the injectors - the engines start!"
+    },
+    "ch_engine_end": {
+      "label": "⚡ Activate emergency impulse",
+      "narrative_override": ""
+    },
+    "ch_2_get_clips": {
+      "label": "📎Search the abandoned reception desk",
+      "narrative_override": "Among the pile of papers you find a pack of durable steel office clips. Why do you need them? Who knows."
+    },
+    "ch_2_bypass_to_bridge": {
+      "label": "👣 Move along the de-energized tunnel up to the Command Bridge",
+      "narrative_override": ""
+    },
+    "ch_1_workbench_to_hub": {
+      "label": "↩️ Return to the hub center",
+      "narrative_override": ""
+    },
+    "ch_3_nest_hug_monster": {
+      "label": "🥺 Try to pet the cute little mutant larva on the wall",
+      "narrative_override": "She moves her mustache so funny! She's probably just scared in this dark nest..."
+    },
+    "ch_4_to_cryo_stasis": {
+      "label": "❄️ Use the Faraday Key Card for the capsule terminal and go into suspended animation",
+      "narrative_override": "Secure access codes put the capsule into autonomous disaster survival mode. Systems isolate you from the outside world."
+    },
+    "ch_cryo_end_trigger": {
+      "label": "💤 Close your eyes and start freezing",
+      "narrative_override": ""
+    },
+    "ch_1_hub_to_cargo": {
+      "label": "⚡ Go down the stairs",
+      "narrative_override": "The metal steps creak under your weight. You descend into the oil-smelling abyss of the lower level."
+    },
+    "ch_1_cargo_loot_servo": {
+      "label": "🔧 Dismantle a broken android for parts",
+      "narrative_override": "Using the suit's basic tools, you carefully open the robot's knee joint and remove the Broken Servo. Heavy, but valuable."
+    },
+    "ch_2_tobias_feed_bar": {
+      "label": "🍫 [ITEM] Give Tobias the Meteor Bar",
+      "narrative_override": "You hand him an ancient, hardened block."
+    },
+    "ch_2_tobias_feed_back": {
+      "label": "↩️ Return to discussion of the plan",
+      "narrative_override": "You give him a break and reassess the situation."
+    },
+    "ch_3_boss_distract_bar": {
+      "label": "🍫 [ITEM] Throw the candy bar in the opposite corner of the laboratory",
+      "narrative_override": "You take out a chemical-soaked candy bar and throw it with all your might at the far end of the hall."
+    },
+    "ch_3_boss_distract_to_nest": {
+      "label": "👣 Slip into the Nest while the monster is busy",
+      "narrative_override": "You silently make your way past while the Patriarch tears at the wrapper in the far corner."
+    },
+    "ch_4_gravity_bait": {
+      "label": "🍫 [ITEM] Place a candy bar on the edge of the anomalous zone as bait",
+      "narrative_override": "You place the candy bar on the floor in a high gravity area."
+    },
+    "ch_4_gravity_bait_to_climb": {
+      "label": "👣 Start climbing the mine safely",
+      "narrative_override": "The threat eliminated, you cling to the first ledge in the shaft."
+    },
+    "ch_2_secret_take_pda": {
+      "label": "💾 Pick up the Director's PDA",
+      "narrative_override": "You pick up the heavy tablet. The status appears on the screen: Administrator Master Access. With this you can try to hack the Hart system."
+    },
+    "ch_5_b_ending_3_workbench": {
+      "label": "🎖 [FINAL] Start blackout protocol (Workbench: Living Tobias and Spare Battery)",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_5_showdown_absurd": {
+      "label": "➡️ Press the button",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_5_showdown_ref": {
+      "label": "➡️ Make a tackle",
+      "narrative_override": ""
+    },
+    "ch_5_showdown_ref": {
+      "label": "⚡ [REFLEXES] Make a tactical tackle under laser beams and cut the power cable",
+      "narrative_override": "Your augmentations and combat experience as a stormtrooper work flawlessly. You fall onto the slippery metal floor, flying under a grid of heat rays. With one precise blow from a heavy tool, you rip out the main power cable from the distribution board by the roots. The bridge plunges into emergency twilight, defense systems go out."
+    },
+    "trans_choice_ch_5_showdown_tobias": {
+      "label": "➡️ Order to cover",
+      "narrative_override": ""
+    },
+    "ch_5_showdown_tobias": {
+      "label": "🤝 [TOBIAS] Order a wounded teammate to cover you with an assault rifle",
+      "narrative_override": "Tobias, overcoming the hellish pain from his lost leg, slides off your shoulders and throws up the captured machine gun: “Run to the console, Marcus! I'll take down these damn guns! While he is pouring lead on the turrets, taking retaliatory hits on his body armor, you break through to the terminal."
+    },
+    "trans_choice_ch_1_hub_take_snack": {
+      "label": "➡️ Hide in pocket",
+      "narrative_override": ""
+    },
+    "ch_1_hub_take_snack": {
+      "label": "🍫 Find a Meteor bar in the broken machine and put it in your pocket",
+      "narrative_override": "You pick an ancient corporate candy bar out of the tray. Looks dubious, but might be useful."
+    },
+    "ch_1_skip_to_act4": {
+      "label": "🔧 [TECHNIQUE] Use a Heavy Crowbar to break into a freight elevator shaft directly",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_skill_luck": {
+      "label": "➡️ Finish calibration",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_skill_ref": {
+      "label": "➡️ Finish calibration",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_skill_srv": {
+      "label": "➡️ Finish calibration",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_skill_stl": {
+      "label": "➡️ Finish calibration",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_repair_servo": {
+      "label": "➡️ Test",
+      "narrative_override": ""
+    },
+    "ch_5_b_ending_3_bad": {
+      "label": "🎖 [FINAL] Give the last order to Tobias",
+      "narrative_override": "You understand that without cover you won't get to the launch pad. Tobias looks at you, already knowing the answer. “Cover me,” you say."
+    },
+    "ch_1_repair_servo": {
+      "label": "🔧 [TECHNIQUE] Repair the servo and integrate it into the exoskeleton of the legs",
+      "narrative_override": "Using engineering tools, you tinker with the servo. The hydraulics of the legs are rumbling quite - the load-carrying capacity of the spacesuit has been significantly increased!"
+    },
+    "ch_5_showdown_absurd": {
+      "label": "🔴 Ignore the turrets, jump into the luxurious captain's chair and press the big red button",
+      "narrative_override": ""
+    },
+    "ch_2_hydro_bypass_oil_back": {
+      "label": "↩️ Go back",
+      "narrative_override": "You decide not to risk it and return to the Hydroponics compartment."
+    },
+    "ch_5_b_ending_2": {
+      "label": "🏆 [FINAL] The reactor is overloaded, the chip is destroyed, the data is erased",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_skip_to_act4": {
+      "label": "🏃 [CUT] Fly down",
+      "narrative_override": "You jump onto the rope, flying through the Residential Sector and Laboratories!"
+    },
+    "ch_2_rec_back": {
+      "label": "↩️ Return to Landfill Hub",
+      "narrative_override": ""
+    },
+    "ch_2_hydro_back": {
+      "label": "↩️ Return back to the residential intersection",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_secret_take_pda": {
+      "label": "➡️ Pick up the tablet",
+      "narrative_override": ""
+    },
+    "ch_2_bypass_act3_4": {
+      "label": "👤 [STEALTH] Use the Ventilation Scheme to directly break through to the Command Bridge",
+      "narrative_override": "The duct map did not disappoint. You climb into a narrow pipe and, bypassing Doctor Hart's bio-laboratories and the exploding reactor, crawl right under the dashboard of the Command Bridge!"
+    },
+    "ch_1_cargo_shortcut": {
+      "label": "⚙️ [MASTER CUT] Open the freight elevator gate and jump into the shaft",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_launch_capsule": {
+      "label": "➡️ Shoot",
+      "narrative_override": ""
+    },
+    "ch_2_sabotage_escape": {
+      "label": "🛠️ [SURVIVAL + PLASMA CUTTER] Prepare a cargo container for emergency shooting into space",
+      "narrative_override": "You use the Heavy Plasma Cutter to cut the fuses on the airlock, and your survival skills help you calculate the minimum oxygen supply in the container."
+    },
+    "ch_1_cargo_shortcut_return": {
+      "label": "↩️ Continue",
+      "narrative_override": ""
+    },
+    "ch_2_hydro_bypass_oil": {
+      "label": "🧴 [ITEM] Use Cryo-Shield oil to open the rusted cargo hatch",
+      "narrative_override": ""
+    },
+    "ch_1_skip_to_act4_back": {
+      "label": "↩️ Go back",
+      "narrative_override": "You decide not to risk it and return to the workbench."
+    },
+    "ch_2_loot_chronometer": {
+      "label": "🕵️ Search the broken clock on the wall of the compartment",
+      "narrative_override": "Among the shards of quartz glass you find a strange prototype of a pocket device. It flickers with a soft blue light, defying the laws of physics. You take it away."
+    },
+    "ch_1_cargo_shortcut_back": {
+      "label": "↩️ Go back",
+      "narrative_override": "You decide not to risk it and return to the cargo hold."
+    },
+    "ch_2_hub_to_hydro": {
+      "label": "🌿 [COMPARTMENT] Enter the foggy sector of the Hydroponics Greenhouse",
+      "narrative_override": ""
+    },
+    "ch_2_bypass_to_bridge_back": {
+      "label": "↩️ Go back",
+      "narrative_override": "You decide not to rush and return to the tunnel."
+    },
+    "trans_choice_ch_2_hydro_bypass_oil": {
+      "label": "🏃 [CUT] Jump into the mine",
+      "narrative_override": "You jump down, completely flying past the research laboratories and straight into the Power Unit!"
+    },
+    "ch_1_skip_to_act4_return": {
+      "label": "↩️ Continue",
+      "narrative_override": ""
+    },
+    "ch_1_hub_loot_crowbar_return": {
+      "label": "↩️ Continue",
+      "narrative_override": ""
+    },
+    "ch_2_hub_to_secret_return": {
+      "label": "↩️ Continue",
+      "narrative_override": ""
+    },
+    "ch_2_lounge_to_security_return": {
+      "label": "↩️ Continue",
+      "narrative_override": ""
+    },
+    "ch_3_hub_to_ai_return": {
+      "label": "↩️ Continue",
+      "narrative_override": ""
+    },
+    "ch_3_hub_to_lore_return": {
+      "label": "↩️ Continue",
+      "narrative_override": ""
+    },
+    "ch_3_hart_exploit_return": {
+      "label": "↩️ Continue",
+      "narrative_override": ""
+    },
+    "ch_1_explore_back": {
+      "label": "↩️ Return to the hub center",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_security_take_items": {
+      "label": "➡️ Continue",
+      "narrative_override": ""
+    },
+    "ch_2_security_take_items": {
+      "label": "📟 Take the Exo-Link and Ventilation Circuit from the table",
+      "narrative_override": "You take the Swarm Provider (Exo-Link) and load the Ventilation Circuit into the PDA. Now you see the entire network of hidden air ducts of the station."
+    },
+    "ch_3_boss_fight": {
+      "label": "🔥 [WEAPON] Use Heavy Plasma Cutter against the Blind Patriarch",
+      "narrative_override": ""
+    },
+    "ch_2_tobias_leave": {
+      "label": "🏃 [LEAVE] Lock the radio room and run to the bio-complex elevator",
+      "narrative_override": ""
+    },
+    "ch_1_explore_to_junk": {
+      "label": "🗑️ Search the rubble of scrap metal",
+      "narrative_override": ""
+    },
+    "ch_2_tobias_save": {
+      "label": "🤝 [SAVE] Put Tobias on your shoulders and move together",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_boss_annihilate": {
+      "label": "➡️ Take the trophy",
+      "narrative_override": ""
+    },
+    "ch_3_boss_annihilate": {
+      "label": "🔥 [WEAPON] Burn the Patriarch with a Heavy Plasma Cutter",
+      "narrative_override": "You activate the plasma cutter at full power. The blinding beam burns through the chitin and tissue of the monster. The creature falls dead. From her skull you extract the surviving Quantum Swarm Provider!"
+    },
+    "trans_choice_ch_3_boss_eng": {
+      "label": "➡️ Rate the result",
+      "narrative_override": ""
+    },
+    "ch_3_boss_eng": {
+      "label": "🔧 [TECHNIQUE] Close the power cables of the capsules to the puddle under the monster's feet",
+      "narrative_override": ""
+    },
+    "ch_1_explore_to_snacks": {
+      "label": "🍫 Approach the broken machine gun",
+      "narrative_override": ""
+    },
+    "ch_3_boss_ref": {
+      "label": "⚡ [REFLEXES] Cut off the creature's auditory membranes with a plasma cutter",
+      "narrative_override": ""
+    },
+    "ch_3_boss_stl": {
+      "label": "👤 [STEALTH] Silently distract the Patriarch by throwing a metal pipe",
+      "narrative_override": ""
+    },
+    "ch_3_choice_hart": {
+      "label": "🤝 Give Isolate to Doctor Hart (Select security and Quantum Carrier)",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_trap_force_injured": {
+      "label": "➡️Pinch the wound",
+      "narrative_override": ""
+    },
+    "ch_3_choice_self": {
+      "label": "🧠 Inject the strain into your brain (Burn out the corporation chip, restore your memory)",
+      "narrative_override": ""
+    },
+    "ch_3_stealth_back": {
+      "label": "↩️ Rate other options",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_choice_vent": {
+      "label": "➡️ Break the flask",
+      "narrative_override": ""
+    },
+    "ch_3_choice_vent": {
+      "label": "💨 Break the flask and release the strain into the general ventilation of the sector",
+      "narrative_override": ""
+    },
+    "ch_1_explore_to_workbench": {
+      "label": "🔧 Inspect the engineering workbench",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_hart_exploit": {
+      "label": "➡️ Pick up Isolate",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_tobias_leave": {
+      "label": "➡️ Lock the door",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_med_heal": {
+      "label": "➡️ Complete treatment",
+      "narrative_override": ""
+    },
+    "ch_3_med_heal": {
+      "label": "💉 Apply neuro-regenerator (Remove all current injuries)",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_choice_self": {
+      "label": "➡️ Enter strain",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_boss_stl": {
+      "label": "➡️ Rate the result",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_boss_ref": {
+      "label": "➡️ Rate the result",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_nest_hck": {
+      "label": "➡️ Pick up Isolate",
+      "narrative_override": ""
+    },
+    "ch_3_nest_hck": {
+      "label": "💻 [HACK/MOD] Carry out a clean software extraction of the strain",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_nest_luck": {
+      "label": "➡️ Grab the flask",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_tobias_save": {
+      "label": "➡️ Put it on your shoulders",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_nest_stl": {
+      "label": "➡️ Disconnect the flask",
+      "narrative_override": ""
+    },
+    "ch_3_reactor_escape_clean": {
+      "label": "👣 Break through the emergency ventilation airlock into the supply mines",
+      "narrative_override": "Choking from the smoke, you knock out the air duct grate and crawl into the elevator shafts. A dull explosion is heard behind - the reactor sector is isolated forever."
+    },
+    "ch_4_climb_power_hydraulics": {
+      "label": "⚙️ Overload the power drives of the legs and servos of the exoskeleton",
+      "narrative_override": "The suit's hydraulics respond with a powerful roar. Your lifting capacity and pushing power are now doubled. An excellent base for carrying heavy loads."
+    },
+    "ch_4_climb_power_magnets": {
+      "label": "🧲 Maximize the power of Magnetic grips on gloves and soles",
+      "narrative_override": "The magnetic relays snap onto the shaft guides with such force that you almost get pinned against the wall. It's almost impossible to get you out of here now."
+    },
+    "ch_4_climb_power_shields": {
+      "label": "🛡️ Direct emergency energy to the suit's Kinetic shields",
+      "narrative_override": "You're redirecting power to the baffles. A faint flickering field flashes around the suit. The speed of movement decreases, but you are protected from external blows."
+    },
+    "trans_choice_ch_4_climb_servo_godmode": {
+      "label": "➡️ Rise higher",
+      "narrative_override": ""
+    },
+    "ch_2_save_to_act3": {
+      "label": "🚀 Drag Tobias into the elevator and go down",
+      "narrative_override": ""
+    },
+    "ch_3_nest_stl": {
+      "label": "👤 [STEALTH] Silently squeeze past the sleeping vines of the Swarm",
+      "narrative_override": "Using the suit's hidden modules, you glide smoothly between the pulsating veins. Your movements are quieter than a sigh. You carefully remove the flask with the Isolate without disturbing any of the larvae."
+    },
+    "ch_5_bridge_recovery": {
+      "label": "➡️ Continue to control terminal",
+      "narrative_override": ""
+    },
+    "ch_3_nest_srv": {
+      "label": "☣️ [SURVIVAL] Manually tear out the capsule directly from the bio-mass",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_reactor_escape_clean": {
+      "label": "➡️ Get into the mines",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_climb_power_hydraulics": {
+      "label": "➡️ Continue climbing",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_climb_power_magnets": {
+      "label": "➡️ Continue climbing",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_climb_power_shields": {
+      "label": "➡️ Continue climbing",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_climb_solo_skip": {
+      "label": "➡️ Start climbing",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_nest_srv": {
+      "label": "➡️Tear out the capsule",
+      "narrative_override": ""
+    },
+    "ch_4_engines_pda_win_return": {
+      "label": "↩️ Continue",
+      "narrative_override": ""
+    },
+    "ch_2_med_to_locked_cabinet_return": {
+      "label": "↩️ Continue",
+      "narrative_override": ""
+    },
+    "ch_5_showdown_hack_return": {
+      "label": "↩️ Continue",
+      "narrative_override": ""
+    },
+    "ch_1_cargo_to_sealed_container_return": {
+      "label": "↩️ Continue",
+      "narrative_override": ""
+    },
+    "ch_4_climb_solo_skip": {
+      "label": "🏃 Start a high-speed climb alone (Slice)",
+      "narrative_override": "You have passed the central sections of the station. You have no wounded behind you, but there is no place to expect support from. You activate the suit's magnetic grips."
+    },
+    "ch_4_climb_universal_fallback": {
+      "label": "🏃 Use standard spacesuit reserves for ascent",
+      "narrative_override": "You are not burdened with wounded comrades and heavy equipment from past acts. Your goal is simply to survive and get to the reactor compartment. You start to climb."
+    },
+    "trans_choice_ch_4_cryo_absurd": {
+      "label": "➡️Lick the wall",
+      "narrative_override": ""
+    },
+    "ch_5_b_ending_3": {
+      "label": "🚀 [FINAL] Launch Alliance Protocol (Requires: Living Tobias and Quantum Carrier)",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_reactor_to_engines_srv": {
+      "label": "➡️ Break out the hatch",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_regen_use": {
+      "label": "➡️ Activate",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_to_engine_deck": {
+      "label": "➡️ Break through",
+      "narrative_override": ""
+    },
+    "ch_4_regen_use": {
+      "label": "💉 Activate capsule (Full healing / Station will fall faster)",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_engines_isolate_exploit": {
+      "label": "➡️ Break the ampoule",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_engines_manual_burn": {
+      "label": "➡️ Grab the cables",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_engines_pda_win": {
+      "label": "➡️ Connect a PDA",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_engine_end": {
+      "label": "➡️ Activate",
+      "narrative_override": ""
+    },
+    "ch_5_bridge_showdown_ai_recovery": {
+      "label": "➡️ Retreat and regroup at the airlock",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_climb_universal_fallback": {
+      "label": "➡️ Start climbing",
+      "narrative_override": ""
+    },
+    "ch_4_reactor_to_engines_srv": {
+      "label": "☣️ [SURVIVAL] Take a shortcut through the gas-polluted supply sector to the brake installations",
+      "narrative_override": "Tightening the spacesuit straps and ignoring warnings about the toxicity of the fuel, you forcefully break down the hatch and squeeze into the corridors of the maneuvering complex. Your experience tells me that if you activate the engines, the fall will stop."
+    },
+    "ch_1_hub_loot_crowbar": {
+      "label": "🔨 Move away the debris of the casing",
+      "narrative_override": "You scatter the fragments of the casing and pull out a heavy steel scrap. A true classic of emergency survival."
+    },
+    "ch_1_find_magnetometer": {
+      "label": "🔍 Approach a pile of electronics",
+      "narrative_override": "Among the wreckage of the navigation boards you find a working Calibrated Magnetometer. This is a specific thing, but it can be useful in the reactor compartment."
+    },
+    "ch_1_hub_take_servo": {
+      "label": "🔍 Search the trash in the center of the room",
+      "narrative_override": "You pick up a heavy industrial servo. It may be possible to repair it or use it to strengthen the hydraulics."
+    },
+    "trans_choice_ch_1_hub_eat_snack": {
+      "label": "➡️Bite and swallow",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_explore_to_junk": {
+      "label": "➡️ Start search",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_explore_to_snacks": {
+      "label": "➡️Come closer",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_explore_to_workbench": {
+      "label": "➡️ Inspect the tools",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_cargo_shortcut": {
+      "label": "🏃 [CUT] Continue falling in the mine",
+      "narrative_override": "You jump onto a cable flying past and fly down, completely missing the residential decks and laboratories!"
+    },
+    "trans_choice_ch_1_hub_to_cargo": {
+      "label": "➡️ Continue descent",
+      "narrative_override": ""
+    },
+    "ch_1_hub_eat_snack": {
+      "label": "🤤 Eat a Meteor bar right now to restore your strength",
+      "narrative_override": "Hunger takes over common sense. You open the helmet flap and pop the candy bar into your mouth..."
+    },
+    "trans_choice_ch_1_escape_injured_next": {
+      "label": "➡️Patch the wound and move on",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_cargo_loot_servo": {
+      "label": "➡️ View the find",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_find_magnetometer": {
+      "label": "➡️ Pick up the device",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_hub_loot_crowbar": {
+      "label": "➡️ Put the crowbar in your inventory",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_hub_take_servo": {
+      "label": "➡️ Put it in your backpack",
+      "narrative_override": ""
+    },
+    "ch_2_corridors_to_start": {
+      "label": "👣 Step aside and explore Quarter B-12",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_hub_to_explore": {
+      "label": "➡️ Look around",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_hub_to_lore": {
+      "label": "➡️ Search",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_trap_eng_clean": {
+      "label": "➡️ Go through the opening",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_hub_to_trap": {
+      "label": "➡️ Assess the situation",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_trap_stl_clean": {
+      "label": "➡️ Go through the opening",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_trap_luck_clean": {
+      "label": "➡️ Go through the opening",
+      "narrative_override": ""
+    },
+    "ch_3_nest_ref": {
+      "label": "⚡ [REFLEXES] Snatch the flask with a quick jerk and dodge the impact of the spikes",
+      "narrative_override": "Your reaction saves your life. In a split second you grab the flask, and when the biomass suddenly awakens and throws out bone spikes, you do a perfect somersault back, escaping with only fear."
+    },
+    "trans_choice_ch_1_hub_to_lounge": {
+      "label": "➡️ Enter the compartment",
+      "narrative_override": ""
+    },
+    "ch_1_hub_eat_snack_back": {
+      "label": "↩️ Change your mind and fasten your helmet",
+      "narrative_override": "Common sense is returning. You fasten the helmet flap without risking your health."
+    },
+    "ch_2_tobias_bleed_back": {
+      "label": "↩️ Urgently pinch the wound and retreat",
+      "narrative_override": "You understand that the smell of blood attracts creatures. We need to stop the bleeding immediately!"
+    },
+    "ch_2_rec_drink_oil_back": {
+      "label": "↩️ Come to your senses and don’t drink chemicals",
+      "narrative_override": "Common sense prevails. You close the helmet valve, realizing that this is a technical lubricant, not a drink."
+    },
+    "ch_2_do_selfie_back": {
+      "label": "↩️ Change your mind and move away from the terminal",
+      "narrative_override": "You decide not to risk it, remove your hand from the console and take a step back into the corridor. The outbreak never happened."
+    },
+    "ch_3_boss_bleed_back": {
+      "label": "↩️ Urgently pinch the wound and step into the shadows",
+      "narrative_override": "You realize that the smell of blood gives you away. We need to stop the bleeding immediately!"
+    },
+    "trans_choice_ch_1_start_to_skills": {
+      "label": "➡️ Start scanning",
+      "narrative_override": ""
+    },
+    "ch_5_bridge_omega_back": {
+      "label": "↩️ Recoil sharply from the terminal",
+      "narrative_override": "You take a step back, trying to get out of the scanning area before the turrets open fire."
+    },
+    "ch_3_nest_hug_back": {
+      "label": "↩️ Change your mind and not touch the mutant",
+      "narrative_override": "You pull your hand back, realizing that this is not a cute pet, but a deadly larva."
+    },
+    "ch_1_trap_stl_clean": {
+      "label": "👤 [STEALTHY] Lubricate the grooves of the sash with oil and silently slip through",
+      "narrative_override": ""
+    },
+    "ch_4_cryo_absurd_back": {
+      "label": "↩️ Come to your senses and don’t lick the ice",
+      "narrative_override": "Common sense returns at the last second. You jerk your head away from the ice wall."
+    },
+    "ch_1_hub_to_lore": {
+      "label": "🔍 Go to the pile of garbage near the wall",
+      "narrative_override": ""
+    },
+    "ch_1_snacks_back": {
+      "label": "↩️ Move away from the machine",
+      "narrative_override": ""
+    },
+    "ch_3_boss_drink_oil_back": {
+      "label": "↩️ Change your mind and not drink oil",
+      "narrative_override": "Panic recedes. You understand that this will not help against the monster, but will only harm."
+    },
+    "ch_1_hub_to_explore": {
+      "label": "🔍 Go to the waste deck",
+      "narrative_override": "You decide to thoroughly search the accessible areas of the Landfill Hub."
+    },
+    "trans_choice_ch_1_loot_servo": {
+      "label": "➡️ Pick up part",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_1_skill_eng": {
+      "label": "➡️ Finish calibration",
+      "narrative_override": ""
+    },
+    "ch_1_workbench_back": {
+      "label": "↩️ Move away from the workbench",
+      "narrative_override": ""
+    },
+    "ch_3_boss_yolo_back": {
+      "label": "↩️ Stop and don’t run to certain death",
+      "narrative_override": "The instinct of self-preservation takes over. You slow down, realizing that you cannot survive a frontal attack."
+    },
+    "trans_choice_ch_2_bypass_act3_4": {
+      "label": "➡️ Get to the bridge",
+      "narrative_override": ""
+    },
+    "ch_2_hub_to_secret": {
+      "label": "🔍 [SEARCH] Check the locked door marked SB",
+      "narrative_override": ""
+    },
+    "ch_2_corridors_to_rooms": {
+      "label": "🚪 Inspect neighboring compartments",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_corridors_to_rooms": {
+      "label": "➡️ View",
+      "narrative_override": ""
+    },
+    "ch_2_corridors_to_search": {
+      "label": "🔍Search the corridor",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_corridors_to_search": {
+      "label": "➡️ Start search",
+      "narrative_override": ""
+    },
+    "ch_2_do_selfie": {
+      "label": "📸 Use the terminal to take a pretentious selfie against the backdrop of a burning corridor",
+      "narrative_override": "You activate the surveillance camera and strike a beautiful pose. Flash!"
+    },
+    "ch_3_nest_luck": {
+      "label": "🎲 [LUCK] Rely on chance and grab the flask while the larvae are sleeping",
+      "narrative_override": "You decide to take a risk. While you are reaching for the flask, the reactor systems malfunction, and a couple of flashes of fire scare away the biomass. You manage to snatch the Isolate out without a single scratch!"
+    },
+    "trans_choice_ch_2_hub_to_hydro": {
+      "label": "➡️ Enter the compartment",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_hub_to_lore": {
+      "label": "➡️ Read",
+      "narrative_override": ""
+    },
+    "ch_2_hub_to_med": {
+      "label": "➕ [MEDICAL POST] Inspect the emergency medical center",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_hub_to_med": {
+      "label": "➡️ Inspect the node",
+      "narrative_override": ""
+    },
+    "ch_2_hub_to_rec": {
+      "label": "🎮 [COMpartment] Go through the broken glass doors to the Break Room",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_hub_to_rec": {
+      "label": "➡️ Go inside",
+      "narrative_override": ""
+    },
+    "ch_2_hub_to_tobias": {
+      "label": "🚪 Enter the wheezing radio room",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_hub_to_tobias": {
+      "label": "➡️ Login",
+      "narrative_override": ""
+    },
+    "ch_4_gravity_test_back": {
+      "label": "↩️ Change your mind and don’t throw away the key",
+      "narrative_override": "You catch the key on the fly, realizing that testing the anomalous gravity on yourself is a bad idea."
+    },
+    "ch_2_hydro_srv": {
+      "label": "☣️ [SURVIVAL] Cut a safe corridor through the poisonous thickets to the elevator",
+      "narrative_override": "Using your innate knowledge of extreme flora, you accurately prune the supporting nodes of mutated vines. They fall powerlessly, freeing up a clear passage to the main elevator."
+    },
+    "trans_choice_ch_2_hydro_srv": {
+      "label": "➡️ Go to the elevator",
+      "narrative_override": ""
+    },
+    "ch_2_hydro_stl": {
+      "label": "👤 [STEALTH] Calculate the movement cycles of the stems and sneak through without a fight",
+      "narrative_override": "You freeze, matching the rhythm of your steps to the slow pulsations of the plants. Your suit slips under the blind vines without touching a single poisonous thorn."
+    },
+    "trans_choice_ch_2_hydro_stl": {
+      "label": "➡️ Slip",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_do_selfie": {
+      "label": "➡️ Take a photo",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_leave_to_act3": {
+      "label": "➡️ Go down",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_bypass_to_bridge": {
+      "label": "🏃 [CUT] Continue path",
+      "narrative_override": "You break out the service panel and find yourself right at the end."
+    },
+    "trans_choice_ch_2_get_clips": {
+      "label": "➡️ Pick up",
+      "narrative_override": ""
+    },
+    "ch_2_hub_to_lore": {
+      "label": "🔍 Examine the papers on the floor",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_rec_drink_oil": {
+      "label": "➡️ Realize the mistake",
+      "narrative_override": ""
+    },
+    "ch_2_lounge_to_security": {
+      "label": "🔑 Search the reception desk and go to the Security Service Offices",
+      "narrative_override": ""
+    },
+    "ch_2_start_next": {
+      "label": "👣 Go to the central intersection of the residential sector",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_secret_take_cutter": {
+      "label": "➡️ Pick up weapons",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_med_back": {
+      "label": "➡️ Return",
+      "narrative_override": ""
+    },
+    "ch_4_to_engine_deck": {
+      "label": "🚀 [ENGINEER] Break through to the engines and manually change the orbit",
+      "narrative_override": "You ignore the reactor and rush towards the engines. Your engineering expertise allows you to redirect the flow of antimatter."
+    },
+    "trans_choice_ch_2_lounge_to_security": {
+      "label": "➡️ Open the door",
+      "narrative_override": ""
+    },
+    "ch_2_rec_to_hydro": {
+      "label": "🌿 Open adjacent Hydroponics maintenance gateway",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_rec_to_hydro": {
+      "label": "➡️ Open the gateway",
+      "narrative_override": ""
+    },
+    "ch_1_loot_servo": {
+      "label": "🔧 [TECHNIQUE] Remove a broken servo from an engineering drone",
+      "narrative_override": "Using your technical knowledge, you can rebuild hydraulic servo valves in a minute. This Heavy Knot is now in your inventory."
+    },
+    "trans_choice_ch_2_save_to_act3": {
+      "label": "➡️ Go down",
+      "narrative_override": ""
+    },
+    "ch_2_lore_back": {
+      "label": "↩️ Return to searching the corridor",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_loot_chronometer": {
+      "label": "➡️ Pick up the device",
+      "narrative_override": ""
+    },
+    "ch_2_rec_drink_oil": {
+      "label": "🤢 Pour expired oil directly into the helmet intake valve",
+      "narrative_override": ""
+    },
+    "ch_2_security_to_corridors": {
+      "label": "↩️ Return to the rest room",
+      "narrative_override": ""
+    },
+    "ch_2_rooms_back": {
+      "label": "↩️ Return to the crossroads",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_start_next": {
+      "label": "➡️ Go deeper",
+      "narrative_override": ""
+    },
+    "ch_2_med_back": {
+      "label": "↩️ Pick up the remaining stimulants and return",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_rec_take_oil": {
+      "label": "➡️ Pick up",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_2_sabotage_escape": {
+      "label": "➡️ Complete preparation",
+      "narrative_override": ""
+    },
+    "ch_4_climb_servo_godmode": {
+      "label": "🦾 Use Boosted Servo to climb with Tobias",
+      "narrative_override": "Your suit's modified hydraulics can easily handle the weight of your wounded partner. You confidently and quickly walk up the cables of the mine, ignoring the gravitational blows."
+    },
+    "trans_choice_ch_3_boss_drink_oil": {
+      "label": "➡️ Realize the mistake",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_boss_kill_to_hub": {
+      "label": "➡️ Go to the laboratory",
+      "narrative_override": ""
+    },
+    "ch_3_boss_kill_to_hub": {
+      "label": "👣 Step through the smoking remains of a monster in the laboratory",
+      "narrative_override": ""
+    },
+    "ch_3_boss_to_combat": {
+      "label": "⚔️ [MENU] Enter into battle / Use vehicles",
+      "narrative_override": ""
+    },
+    "ch_1_junk_complete": {
+      "label": "🏆 The rubble has been explored to the bottom",
+      "narrative_override": ""
+    },
+    "ch_3_boss_luck": {
+      "label": "🎲 [LUCK] Freeze and hope that the creature steps on the exposed power cable",
+      "narrative_override": "Incredible accident! The creature takes a blind step to the side, and its clawed paw lands directly on a sparkling high-voltage cable. A terrible discharge of current throws the Blind Patriarch back into the darkness, giving you precious time to rush to the nest."
+    },
+    "trans_choice_ch_3_boss_luck": {
+      "label": "➡️ Jump to the nest",
+      "narrative_override": ""
+    },
+    "ch_3_boss_srv": {
+      "label": "🌿 [SURVIVAL] Use pheromones from the bio-waste container to mask the smell",
+      "narrative_override": "You quickly break the emergency container and smear the caustic mucus of a dead Swarm specimen all over your suit. The Patriarch moves his blind muzzle just a couple of centimeters from your helmet, noisily inhaling air, but, uttering a guttural roar, he turns around and goes into the ventilation. The path is clear."
+    },
+    "trans_choice_ch_3_boss_srv": {
+      "label": "➡️ Jump to the nest",
+      "narrative_override": ""
+    },
+    "ch_3_boss_to_stealth": {
+      "label": "👤 [MENU] Act stealthily",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_boss_to_stealth": {
+      "label": "➡️ Select action",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_nest_hug_monster": {
+      "label": "➡️Pet",
+      "narrative_override": ""
+    },
+    "ch_3_lore_back": {
+      "label": "↩️ Move away from the terminal",
+      "narrative_override": ""
+    },
+    "ch_2_bypass_back": {
+      "label": "↩️ Change your mind and return to the Greenhouse",
+      "narrative_override": "You decide that taking a shortcut through a blackout tunnel is too risky without proper preparation. It's better to find another way."
+    },
+    "ch_2_capsule_back": {
+      "label": "↩️ Cancel preparations and return to the Greenhouse",
+      "narrative_override": "You've changed your mind about risking your life in outer space. It's a one-way ticket, and you're not ready to use it yet."
+    },
+    "ch_4_cryo_stasis_back": {
+      "label": "↩️ Exit the capsule and continue to the reactor",
+      "narrative_override": "You changed your mind about giving up. The station hasn't fallen yet, you have a chance to fix everything with your own hands."
+    },
+    "ch_3_boss_yolo": {
+      "label": "🏃 Try to get through (No skills)",
+      "narrative_override": ""
+    },
+    "ch_3_hub_to_lore": {
+      "label": "💻 Hack the laboratory's archive terminal",
+      "narrative_override": ""
+    },
+    "ch_3_cryo_proceed": {
+      "label": "👣 Move forward through frosty capsules",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_cryo_proceed": {
+      "label": "➡️ Move forward",
+      "narrative_override": ""
+    },
+    "ch_3_hart_accept": {
+      "label": "☣️ Accept the terms. Go down to the Reactor Nest for Isolate",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_hart_accept": {
+      "label": "➡️ Go down to the Nest",
+      "narrative_override": ""
+    },
+    "ch_3_hub_to_hart": {
+      "label": "🚪 Approach Doctor Hart's armored bunker",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_hub_to_hart": {
+      "label": "➡️ Approach",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_hub_to_lore": {
+      "label": "➡️ Hack",
+      "narrative_override": ""
+    },
+    "ch_3_hub_to_med": {
+      "label": "🔬 Go to the laboratory medical cabinet",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_hub_to_med": {
+      "label": "➡️ Approach",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_boss_yolo": {
+      "label": "➡️ Continue",
+      "narrative_override": ""
+    },
+    "ch_3_med_back": {
+      "label": "↩️ Return to the hub center",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_med_back": {
+      "label": "➡️ Return",
+      "narrative_override": ""
+    },
+    "ch_3_combat_back": {
+      "label": "↩️ Rate other options",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_choice_hart": {
+      "label": "➡️ Complete the transaction",
+      "narrative_override": ""
+    },
+    "ch_3_hub_toolkit_broken": {
+      "label": "🧰 Complete set of tools",
+      "narrative_override": ""
+    },
+    "ch_3_hub_toolkit_enhanced": {
+      "label": "🧰 Complete set of tools",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_nest_ref": {
+      "label": "➡️Tear out the flask",
+      "narrative_override": ""
+    },
+    "ch_5_start_next_bypass": {
+      "label": "👣 Go to the main control terminal",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_5_start_next_bypass": {
+      "label": "➡️ Approach",
+      "narrative_override": ""
+    },
+    "ch_4_climb_magnetometer": {
+      "label": "🧲 Use a Calibrated Magnetometer to safely navigate to the engines",
+      "narrative_override": "The device clearly registers field fluctuations. You calculate a completely safe corridor and proceed to the engine controls without any skill checks."
+    },
+    "ch_2_rec_to_corridors": {
+      "label": "🚪 Go out to the common corridors of the cabins",
+      "narrative_override": ""
+    },
+    "ch_3_start_to_cryo": {
+      "label": "👣 Go to the cryogenic compartment",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_3_start_to_cryo": {
+      "label": "➡️ Go inside",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_climb_magnetometer": {
+      "label": "➡️ Walk along the corridor",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_gravity_test": {
+      "label": "➡️ Toss the key",
+      "narrative_override": ""
+    },
+    "ch_5_b_ending_4": {
+      "label": "🏆 [FINAL] Your body is completely destroyed by toxins and the Omega virus",
+      "narrative_override": ""
+    },
+    "ch_4_phase2_fall_tobias": {
+      "label": "🚨 [CATastrophe] Trying to hold Tobias without strengthening the drives...",
+      "narrative_override": "The overload becomes unbearable. Without additional power in the hydraulics or passive servos, your knees break with a terrible sound. Under the wild cry of your partner, you both fall into the abyss."
+    },
+    "ch_4_phase2_hydraulics_win": {
+      "label": "⚙️ [HYDRAULICS] Get the most out of the exoskeleton and pull out the wounded",
+      "narrative_override": "The suit's motors howl heart-rendingly, the indicators glow crimson, but the powerful leg drives can withstand Tobias' monstrous mass. With a powerful jerk, you throw yourself and your partner onto the hard floor of the reactor hall."
+    },
+    "ch_4_gravity_test": {
+      "label": "🔨 Throw a heavy key up to check for abnormal gravity",
+      "narrative_override": ""
+    },
+    "ch_2_hydro_bypass_open": {
+      "label": "🚪Go through the open cargo hatch",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_phase2_fall_tobias": {
+      "label": "➡️ Try to hold",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_phase2_hydraulics_win": {
+      "label": "➡️ Pull out your partner",
+      "narrative_override": ""
+    },
+    "ch_4_phase2_luck_win": {
+      "label": "🎲 [LUCK] Hoping that the broken elevator cable will jam and create a support",
+      "narrative_override": "Incredible! The whipped steel cable wraps around the torn beam right under your feet, forming a temporary bridge. You quickly step over the dangerous area."
+    },
+    "trans_choice_ch_4_phase2_luck_win": {
+      "label": "➡️Step over",
+      "narrative_override": ""
+    },
+    "ch_4_phase2_magboots_win": {
+      "label": "🧲 [MAGNETS / BOOTS] Fix tightly on the vibrating wall",
+      "narrative_override": "Whether it's the activated energy of magnets or your engineered Magnetic Boots, the soles are tightly welded to the rail. You don't care about the gravity shift. After calmly waiting out the vibration, you reach the top."
+    },
+    "trans_choice_ch_4_phase2_magboots_win": {
+      "label": "➡️ Register",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_phase2_solo_clean": {
+      "label": "➡️ Get into the airlock",
+      "narrative_override": ""
+    },
+    "ch_5_b_ending_1": {
+      "label": "🏆 [FINAL] The reactor is stable, you have Quantum Carrier Heart in your hands",
+      "narrative_override": ""
+    },
+    "ch_4_phase2_solo_clean": {
+      "label": "👣 Catch onto the lifeline and make the final push",
+      "narrative_override": "Since you are traveling light and not burdened by a wounded officer, your basic strength is enough to ignore the tilt of the station and deftly climb into the open reactor airlock."
+    },
+    "ch_4_power_back": {
+      "label": "↩️ Rate other options",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_reactor_to_engines_eng": {
+      "label": "➡️ Reconfigure",
+      "narrative_override": ""
+    },
+    "ch_4_start_to_climb": {
+      "label": "👣 Start climbing the vertical elevator shaft",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_start_to_climb": {
+      "label": "➡️ Start climbing",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_start_to_regen": {
+      "label": "➡️ Enter the compartment",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_4_to_cryo_stasis": {
+      "label": "➡️ Launch",
+      "narrative_override": ""
+    },
+    "ch_4_start_to_regen": {
+      "label": "🔧 Enter the technical compartment with the cryo-capsule",
+      "narrative_override": ""
+    },
+    "ch_4_reactor_to_engines_eng": {
+      "label": "🛠 [TECHNIQUE] Redirect plasma flows directly to the shunting nozzles of the engine deck",
+      "narrative_override": "You're reconfiguring the distribution network. The HUD navigates the route through the emergency sewer to the southern boosters. There is still a chance to save the station itself!"
+    },
+    "trans_choice_ch_4_reactor_stabilize": {
+      "label": "➡️ Stabilize",
+      "narrative_override": ""
+    },
+    "ch_4_reactor_stabilize": {
+      "label": "🔧 [TECHNIQUE] Direct all reserves to stabilize the magnetic field of the core",
+      "narrative_override": ""
+    },
+    "ch_5_start_next": {
+      "label": "👣 Go to the main control terminal",
+      "narrative_override": ""
+    },
+    "ch_5_showdown_hack": {
+      "label": "💻 [MOD] Use the Director's PDA to remotely disable the defense protocol",
+      "narrative_override": "You promptly connect the Director's secure PDA, found in Act 2, to the service port of the gateway. Corporate Master Codes instantly take over priority. The laser turrets turn off with a squeal and retract back into their slots. The path to the main terminal is clear."
+    },
+    "trans_choice_ch_5_bridge_omega_detection": {
+      "label": "➡️ Realize the mistake",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_5_showdown_yolo": {
+      "label": "➡️ Continue",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_5_showdown_hack": {
+      "label": "➡️ Connect a PDA",
+      "narrative_override": ""
+    },
+    "trans_choice_ch_cryo_end_trigger": {
+      "label": "➡️ Close your eyes",
+      "narrative_override": ""
+    },
+    "ch_5_showdown_yolo": {
+      "label": "🏃 Try to break through to the terminal under heavy fire",
+      "narrative_override": "You don't have the right tools or tactical advantage. You just run forward through open space. The turret laser markers instantly converge on your chest. A volley of plasma burns right through your suit, throwing your lifeless body back into the shaft."
+    },
+    "trans_choice_ch_5_start_next": {
+      "label": "➡️ Approach",
+      "narrative_override": ""
+    }
+  },
+  "achievements": {
+    "ach_speedrun": {
+      "title": "Rapid fire",
+      "description": "Die in the first 2 minutes of the game by causing a rumble in the Landfill Hub."
+    },
+    "ach_say_cheese": {
+      "title": "Smile!",
+      "description": "Attempt to take a selfie through the security terminal during a Morph breach."
+    },
+    "ach_mother_teresa": {
+      "title": "Mother Teresa",
+      "description": "Try to hug and feel sorry for the cute larva of a foreign organism."
+    },
+    "ach_newton_approves": {
+      "title": "Newton approves",
+      "description": "Throw a wrench upward in an area of ​​abnormally high gravity."
+    },
+    "ach_red_button": {
+      "title": "What is she doing?",
+      "description": "Press the huge, inviting red button on the Command Bridge just before the finale."
+    },
+    "ach_smuggler_route": {
+      "title": "Smuggler",
+      "description": "Hack the cargo sub-tier in Act 1 and take the shortcut directly to Act 4."
+    },
+    "ach_vent_rat": {
+      "title": "Ventilation rat",
+      "description": "Find the hidden SB drawings and climb through the ventilation pipes from Act 2 directly to the Bridge."
+    },
+    "ach_david_vs_goliath": {
+      "title": "David vs Goliath",
+      "description": "Do not run away from the Blind Patriarch, but completely annihilate him with a heavy plasma cutter."
+    },
+    "ach_lucky_bastard": {
+      "title": "Smile of Fortune",
+      "description": "Complete the game relying solely on blind luck (Class LUCK)."
+    },
+    "ach_swarm_lord": {
+      "title": "Morph Lord",
+      "description": "Subdue the Swarm Mind using Exo-Link and preserve human sanity."
+    },
+    "space_wanderer": {
+      "title": "Space Trucker",
+      "description": "Escape the station in a cargo container, completely missing half the game."
+    },
+    "chronos_master": {
+      "title": "Time Lord",
+      "description": "Find and repair the Broken Chronometer prototype in the civilian sector."
+    },
+    "infected_mind": {
+      "title": "The Phantom Menace",
+      "description": "Reach the ending with the hidden phase of Swarm incubation inside your own body."
+    },
+    "eternal_passenger": {
+      "title": "Eternal Passenger",
+      "description": "Go into cryo-sleep and survive the fall of the space station."
+    },
+    "heavy_mechanic": {
+      "title": "Exo-Engineer",
+      "description": "Collect and repair the Broken Servo in Act 1, making the passage of the elevator shaft completely easier."
+    },
+    "ach_chemical_gourmet": {
+      "title": "Chemical industry gourmand",
+      "description": "Drink a canister of expired technical oil \"Cryo-Shield\"."
+    },
+    "ach_food_poisoning": {
+      "title": "Food poisoning of the century",
+      "description": "Eat a 10-year-old Meteor bar from a contaminated vending machine."
+    },
+    "ach_boss_death": {
+      "title": "Torn to pieces",
+      "description": "Die in the clutches of the Blind Patriarch, underestimating his rage."
+    },
+    "ach_reactor_fall": {
+      "title": "Falling into the reactor",
+      "description": "Fall into the reactor shaft, trying to hold Tobias."
+    },
+    "ach_time_paradox": {
+      "title": "Time paradox",
+      "description": "Try to rewind time with a Broken Chronometer and destroy your own mind."
+    },
+    "ach_sacrifice_ending": {
+      "title": "Burning of Jericho",
+      "description": "Sacrifice yourself and the station to destroy the Swarm along with Nemesis."
+    },
+    "ach_savior_ending": {
+      "title": "Savior Nemesis",
+      "description": "Save the station from the Swarm by sacrificing part of yourself."
+    },
+    "ach_steel_cocoon": {
+      "title": "Steel cocoon",
+      "description": "Stop time around the station, freezing himself and Roy in eternal sleep."
+    },
+    "ach_blood_trail": {
+      "title": "A trail of blood",
+      "description": "Die from losing too much blood near Tobias."
+    },
+    "ach_scrap_perfectionist": {
+      "title": "Junk perfectionist",
+      "description": "Don't miss anything at the Scrap Heaps: three items and a tablet in your pocket."
+    },
+    "ach_abandon_tobias": {
+      "title": "Every man for himself",
+      "description": "Leaving the wounded Tobias for dead in Act 2."
+    },
+    "ach_hart_deal": {
+      "title": "Deal with the Devil",
+      "description": "Make a dubious deal with Dr. Hart."
+    },
+    "ach_hart_enemy": {
+      "title": "Enemy of Science",
+      "description": "Refuse Hart and make him an enemy."
+    },
+    "ach_patriarch_sneak": {
+      "title": "Shadow in the ventilation",
+      "description": "Deceive the Blind Patriarch and escape unnoticed."
+    },
+    "ach_patriarch_blind": {
+      "title": "Blind watchmaker",
+      "description": "Blind the Blind Patriarch."
+    },
+    "ach_full_toolkit": {
+      "title": "Swiss knife",
+      "description": "Collect a complete set of tools: magnetometer, crowbar, servo, clamps, chronometer and director's PDA."
+    },
+    "ach_hydro_shortcut": {
+      "title": "Rat crawl",
+      "description": "A shortcut through hydroponics, bypassing laboratories."
+    },
+    "ach_corp_ending": {
+      "title": "Ghost of the Vanguard",
+      "description": "Hide in cold space, leaving Nemesis and her secrets to the corporation."
+    },
+    "ach_no_man_left_behind": {
+      "title": "We don’t abandon our own",
+      "description": "Drag the crippled Tobias to the final through all the circles of hell."
+    },
+    "ach_toxicosis": {
+      "title": "Green Defender",
+      "description": "Receive toxic poisoning by tearing out a capsule of Omega Isolate."
+    },
+    "ach_no_man_left_behind_workbench": {
+      "title": "We don’t abandon our own (workbench)",
+      "description": "Alternative route: Rescue Tobias and bring him to the final by repairing the servo at the workbench."
+    },
+    "ach_no_man_left_behind_bad": {
+      "title": "Aren't we abandoning our own?..",
+      "description": "You saved Tobias, but in the shuttle cockpit you gave him the last order. He covered you and was mortally wounded. You picked him up and carried him further - but will he remain alive?"
+    }
+  }
+}

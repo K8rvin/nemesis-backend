@@ -2,29 +2,16 @@
 // 🗺️ ACHIEVEMENT ROUTES — загрузка готовых маршрутов из БД
 // ==========================================
 
+import { localizeAchievement, localizeChoice } from './localization.js';
+
 const START_NODE_ID = 'act1_start';
 
 const TIER_ORDER = ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM'];
-
-const TIER_NAME_MAP = {
-  'BRONZE': 'ОБЫЧНАЯ',
-  'SILVER': 'РЕДКАЯ',
-  'GOLD': 'ЭПИЧЕСКАЯ',
-  'PLATINUM': 'ЛЕГЕНДАРНАЯ',
-};
 
 function asArray(val) {
   if (val === undefined || val === null) return [];
   if (Array.isArray(val)) return val;
   return [val];
-}
-
-function withRarity(achievement) {
-  if (!achievement) return null;
-  return {
-    ...achievement,
-    rarity: TIER_NAME_MAP[achievement.medal_tier?.toUpperCase()] || 'ОБЫЧНАЯ',
-  };
 }
 
 function clonePlayer(player) {
@@ -80,13 +67,13 @@ function formatChoiceRequirements(choice) {
   if (!choice) return null;
   const conds = choice.conditions || {};
   const reqs = [];
-  if (conds.required_skill) reqs.push(`навык: ${conds.required_skill}`);
+  if (conds.required_skill) reqs.push({ type: 'skill', value: conds.required_skill });
   if (conds.flag_required) {
     const flags = Array.isArray(conds.flag_required) ? conds.flag_required : [conds.flag_required];
-    reqs.push(...flags.map(f => `флаг: ${f}`));
+    flags.forEach(f => reqs.push({ type: 'flag', value: f }));
   }
-  if (conds.item_required) reqs.push(`предмет: ${conds.item_required}`);
-  if (choice.effects?.add_skill) reqs.push(`не иметь навык: ${choice.effects.add_skill}`);
+  if (conds.item_required) reqs.push({ type: 'item', value: conds.item_required });
+  if (choice.effects?.add_skill) reqs.push({ type: 'no_skill', value: choice.effects.add_skill });
   return reqs.length > 0 ? reqs : null;
 }
 
@@ -118,7 +105,7 @@ async function loadChoicesForPath(env, supabaseFetch, path) {
   return map;
 }
 
-function buildResponse(player, targetAchievement, route, nextChoice, stepsFromHere) {
+function buildResponse(player, targetAchievement, route, nextChoice, stepsFromHere, lang) {
   const nextChoiceAvailable = nextChoice ? filterSingleChoice(nextChoice, clonePlayer(player)) : null;
 
   return {
@@ -130,9 +117,9 @@ function buildResponse(player, targetAchievement, route, nextChoice, stepsFromHe
     next_choice_requirements: nextChoice && !nextChoiceAvailable
       ? formatChoiceRequirements(nextChoice)
       : null,
-    target_achievement: withRarity(targetAchievement),
+    target_achievement: localizeAchievement(targetAchievement, lang),
     next_choice: nextChoice
-      ? { id: nextChoice.id, label: nextChoice.label }
+      ? { id: nextChoice.id, label: localizeChoice(nextChoice, lang).label }
       : null,
     path: route.path || [],
     steps_remaining: stepsFromHere,
@@ -141,7 +128,7 @@ function buildResponse(player, targetAchievement, route, nextChoice, stepsFromHe
 }
 
 export async function getHint(env, userId, targetTier, _targetType, targetAchievementId, dataProviders) {
-  const { getPlayerState, supabaseFetch } = dataProviders;
+  const { getPlayerState, supabaseFetch, lang } = dataProviders;
 
   const player = await loadPlayerState(env, userId, getPlayerState);
   if (!player) {
@@ -173,7 +160,7 @@ export async function getHint(env, userId, targetTier, _targetType, targetAchiev
         hint_enabled: true,
         reachable: false,
         reason: 'target_not_available',
-        target_achievement: withRarity(achievementById.get(targetAchievementId)) || null,
+        target_achievement: localizeAchievement(achievementById.get(targetAchievementId), lang) || null,
         next_choice: null,
       };
     }
@@ -205,7 +192,8 @@ export async function getHint(env, userId, targetTier, _targetType, targetAchiev
   });
 
   const selected = candidates[0];
-  const { route, achievement } = selected;
+  const { route } = selected;
+  const achievement = localizeAchievement(selected.achievement, lang);
   const path = route.path || [];
 
   // Загружаем объекты выборов из маршрута, чтобы найти текущую позицию игрока
@@ -280,7 +268,7 @@ export async function getHint(env, userId, targetTier, _targetType, targetAchiev
         reachable: true,
         reason: null,
         goal_reached: true,
-        target_achievement: withRarity(achievement),
+        target_achievement: achievement,
         path,
         next_choice: null,
         steps_remaining: 0,
@@ -291,12 +279,12 @@ export async function getHint(env, userId, targetTier, _targetType, targetAchiev
       hint_enabled: true,
       reachable: false,
       reason: 'off_route',
-      target_achievement: withRarity(achievement),
+      target_achievement: achievement,
       path,
       next_choice: null,
       steps_remaining: route.steps_remaining,
     };
   }
 
-  return buildResponse(player, achievement, route, nextChoice, stepsFromHere);
+  return buildResponse(player, achievement, route, nextChoice, stepsFromHere, lang);
 }
