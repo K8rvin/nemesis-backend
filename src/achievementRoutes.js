@@ -55,6 +55,10 @@ export function filterSingleChoice(choice, player) {
     const items = Array.isArray(conds.item_required) ? conds.item_required : [conds.item_required];
     if (!items.every(it => playerInventory.includes(it))) return false;
   }
+  if (conds.item_required_any) {
+    const items = Array.isArray(conds.item_required_any) ? conds.item_required_any : [conds.item_required_any];
+    if (!items.some(it => playerInventory.includes(it))) return false;
+  }
   if (conds.item_not_required) {
     const items = Array.isArray(conds.item_not_required) ? conds.item_not_required : [conds.item_not_required];
     if (items.some(it => playerInventory.includes(it))) return false;
@@ -73,6 +77,7 @@ function formatChoiceRequirements(choice) {
     flags.forEach(f => reqs.push({ type: 'flag', value: f }));
   }
   if (conds.item_required) reqs.push({ type: 'item', value: conds.item_required });
+  if (conds.item_required_any) reqs.push({ type: 'item', value: Array.isArray(conds.item_required_any) ? conds.item_required_any.join(' / ') : conds.item_required_any });
   if (choice.effects?.add_skill) reqs.push({ type: 'no_skill', value: choice.effects.add_skill });
   return reqs.length > 0 ? reqs : null;
 }

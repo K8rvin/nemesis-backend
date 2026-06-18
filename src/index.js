@@ -194,6 +194,10 @@ function filterChoices(allChoices, player) {
       const items = Array.isArray(conds.item_required) ? conds.item_required : [conds.item_required];
       if (!items.every(it => playerInventory.includes(it))) return false;
     }
+    if (conds.item_required_any) {
+      const items = Array.isArray(conds.item_required_any) ? conds.item_required_any : [conds.item_required_any];
+      if (!items.some(it => playerInventory.includes(it))) return false;
+    }
 
     return true;
   });

@@ -1,20 +1,19 @@
--- Маршрут к ачивке PLATINUM "Своих не бросаем?.." (ach_no_man_left_behind_bad).
--- Печальная концовка: Тобиас спасён, но в "Западне на краю света" получает смертельное ранение,
--- прикрывая оператора (ch_5_showdown_tobias). В терминале финальный выбор ch_5_b_ending_3_bad
--- запускает печальный протокол "Альянс" при наличии Квантового Носителя или Запасного аккумулятора.
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Upsert the route for ach_no_man_left_behind_bad."""
+import os, requests
+from datetime import datetime, timezone
 
-INSERT INTO public.achievement_routes (
-  start_node_id,
-  achievement_id,
-  path,
-  next_choice_id,
-  steps_remaining,
-  reachable,
-  created_at
-) VALUES (
-  'act1_start',
-  'ach_no_man_left_behind_bad',
-  '[
+url = os.environ['SUPABASE_URL']
+key = os.environ['SUPABASE_SERVICE_ROLE_KEY']
+headers = {
+    'apikey': key,
+    'Authorization': f'Bearer {key}',
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+}
+
+path = [
     "ch_1_start_to_skills",
     "trans_choice_ch_1_start_to_skills",
     "ch_1_skill_eng",
@@ -65,15 +64,21 @@ INSERT INTO public.achievement_routes (
     "ch_5_showdown_tobias",
     "trans_choice_ch_5_showdown_tobias",
     "ch_5_b_ending_3_bad"
-  ]'::jsonb,
-  'ch_1_start_to_skills',
-  0,
-  true,
-  now()
-)
-ON CONFLICT (start_node_id, achievement_id) DO UPDATE SET
-  path = EXCLUDED.path,
-  next_choice_id = EXCLUDED.next_choice_id,
-  steps_remaining = EXCLUDED.steps_remaining,
-  reachable = EXCLUDED.reachable,
-  created_at = EXCLUDED.created_at;
+]
+
+body = {
+    'start_node_id': 'act1_start',
+    'achievement_id': 'ach_no_man_left_behind_bad',
+    'path': path,
+    'next_choice_id': 'ch_1_start_to_skills',
+    'steps_remaining': 0,
+    'reachable': True,
+    'created_at': datetime.now(timezone.utc).isoformat(),
+}
+
+# Try upsert via POST with on_conflict
+upsert_headers = {**headers, 'Prefer': 'resolution=merge-duplicates'}
+r = requests.post(f"{url}/rest/v1/achievement_routes", headers=upsert_headers, json=body, params={'on_conflict': 'start_node_id,achievement_id'})
+print(f"POST achievement_routes upsert -> {r.status_code}")
+if r.status_code not in (201, 200, 204):
+    print(r.text)
