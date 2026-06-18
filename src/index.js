@@ -143,12 +143,17 @@ async function getAchievements(env, lang) {
 }
 
 async function unlockAchievement(env, userId, achievementId) {
+  const checkRes = await supabaseFetch(env, `/user_achievements?user_id=eq.${userId}&achievement_id=eq.${achievementId}&select=achievement_id`);
+  const checkData = await checkRes.json();
+  if (checkData.length > 0) return false; // уже разблокировано
+
   const res = await supabaseFetch(env, '/user_achievements', {
     method: 'POST',
-    headers: { 'Prefer': 'resolution=ignore-duplicates' },
+    headers: { 'Prefer': 'return=minimal' },
     body: JSON.stringify({ user_id: userId, achievement_id: achievementId }),
   });
   if (res) await res.text(); // Освобождаем сокет Supabase!
+  return true;
 }
 
 async function getAchievement(env, achievementId, lang) {
@@ -448,6 +453,7 @@ app.post('/api/choice', authMiddleware, async (c) => {
     ];
 
     let unlockedAchievement = null;
+    let alreadyUnlocked = false;
 
     const oldInventory = player.inventory || [];
     const newInventory = updates.inventory || [];
@@ -466,8 +472,6 @@ app.post('/api/choice', authMiddleware, async (c) => {
       const unlockedIds = new Set(unlockedData.map(r => r.achievement_id));
 
       for (const col of COLLECTION_ACHIEVEMENTS) {
-        if (unlockedIds.has(col.id)) continue;
-
         let satisfied = true;
 
         if (col.items) {
@@ -483,15 +487,25 @@ app.post('/api/choice', authMiddleware, async (c) => {
           if (!col.trigger_removed_flags.some(f => removedFlags.includes(f))) satisfied = false;
         }
 
-        if (satisfied) {
-          const flags = updates.story_flags || [];
-          if (!flags.includes(col.flag)) flags.push(col.flag);
-          updates.story_flags = flags;
+        if (!satisfied) continue;
 
-          await unlockAchievement(c.env, userId, col.id);
-          const ach = await getAchievement(c.env, col.id, lang);
-          if (ach) unlockedAchievement = ach;
+        const ach = await getAchievement(c.env, col.id, lang);
+        if (!ach) continue;
+
+        if (unlockedIds.has(col.id)) {
+          // Ачивка уже есть, но клиент может захотеть показать эффект повторно
+          unlockedAchievement = ach;
+          alreadyUnlocked = true;
+          continue;
         }
+
+        const flags = updates.story_flags || [];
+        if (!flags.includes(col.flag)) flags.push(col.flag);
+        updates.story_flags = flags;
+
+        const wasNew = await unlockAchievement(c.env, userId, col.id);
+        unlockedAchievement = ach;
+        alreadyUnlocked = !wasNew;
       }
     }
     // ---
@@ -501,10 +515,11 @@ app.post('/api/choice', authMiddleware, async (c) => {
 
     // Логика обработки явной ачивки из выбора (если не была выдана автопроверкой)
     if (effects.unlock_achievement && (!unlockedAchievement || unlockedAchievement.id !== effects.unlock_achievement)) {
-      await unlockAchievement(c.env, userId, effects.unlock_achievement);
       const ach = await getAchievement(c.env, effects.unlock_achievement, lang);
       if (ach) {
+        const wasNew = await unlockAchievement(c.env, userId, effects.unlock_achievement);
         unlockedAchievement = ach;
+        alreadyUnlocked = !wasNew;
       }
     }
 
@@ -526,7 +541,8 @@ app.post('/api/choice', authMiddleware, async (c) => {
         choices: [],
         player: updates,
         is_ending: true,
-        unlocked_achievement: unlockedAchievement
+        unlocked_achievement: unlockedAchievement,
+        already_unlocked: alreadyUnlocked
       });
     }
 
@@ -544,7 +560,8 @@ app.post('/api/choice', authMiddleware, async (c) => {
       player: updates,
       is_ending: newNode.is_ending || false,
       ending_type: newNode.ending_type || null,
-      unlocked_achievement: unlockedAchievement
+      unlocked_achievement: unlockedAchievement,
+      already_unlocked: alreadyUnlocked
     });
   } catch (err) {
     console.error(`❌ Error in /api/choice after ${Date.now() - requestStart}ms:`, err.message);
