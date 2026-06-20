@@ -481,6 +481,8 @@ app.post('/api/choice', authMiddleware, async (c) => {
         }
         if (satisfied && col.required_flags) {
           if (!col.required_flags.every(f => newFlags.includes(f))) satisfied = false;
+          // Lore historian achievement should only trigger when one of its lore flags is added
+          if (satisfied && !col.required_flags.some(f => addedFlags.includes(f))) satisfied = false;
         }
         if (satisfied && col.absent_flags) {
           if (col.absent_flags.some(f => newFlags.includes(f))) satisfied = false;
