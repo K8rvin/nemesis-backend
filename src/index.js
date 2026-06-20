@@ -383,7 +383,7 @@ app.post('/api/choice', authMiddleware, async (c) => {
   const requestStart = Date.now();
   try {
     const userId = c.get('userId');
-    const { choiceId } = await c.req.json();
+    const { choiceId, difficulty } = await c.req.json();
     if (!choiceId) return c.json({ error: 'Missing choiceId' }, 400);
 
     const choiceRes = await supabaseFetch(c.env, `/choices?id=eq.${choiceId}`);
@@ -574,7 +574,7 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
   const requestStart = Date.now();
   try {
     const userId = c.get('userId');
-    const { choiceId } = await c.req.json();
+    const { choiceId, difficulty } = await c.req.json();
     if (!choiceId) return c.json({ error: 'Missing choiceId' }, 400);
 
     const choiceRes = await supabaseFetch(c.env, `/choices?id=eq.${choiceId}`);
@@ -601,6 +601,11 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
       current_node_id: failNodeId,
       story_flags: storyFlags,
     };
+
+    // Apply damage on minigame failure; Hard difficulty doubles it
+    const baseDamage = effects.apply_damage || 10;
+    const damageMultiplier = difficulty === 'hard' ? 2 : 1;
+    updates.hp = Math.max(0, (player.hp || 100) - baseDamage * damageMultiplier);
 
     await updatePlayerState(c.env, userId, updates);
 
