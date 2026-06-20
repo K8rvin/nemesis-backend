@@ -476,6 +476,8 @@ app.post('/api/choice', authMiddleware, async (c) => {
 
         if (col.items) {
           if (!col.items.every(it => newInventory.includes(it))) satisfied = false;
+          // Swiss knife achievement should only trigger when one of its items is picked up
+          if (satisfied && !col.items.some(it => addedItems.includes(it))) satisfied = false;
         }
         if (satisfied && col.required_flags) {
           if (!col.required_flags.every(f => newFlags.includes(f))) satisfied = false;
