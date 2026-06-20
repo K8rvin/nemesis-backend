@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { getHint } from './achievementRoutes.js';
 import { normalizeLang, localizeNode, localizeChoice, localizeAchievement } from './localization.js';
+import { cacheGet, cacheSet, cacheStats } from './cache.js';
 
 // ==========================================
 // 🎛️ НАСТРОЙКИ ПРИЛОЖЕНИЯ
@@ -81,6 +82,25 @@ async function supabaseFetch(env, path, options = {}, retries = 3, baseDelay = 1
 }
 
 // ==========================================
+// ⏱️ TIMING HELPERS
+// ==========================================
+function timingStart() {
+  return { start: Date.now(), steps: {} };
+}
+
+function timingStep(t, name) {
+  const now = Date.now();
+  t.steps[name] = now - t.start;
+  t.start = now;
+  return t.steps[name];
+}
+
+function timingLog(prefix, t, extra = {}) {
+  const total = Object.values(t.steps).reduce((a, b) => a + b, 0);
+  console.log(`[TIMING ${prefix}] total=${total}ms`, Object.entries(t.steps).map(([k, v]) => `${k}=${v}ms`).join(' '), Object.keys(extra).length ? JSON.stringify(extra) : '');
+}
+
+// ==========================================
 // 📦 СЛОЙ ДАННЫХ (DATA PROVIDERS)
 // ==========================================
 async function getPlayerState(env, userId) {
@@ -90,9 +110,15 @@ async function getPlayerState(env, userId) {
 }
 
 async function getStartNodeId(env) {
+  const cacheKey = 'start_node_id';
+  let id = cacheGet(cacheKey);
+  if (id !== undefined) return id;
+
   const res = await supabaseFetch(env, '/nodes?is_start_node=eq.true&select=id');
   const data = await res.json();
-  return data[0]?.id;
+  id = data[0]?.id || null;
+  cacheSet(cacheKey, id);
+  return id;
 }
 
 async function createPlayerState(env, userId, startNodeId) {
@@ -126,14 +152,36 @@ async function updatePlayerState(env, userId, updates) {
 }
 
 async function getNode(env, nodeId, lang) {
+  const cacheKey = `node:${nodeId}:${lang}`;
+  let node = cacheGet(cacheKey);
+  if (node !== undefined) return node;
+
   const res = await supabaseFetch(env, `/nodes?id=eq.${nodeId}`);
-  return localizeNode((await res.json())[0], lang);
+  node = localizeNode((await res.json())[0], lang);
+  cacheSet(cacheKey, node);
+  return node;
 }
 
 async function getChoicesForNode(env, nodeId, lang) {
+  const cacheKey = `choices:${nodeId}:${lang}`;
+  let choices = cacheGet(cacheKey);
+  if (choices !== undefined) return choices;
+
   const res = await supabaseFetch(env, `/choices?node_id=eq.${nodeId}&order=sort_order.asc`);
-  const choices = await res.json();
-  return choices.map(c => localizeChoice(c, lang));
+  choices = (await res.json()).map(c => localizeChoice(c, lang));
+  cacheSet(cacheKey, choices);
+  return choices;
+}
+
+async function getChoiceById(env, choiceId, lang) {
+  const cacheKey = `choice:${choiceId}:${lang}`;
+  let choice = cacheGet(cacheKey);
+  if (choice !== undefined) return choice;
+
+  const res = await supabaseFetch(env, `/choices?id=eq.${choiceId}`);
+  choice = localizeChoice((await res.json())[0], lang);
+  cacheSet(cacheKey, choice);
+  return choice;
 }
 
 async function getAchievements(env, lang) {
@@ -142,10 +190,8 @@ async function getAchievements(env, lang) {
   return data.map(a => localizeAchievement(a, lang));
 }
 
-async function unlockAchievement(env, userId, achievementId) {
-  const checkRes = await supabaseFetch(env, `/user_achievements?user_id=eq.${userId}&achievement_id=eq.${achievementId}&select=achievement_id`);
-  const checkData = await checkRes.json();
-  if (checkData.length > 0) return false; // уже разблокировано
+async function unlockAchievement(env, userId, achievementId, alreadyUnlocked = false) {
+  if (alreadyUnlocked) return false;
 
   const res = await supabaseFetch(env, '/user_achievements', {
     method: 'POST',
@@ -157,9 +203,14 @@ async function unlockAchievement(env, userId, achievementId) {
 }
 
 async function getAchievement(env, achievementId, lang) {
+  const cacheKey = `achievement:${achievementId}:${lang}`;
+  let ach = cacheGet(cacheKey);
+  if (ach !== undefined) return ach;
+
   const res = await supabaseFetch(env, `/achievements?id=eq.${achievementId}`);
-  const data = await res.json();
-  return localizeAchievement(data[0], lang);
+  ach = localizeAchievement((await res.json())[0], lang);
+  cacheSet(cacheKey, ach);
+  return ach;
 }
 
 // Изображения теперь встроены в Flutter-клиент (assets/images/).
@@ -341,11 +392,11 @@ app.post('/api/auth/refresh', async (c) => {
 
 // 1. Получить текущую сцену и доступные выборы
 app.get('/api/state', authMiddleware, async (c) => {
-  const requestStart = Date.now();
+  const t = timingStart();
+  const userId = c.get('userId');
   try {
-    const userId = c.get('userId');
-
     let player = await getPlayerState(c.env, userId);
+    timingStep(t, 'player');
 
     if (!player) {
       const startNodeId = await getStartNodeId(c.env);
@@ -364,37 +415,42 @@ app.get('/api/state', authMiddleware, async (c) => {
     player.skill_primary = skillsArr[0] || null;
 
     const lang = normalizeLang(c.req.header('Accept-Language'));
-    const currentNode = await getNode(c.env, player.current_node_id, lang);
+    const [currentNode, allChoices] = await Promise.all([
+      getNode(c.env, player.current_node_id, lang),
+      getChoicesForNode(c.env, player.current_node_id, lang),
+    ]);
+    timingStep(t, 'node+choices');
+
     if (!currentNode) return c.json({ error: 'Current node not found in DB' }, 404);
 
-    const allChoices = await getChoicesForNode(c.env, currentNode.id, lang);
     const availableChoices = filterChoices(allChoices, player);
 
-    console.log(`[API /api/state] user=${userId} duration=${Date.now() - requestStart}ms`);
+    timingLog('GET /api/state', t, { user: userId, node: currentNode.id, cache: cacheStats().size });
     return c.json({ player, node: currentNode, choices: availableChoices });
   } catch (err) {
-    console.error(`❌ Error in /api/state after ${Date.now() - requestStart}ms:`, err.message);
+    timingLog('GET /api/state ERROR', t, { user: userId, error: err.message });
     return c.json({ error: 'Failed to load game state', details: err.message }, 500);
   }
 });
 
 // 2. Обработка выбора игрока
 app.post('/api/choice', authMiddleware, async (c) => {
-  const requestStart = Date.now();
+  const t = timingStart();
+  const userId = c.get('userId');
   try {
-    const userId = c.get('userId');
     const { choiceId, difficulty } = await c.req.json();
     if (!choiceId) return c.json({ error: 'Missing choiceId' }, 400);
 
-    const choiceRes = await supabaseFetch(c.env, `/choices?id=eq.${choiceId}`);
-    const choice = (await choiceRes.json())[0];
+    const lang = normalizeLang(c.req.header('Accept-Language'));
+
+    const [choice, player] = await Promise.all([
+      getChoiceById(c.env, choiceId, lang),
+      getPlayerState(c.env, userId),
+    ]);
+    timingStep(t, 'choice+player');
 
     if (!choice) return c.json({ error: 'Choice not found' }, 404);
-
-    let player = await getPlayerState(c.env, userId);
     if (!player) return c.json({ error: 'Player not found' }, 404);
-
-    const lang = normalizeLang(c.req.header('Accept-Language'));
 
     const effects = choice.effects || {};
     const updates = { ...player };
@@ -516,6 +572,7 @@ app.post('/api/choice', authMiddleware, async (c) => {
 
     updates.current_node_id = choice.target_node_id;
     await updatePlayerState(c.env, userId, updates);
+    timingStep(t, 'update');
 
     // Логика обработки явной ачивки из выбора (если не была выдана автопроверкой)
     if (effects.unlock_achievement && (!unlockedAchievement || unlockedAchievement.id !== effects.unlock_achievement)) {
@@ -526,6 +583,7 @@ app.post('/api/choice', authMiddleware, async (c) => {
         alreadyUnlocked = !wasNew;
       }
     }
+    timingStep(t, 'achievements');
 
     // Если у выбора нет следующей ноды — генерируем виртуальную финальную сцену
     if (!choice.target_node_id) {
@@ -539,6 +597,7 @@ app.post('/api/choice', authMiddleware, async (c) => {
         is_ending: true,
         ending_type: 'TERMINATED'
       };
+      timingLog('POST /api/choice terminal', t, { user: userId, choice: choiceId, cache: cacheStats().size });
       return c.json({
         success: true,
         node: closingNode,
@@ -550,12 +609,16 @@ app.post('/api/choice', authMiddleware, async (c) => {
       });
     }
 
-    const newNode = await getNode(c.env, choice.target_node_id, lang);
+    const [newNode, nextAllChoices] = await Promise.all([
+      getNode(c.env, choice.target_node_id, lang),
+      getChoicesForNode(c.env, choice.target_node_id, lang),
+    ]);
+    timingStep(t, 'node+choices');
+
     if (!newNode) return c.json({ error: 'Target node missing from database' }, 404);
-    const nextAllChoices = await getChoicesForNode(c.env, newNode.id, lang);
     const nextChoices = filterChoices(nextAllChoices, updates);
 
-    console.log(`[API /api/choice] user=${userId} choice=${choiceId} duration=${Date.now() - requestStart}ms`);
+    timingLog('POST /api/choice', t, { user: userId, choice: choiceId, node: newNode.id, cache: cacheStats().size });
     return c.json({
       success: true,
       narrative_override: choice.narrative_override,
@@ -568,21 +631,27 @@ app.post('/api/choice', authMiddleware, async (c) => {
       already_unlocked: alreadyUnlocked
     });
   } catch (err) {
-    console.error(`❌ Error in /api/choice after ${Date.now() - requestStart}ms:`, err.message);
+    timingLog('POST /api/choice ERROR', t, { user: userId, choice: choiceId, error: err.message, cache: cacheStats().size });
     return c.json({ error: 'Failed to process choice', details: err.message }, 500);
   }
 });
 
 // 2a. Обработка провала мини-игры (failure-выборы удалены из БД)
 app.post('/api/minigame/failure', authMiddleware, async (c) => {
-  const requestStart = Date.now();
+  const t = timingStart();
+  const userId = c.get('userId');
   try {
-    const userId = c.get('userId');
     const { choiceId, difficulty } = await c.req.json();
     if (!choiceId) return c.json({ error: 'Missing choiceId' }, 400);
 
-    const choiceRes = await supabaseFetch(c.env, `/choices?id=eq.${choiceId}`);
-    const choice = (await choiceRes.json())[0];
+    const lang = normalizeLang(c.req.header('Accept-Language'));
+
+    const [choice, player] = await Promise.all([
+      getChoiceById(c.env, choiceId, lang),
+      getPlayerState(c.env, userId),
+    ]);
+    timingStep(t, 'choice+player');
+
     if (!choice) return c.json({ error: 'Choice not found' }, 404);
 
     const effects = choice.effects || {};
@@ -590,10 +659,8 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
       return c.json({ error: 'Choice is not a minigame' }, 400);
     }
 
-    const player = await getPlayerState(c.env, userId);
     if (!player) return c.json({ error: 'Player not found' }, 404);
 
-    const lang = normalizeLang(c.req.header('Accept-Language'));
     const failNodeId = `fail_${choiceId}`;
     const failedFlag = `${choiceId}_failed`;
 
@@ -612,14 +679,19 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
     updates.hp = Math.max(0, (player.hp || 100) - baseDamage * damageMultiplier);
 
     await updatePlayerState(c.env, userId, updates);
+    timingStep(t, 'update');
 
-    const failNode = await getNode(c.env, failNodeId, lang);
+    const [failNode, allChoices] = await Promise.all([
+      getNode(c.env, failNodeId, lang),
+      getChoicesForNode(c.env, failNodeId, lang),
+    ]);
+    timingStep(t, 'node+choices');
+
     if (!failNode) return c.json({ error: 'Failure node not found' }, 404);
 
-    const allChoices = await getChoicesForNode(c.env, failNodeId, lang);
     const availableChoices = filterChoices(allChoices, updates);
 
-    console.log(`[API /api/minigame/failure] user=${userId} choice=${choiceId} duration=${Date.now() - requestStart}ms`);
+    timingLog('POST /api/minigame/failure', t, { user: userId, choice: choiceId, cache: cacheStats().size });
     return c.json({
       success: true,
       narrative_override: null,
@@ -631,7 +703,7 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
       unlocked_achievement: null,
     });
   } catch (err) {
-    console.error(`❌ Error in /api/minigame/failure after ${Date.now() - requestStart}ms:`, err.message);
+    timingLog('POST /api/minigame/failure ERROR', t, { user: userId, choice: choiceId, error: err.message, cache: cacheStats().size });
     return c.json({ error: 'Failed to process minigame failure', details: err.message }, 500);
   }
 });
@@ -701,9 +773,9 @@ app.post('/api/achievements/reset', authMiddleware, async (c) => {
 
 // 5. Умный подсказчик к неполученным ачивкам
 app.post('/api/hint', authMiddleware, async (c) => {
-  const requestStart = Date.now();
+  const t = timingStart();
+  const userId = c.get('userId');
   try {
-    const userId = c.get('userId');
     const { target_tier, target_type, target_achievement_id } = await c.req.json();
 
     const lang = normalizeLang(c.req.header('Accept-Language'));
@@ -715,16 +787,17 @@ app.post('/api/hint', authMiddleware, async (c) => {
       localizeAchievement,
       localizeChoice,
     });
+    timingStep(t, 'hint');
 
     if (result.error) {
-      console.log(`[API /api/hint] user=${userId} error=${result.error} duration=${Date.now() - requestStart}ms`);
+      timingLog('POST /api/hint ERROR', t, { user: userId, error: result.error, cache: cacheStats().size });
       return c.json({ error: result.error }, 404);
     }
 
-    console.log(`[API /api/hint] user=${userId} tier=${target_tier || 'ANY'} target=${result.target_achievement?.id || 'none'} reachable=${result.reachable} duration=${Date.now() - requestStart}ms`);
+    timingLog('POST /api/hint', t, { user: userId, tier: target_tier || 'ANY', target: result.target_achievement?.id || 'none', reachable: result.reachable, cache: cacheStats().size });
     return c.json(result);
   } catch (err) {
-    console.error(`❌ Error in /api/hint after ${Date.now() - requestStart}ms:`, err.message);
+    timingLog('POST /api/hint ERROR', t, { user: userId, error: err.message, cache: cacheStats().size });
     return c.json({ error: 'Failed to build hint', details: err.message }, 500);
   }
 });
