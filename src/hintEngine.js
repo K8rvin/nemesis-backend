@@ -308,6 +308,7 @@ function buildCachedHintResponse(targetAchievement, route, graph, currentNodeId,
   return {
     hint_enabled: true,
     reachable: route.reachable,
+    goal_reached: isGoalReached(targetAchievement, player, graph),
     reason: isTheoretical ? 'theoretical_reverse' : route.reason,
     theoretical: isTheoretical,
     next_choice_available: nextChoiceAvailable,
@@ -339,6 +340,13 @@ function formatChoiceRequirements(choice) {
   return reqs.length > 0 ? reqs : null;
 }
 
+// Проверяем, находится ли игрок уже в ноде с целевым choice и доступен ли он.
+function isGoalReached(targetAchievement, player, graph) {
+  if (!targetAchievement || !player) return false;
+  const targetChoices = graph.achievementToChoices.get(targetAchievement.id) || [];
+  return targetChoices.some(tc => tc.node_id === player.current_node_id && filterSingleChoice(tc, player));
+}
+
 function buildReverseHintResponse(targetAchievement, reverseResult, player = null) {
   const tierMap = { 'BRONZE': 'ОБЫЧНАЯ', 'SILVER': 'РЕДКАЯ', 'GOLD': 'ЭПИЧЕСКАЯ', 'PLATINUM': 'ЛЕГЕНДАРНАЯ' };
   const nextChoice = reverseResult.nextChoice || null;
@@ -346,6 +354,7 @@ function buildReverseHintResponse(targetAchievement, reverseResult, player = nul
   return {
     hint_enabled: true,
     reachable: true,
+    goal_reached: isGoalReached(targetAchievement, player, graph),
     reason: 'theoretical_path',
     theoretical: true,
     next_choice_available: nextChoiceAvailable,
@@ -509,6 +518,7 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
       return {
         ...cachedHint,
         reachable: true,
+        goal_reached: isGoalReached(cachedHint.target_achievement, player, graph),
         reason: null,
         theoretical: false,
         next_choice: forward.nextChoice ? { id: forward.nextChoice.id, label: forward.nextChoice.label } : null,
@@ -612,6 +622,7 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
     return {
       hint_enabled: true,
       reachable: result.reachable,
+      goal_reached: isGoalReached(targetAchievement, player, graph),
       reason: result.reason,
       target_achievement: {
         ...targetAchievement,
@@ -693,6 +704,7 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
     return {
       hint_enabled: true,
       reachable: false,
+      goal_reached: false,
       reason: 'no_suitable_achievement',
       target_achievement: null,
       next_choice: null,
@@ -707,6 +719,7 @@ export async function getHint(env, userId, targetTier, targetType, targetAchieve
   return {
     hint_enabled: true,
     reachable: result.reachable,
+    goal_reached: isGoalReached(targetAchievement, player, graph),
     reason: result.reason,
     target_achievement: {
       ...targetAchievement,
