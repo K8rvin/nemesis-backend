@@ -213,6 +213,37 @@ async function getAchievement(env, achievementId, lang) {
   return ach;
 }
 
+// 🏆 Рейтинг: запись концовки игрока.
+async function recordUserEnding(env, userId, nodeId, endingType) {
+  try {
+    const res = await supabaseFetch(env, '/user_endings', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        user_id: userId,
+        node_id: nodeId,
+        ending_type: endingType || null,
+      }),
+    });
+    if (res) await res.text();
+  } catch (err) {
+    console.warn('⚠️ Failed to record user ending:', err.message);
+  }
+}
+
+// 🏆 Рейтинг: принудительный пересчёт строки игрока.
+async function recalculateLeaderboard(env, userId) {
+  try {
+    const res = await supabaseFetch(env, '/rpc/recalculate_leaderboard', {
+      method: 'POST',
+      body: JSON.stringify({ p_user_id: userId }),
+    });
+    if (res) await res.text();
+  } catch (err) {
+    console.warn('⚠️ Failed to recalculate leaderboard:', err.message);
+  }
+}
+
 // Изображения теперь встроены в Flutter-клиент (assets/images/).
 // Бэкенд больше не отдает imageUrl.
 function getImageUrl() {
@@ -616,6 +647,12 @@ app.post('/api/choice', authMiddleware, async (c) => {
     timingStep(t, 'node+choices');
 
     if (!newNode) return c.json({ error: 'Target node missing from database' }, 404);
+
+    // 🏆 Фиксируем достигнутую концовку для рейтинга.
+    if (newNode.is_ending) {
+      await recordUserEnding(c.env, userId, newNode.id, newNode.ending_type || null);
+    }
+
     const nextChoices = filterChoices(nextAllChoices, updates);
 
     timingLog('POST /api/choice', t, { user: userId, choice: choiceId, node: newNode.id, cache: cacheStats().size });
@@ -799,6 +836,68 @@ app.post('/api/hint', authMiddleware, async (c) => {
   } catch (err) {
     timingLog('POST /api/hint ERROR', t, { user: userId, error: err.message, cache: cacheStats().size });
     return c.json({ error: 'Failed to build hint', details: err.message }, 500);
+  }
+});
+
+// 6. 🏆 Глобальный рейтинг игроков
+app.get('/api/leaderboard', async (c) => {
+  const t = timingStart();
+  try {
+    const query = c.req.query();
+    const limit = Math.min(parseInt(query.limit || '50', 10), 100);
+    const offset = Math.max(parseInt(query.offset || '0', 10), 0);
+    const sort = ['score', 'achievements_count', 'endings_count'].includes(query.sort)
+      ? query.sort
+      : 'score';
+
+    const authHeader = c.req.header('authorization');
+    let currentUserId = null;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.slice(7);
+        const userRes = await fetch(`${c.env.SUPABASE_URL}/auth/v1/user`, {
+          headers: {
+            'apikey': c.env.SUPABASE_SERVICE_ROLE_KEY,
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (userRes.ok) {
+          const user = await userRes.json();
+          currentUserId = user.id;
+        }
+      } catch (err) {
+        // Токен недействителен — просто не показываем "мою" позицию.
+      }
+    }
+
+    const [listRes, countRes, meRes] = await Promise.all([
+      supabaseFetch(c.env, '/rpc/get_leaderboard', {
+        method: 'POST',
+        body: JSON.stringify({ p_limit: limit, p_offset: offset, p_sort: sort }),
+      }),
+      supabaseFetch(c.env, '/leaderboard?select=user_id'),
+      currentUserId
+        ? supabaseFetch(c.env, '/rpc/get_leaderboard_me', {
+            method: 'POST',
+            body: JSON.stringify({ p_user_id: currentUserId }),
+          })
+        : Promise.resolve(null),
+    ]);
+
+    const list = await listRes.json();
+    const countData = await countRes.json();
+    const me = meRes ? await meRes.json() : null;
+    timingStep(t, 'leaderboard');
+
+    timingLog('GET /api/leaderboard', t, { limit, offset, sort, count: list.length });
+    return c.json({
+      leaderboard: list,
+      total: countData.length,
+      me: Array.isArray(me) ? me[0] : me,
+    });
+  } catch (err) {
+    timingLog('GET /api/leaderboard ERROR', t, { error: err.message });
+    return c.json({ error: 'Failed to load leaderboard', details: err.message }, 500);
   }
 });
 
