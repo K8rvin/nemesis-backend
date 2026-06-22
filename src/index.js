@@ -983,11 +983,32 @@ app.post('/api/redeem_promo_code', authMiddleware, async (c) => {
       return c.json({ error: 'already_pro' }, 400);
     }
 
-    const promoRes = await supabaseFetch(c.env, `/promo_codes?code=eq.${encodeURIComponent(code.trim())}&is_active=eq.true&select=code`);
+    const promoRes = await supabaseFetch(c.env, `/promo_codes?code=eq.${encodeURIComponent(code.trim())}&is_active=eq.true&select=code,max_uses,used_count,expires_at`);
     const promos = await promoRes.json();
     if (promos.length === 0) {
       timingLog('POST /api/redeem_promo_code INVALID', t, { user: userId, code: code.trim(), cache: cacheStats().size });
       return c.json({ error: 'invalid_code' }, 400);
+    }
+
+    const promo = promos[0];
+    if (promo.expires_at && new Date(promo.expires_at) < new Date()) {
+      timingLog('POST /api/redeem_promo_code EXPIRED', t, { user: userId, code: code.trim(), cache: cacheStats().size });
+      return c.json({ error: 'expired_code' }, 400);
+    }
+    if (promo.max_uses !== null && promo.max_uses !== undefined && promo.used_count >= promo.max_uses) {
+      timingLog('POST /api/redeem_promo_code DEPLETED', t, { user: userId, code: code.trim(), cache: cacheStats().size });
+      return c.json({ error: 'code_depleted' }, 400);
+    }
+
+    // Атомарно увеличиваем счётчик использований.
+    const newUsedCount = (promo.used_count ?? 0) + 1;
+    const patchRes = await supabaseFetch(c.env, `/promo_codes?code=eq.${encodeURIComponent(code.trim())}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ used_count: newUsedCount }),
+    });
+    if (!patchRes.ok) {
+      throw new Error('Failed to update promo code usage count');
     }
 
     await setProUser(c.env, userId, 'promo_code');
@@ -996,32 +1017,6 @@ app.post('/api/redeem_promo_code', authMiddleware, async (c) => {
   } catch (err) {
     timingLog('POST /api/redeem_promo_code ERROR', t, { user: userId, error: err.message, cache: cacheStats().size });
     return c.json({ error: 'Failed to redeem promo code', details: err.message }, 500);
-  }
-});
-
-app.post('/api/webhook/rustore', async (c) => {
-  const t = timingStart();
-  try {
-    const body = await c.req.json();
-    const userId = body.user_id;
-    if (!userId) {
-      return c.json({ error: 'Missing user_id' }, 400);
-    }
-
-    // Принимаем только успешные покупки pro_unlock.
-    const productId = body.product_id;
-    const eventType = body.event_type;
-    if (productId !== 'pro_unlock' || eventType !== 'PURCHASE') {
-      timingLog('POST /api/webhook/rustore SKIP', t, { product_id: productId, event_type: eventType, cache: cacheStats().size });
-      return c.json({ success: true, ignored: true });
-    }
-
-    await setProUser(c.env, userId, 'rustore');
-    timingLog('POST /api/webhook/rustore OK', t, { user: userId, cache: cacheStats().size });
-    return c.json({ success: true });
-  } catch (err) {
-    timingLog('POST /api/webhook/rustore ERROR', t, { error: err.message, cache: cacheStats().size });
-    return c.json({ error: 'Failed to process webhook', details: err.message }, 500);
   }
 });
 
