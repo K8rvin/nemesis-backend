@@ -109,6 +109,28 @@ async function getPlayerState(env, userId) {
   return data[0];
 }
 
+async function isProUser(env, userId) {
+  const res = await supabaseFetch(env, `/user_pro_status?user_id=eq.${userId}&select=is_pro`);
+  const data = await res.json();
+  return data.length > 0 && data[0].is_pro === true;
+}
+
+async function setProUser(env, userId, source) {
+  const res = await supabaseFetch(env, '/user_pro_status', {
+    method: 'POST',
+    headers: {
+      'Prefer': 'resolution=merge-duplicates',
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      is_pro: true,
+      purchased_at: new Date().toISOString(),
+      source,
+    }),
+  });
+  await res.text();
+}
+
 async function getStartNodeId(env) {
   const cacheKey = 'start_node_id';
   let id = cacheGet(cacheKey);
@@ -829,8 +851,20 @@ app.post('/api/hint', authMiddleware, async (c) => {
   try {
     const { target_tier, target_type, target_achievement_id } = await c.req.json();
 
+    const isPro = await isProUser(c.env, userId);
+    const requestedTier = (target_tier || '').toUpperCase();
+    if (!isPro && ['GOLD', 'PLATINUM'].includes(requestedTier)) {
+      timingLog('POST /api/hint PRO REQUIRED', t, { user: userId, tier: requestedTier, cache: cacheStats().size });
+      return c.json({ error: 'pro_required', message: 'Подсказки для GOLD и PLATINUM доступны в Pro версии' }, 403);
+    }
+
+    // Free-версия видит только BRONZE и SILVER; ANY трактуем как SILVER.
+    const effectiveTier = isPro
+      ? (target_tier || 'ANY')
+      : (requestedTier === 'ANY' ? 'SILVER' : target_tier);
+
     const lang = normalizeLang(c.req.header('Accept-Language'));
-    const result = await getHint(c.env, userId, target_tier, target_type, target_achievement_id, {
+    const result = await getHint(c.env, userId, effectiveTier, target_type, target_achievement_id, {
       getPlayerState,
       supabaseFetch,
       getChoicesForNode,
@@ -845,7 +879,7 @@ app.post('/api/hint', authMiddleware, async (c) => {
       return c.json({ error: result.error }, 404);
     }
 
-    timingLog('POST /api/hint', t, { user: userId, tier: target_tier || 'ANY', target: result.target_achievement?.id || 'none', reachable: result.reachable, cache: cacheStats().size });
+    timingLog('POST /api/hint', t, { user: userId, tier: effectiveTier || 'ANY', target: result.target_achievement?.id || 'none', reachable: result.reachable, cache: cacheStats().size });
     return c.json(result);
   } catch (err) {
     timingLog('POST /api/hint ERROR', t, { user: userId, error: err.message, cache: cacheStats().size });
@@ -884,6 +918,13 @@ app.get('/api/leaderboard', async (c) => {
       }
     }
 
+    // Рейтинг доступен только в Pro.
+    const hasProAccess = currentUserId && await isProUser(c.env, currentUserId);
+    if (!hasProAccess) {
+      timingLog('GET /api/leaderboard PRO REQUIRED', t, { user: currentUserId || 'anonymous', cache: cacheStats().size });
+      return c.json({ error: 'pro_required', message: 'Рейтинг доступен в Pro версии' }, 403);
+    }
+
     const [listRes, countRes, meRes] = await Promise.all([
       supabaseFetch(c.env, '/rpc/get_leaderboard', {
         method: 'POST',
@@ -912,6 +953,75 @@ app.get('/api/leaderboard', async (c) => {
   } catch (err) {
     timingLog('GET /api/leaderboard ERROR', t, { error: err.message });
     return c.json({ error: 'Failed to load leaderboard', details: err.message }, 500);
+  }
+});
+
+// 7. 💎 Pro-статус
+app.get('/api/pro/verify', authMiddleware, async (c) => {
+  const t = timingStart();
+  const userId = c.get('userId');
+  try {
+    const isPro = await isProUser(c.env, userId);
+    timingLog('GET /api/pro/verify', t, { user: userId, is_pro: isPro, cache: cacheStats().size });
+    return c.json({ is_pro: isPro });
+  } catch (err) {
+    timingLog('GET /api/pro/verify ERROR', t, { user: userId, error: err.message, cache: cacheStats().size });
+    return c.json({ error: 'Failed to verify pro status', details: err.message }, 500);
+  }
+});
+
+app.post('/api/redeem_promo_code', authMiddleware, async (c) => {
+  const t = timingStart();
+  const userId = c.get('userId');
+  try {
+    const { code } = await c.req.json();
+    if (!code || typeof code !== 'string') {
+      return c.json({ error: 'Missing promo code' }, 400);
+    }
+
+    if (await isProUser(c.env, userId)) {
+      return c.json({ error: 'already_pro' }, 400);
+    }
+
+    const promoRes = await supabaseFetch(c.env, `/promo_codes?code=eq.${encodeURIComponent(code.trim())}&is_active=eq.true&select=code`);
+    const promos = await promoRes.json();
+    if (promos.length === 0) {
+      timingLog('POST /api/redeem_promo_code INVALID', t, { user: userId, code: code.trim(), cache: cacheStats().size });
+      return c.json({ error: 'invalid_code' }, 400);
+    }
+
+    await setProUser(c.env, userId, 'promo_code');
+    timingLog('POST /api/redeem_promo_code OK', t, { user: userId, code: code.trim(), cache: cacheStats().size });
+    return c.json({ success: true, is_pro: true });
+  } catch (err) {
+    timingLog('POST /api/redeem_promo_code ERROR', t, { user: userId, error: err.message, cache: cacheStats().size });
+    return c.json({ error: 'Failed to redeem promo code', details: err.message }, 500);
+  }
+});
+
+app.post('/api/webhook/rustore', async (c) => {
+  const t = timingStart();
+  try {
+    const body = await c.req.json();
+    const userId = body.user_id;
+    if (!userId) {
+      return c.json({ error: 'Missing user_id' }, 400);
+    }
+
+    // Принимаем только успешные покупки pro_unlock.
+    const productId = body.product_id;
+    const eventType = body.event_type;
+    if (productId !== 'pro_unlock' || eventType !== 'PURCHASE') {
+      timingLog('POST /api/webhook/rustore SKIP', t, { product_id: productId, event_type: eventType, cache: cacheStats().size });
+      return c.json({ success: true, ignored: true });
+    }
+
+    await setProUser(c.env, userId, 'rustore');
+    timingLog('POST /api/webhook/rustore OK', t, { user: userId, cache: cacheStats().size });
+    return c.json({ success: true });
+  } catch (err) {
+    timingLog('POST /api/webhook/rustore ERROR', t, { error: err.message, cache: cacheStats().size });
+    return c.json({ error: 'Failed to process webhook', details: err.message }, 500);
   }
 });
 
