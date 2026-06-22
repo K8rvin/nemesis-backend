@@ -14,7 +14,8 @@ COMMENT ON TABLE public.promo_codes IS 'Промокоды для бесплат
 -- Разрешаем сервис-роли управлять кодами
 ALTER TABLE public.promo_codes ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS service_all_promo_codes
+DROP POLICY IF EXISTS service_all_promo_codes ON public.promo_codes;
+CREATE POLICY service_all_promo_codes
   ON public.promo_codes
   FOR ALL
   TO service_role

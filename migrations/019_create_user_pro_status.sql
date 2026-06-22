@@ -15,7 +15,8 @@ COMMENT ON TABLE public.user_pro_status IS 'Статус Pro версии для
 -- Разрешаем сервис-роли читать/писать (backend использует service-role key)
 ALTER TABLE public.user_pro_status ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS service_all_user_pro_status
+DROP POLICY IF EXISTS service_all_user_pro_status ON public.user_pro_status;
+CREATE POLICY service_all_user_pro_status
   ON public.user_pro_status
   FOR ALL
   TO service_role
