@@ -653,6 +653,20 @@ app.post('/api/choice', authMiddleware, async (c) => {
       await recordUserEnding(c.env, userId, newNode.id, newNode.ending_type || null);
     }
 
+    // 🏆 Автоматическая выдача достижений по типу концовки (если choice ещё не выдал ачивку).
+    const ENDING_ACHIEVEMENTS = {
+      'victory_stasis': 'ach_steel_cocoon',
+    };
+    if (newNode.is_ending && ENDING_ACHIEVEMENTS[newNode.ending_type] && !unlockedAchievement) {
+      const endingAchId = ENDING_ACHIEVEMENTS[newNode.ending_type];
+      const endingAch = await getAchievement(c.env, endingAchId, lang);
+      if (endingAch) {
+        const wasNew = await unlockAchievement(c.env, userId, endingAchId);
+        unlockedAchievement = endingAch;
+        alreadyUnlocked = !wasNew;
+      }
+    }
+
     const nextChoices = filterChoices(nextAllChoices, updates);
 
     timingLog('POST /api/choice', t, { user: userId, choice: choiceId, node: newNode.id, cache: cacheStats().size });
