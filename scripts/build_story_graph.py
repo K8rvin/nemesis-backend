@@ -150,6 +150,20 @@ def branch_type(node_id: str) -> str:
     return "transition" if node_id.startswith("trans_") else "critical"
 
 
+def _first_condition_value(conditions: dict | None, key: str):
+    """Return a single string/array value from conditions or null."""
+    if not conditions:
+        return None
+    value = conditions.get(key)
+    if value is None or value == [] or value == "":
+        return None
+    return value
+
+
+def node_image_asset(node_id: str) -> str:
+    return f"assets/images/nodes/{node_id}.webp"
+
+
 def build_layout(nodes, edges):
     """Simple hierarchical layout: acts as columns, BFS levels as vertical order."""
     node_map = {n["id"]: n for n in nodes}
@@ -194,13 +208,17 @@ def main():
     for ch in choices:
         if not ch.get("target_node_id"):
             continue
+        conditions = ch.get("conditions") or {}
         edges.append({
             "id": ch["id"],
             "source": ch["node_id"],
             "target": ch["target_node_id"],
             "label": ch.get("label", ""),
-            "conditions": ch.get("conditions"),
-            "effects": ch.get("effects"),
+            "required_skill": _first_condition_value(conditions, "required_skill"),
+            "item_required": _first_condition_value(conditions, "item_required"),
+            "item_required_any": _first_condition_value(conditions, "item_required_any"),
+            "flag_required": _first_condition_value(conditions, "flag_required"),
+            "flag_forbidden": _first_condition_value(conditions, "flag_forbidden"),
         })
 
     positions = build_layout(nodes, edges)
@@ -222,6 +240,7 @@ def main():
             "branch_type": branch_type(nid),
             "title": n.get("title", ""),
             "location": n.get("location_name", ""),
+            "image_asset": node_image_asset(nid),
             "is_ending": bool(n.get("is_ending")),
             "ending_type": n.get("ending_type"),
             "x": positions.get(nid, (0, 0))[0],
