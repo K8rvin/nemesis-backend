@@ -150,6 +150,7 @@ async function createPlayerState(env, userId, startNodeId) {
     body: JSON.stringify({
       user_id: userId,
       current_node_id: startNodeId,
+      visited_nodes: [startNodeId],
       hp: 100,
       story_flags: [],
       inventory: [],
@@ -160,15 +161,19 @@ async function createPlayerState(env, userId, startNodeId) {
 }
 
 async function updatePlayerState(env, userId, updates) {
+  const payload = {
+    hp: updates.hp,
+    story_flags: updates.story_flags,
+    inventory: updates.inventory,
+    skills: updates.skills,
+    current_node_id: updates.current_node_id,
+  };
+  if (updates.visited_nodes !== undefined) {
+    payload.visited_nodes = updates.visited_nodes;
+  }
   const res = await supabaseFetch(env, `/game_state?user_id=eq.${userId}`, {
     method: 'PATCH',
-    body: JSON.stringify({
-      hp: updates.hp,
-      story_flags: updates.story_flags,
-      inventory: updates.inventory,
-      skills: updates.skills,
-      current_node_id: updates.current_node_id,
-    }),
+    body: JSON.stringify(payload),
   });
   await res.text(); // Освобождаем сокет
 }
@@ -461,6 +466,7 @@ app.get('/api/state', authMiddleware, async (c) => {
       const startNodeId = await getStartNodeId(c.env);
       if (!startNodeId) return c.json({ error: 'No start node to recover' }, 500);
       player.current_node_id = startNodeId;
+      player.visited_nodes = player.visited_nodes?.length ? player.visited_nodes : [startNodeId];
       await updatePlayerState(c.env, userId, player);
     }
 
@@ -511,6 +517,10 @@ app.post('/api/choice', authMiddleware, async (c) => {
     updates.inventory = [...(player.inventory || [])];
     updates.story_flags = [...(player.story_flags || [])];
     updates.skills = [...(player.skills || [])];
+    updates.visited_nodes = [...(player.visited_nodes || [])];
+    if (!updates.visited_nodes.includes(player.current_node_id)) {
+      updates.visited_nodes.push(player.current_node_id);
+    }
 
     if (effects.apply_damage) updates.hp = Math.max(0, updates.hp - effects.apply_damage);
     if (effects.add_hp) updates.hp = Math.min(100, updates.hp + effects.add_hp);
@@ -794,13 +804,46 @@ app.post('/api/reset', authMiddleware, async (c) => {
       story_flags: [],
       inventory: [],
       skills: [],
-      current_node_id: startNodeId
+      current_node_id: startNodeId,
+      visited_nodes: [startNodeId],
     });
 
     return c.json({ success: true });
   } catch (err) {
     console.error('❌ Error in /api/reset:', err.message);
     return c.json({ error: 'Failed to reset game state', details: err.message }, 500);
+  }
+});
+
+// 3.1 Прогресс для интерактивной карты сюжета (Pro)
+app.get('/api/story/progress', authMiddleware, async (c) => {
+  try {
+    const userId = c.get('userId');
+    const isPro = await isProUser(c.env, userId);
+    if (!isPro) {
+      return c.json({ error: 'pro_required', message: 'Карта сюжета доступна в Pro версии' }, 403);
+    }
+
+    const [playerRes, achievementsRes, endingsRes] = await Promise.all([
+      supabaseFetch(c.env, `/game_state?user_id=eq.${userId}&select=visited_nodes,current_node_id`),
+      supabaseFetch(c.env, `/user_achievements?user_id=eq.${userId}&select=achievement_id`),
+      supabaseFetch(c.env, `/user_endings?user_id=eq.${userId}&select=node_id,ending_type`),
+    ]);
+
+    const playerData = await playerRes.json();
+    const achievementsData = await achievementsRes.json();
+    const endingsData = await endingsRes.json();
+
+    const player = playerData[0] || {};
+    return c.json({
+      visited_nodes: player.visited_nodes || [],
+      current_node_id: player.current_node_id || null,
+      unlocked_achievements: achievementsData.map((r) => r.achievement_id),
+      unlocked_endings: endingsData.map((r) => ({ node_id: r.node_id, ending_type: r.ending_type })),
+    });
+  } catch (err) {
+    console.error('❌ Error in GET /api/story/progress:', err.message);
+    return c.json({ error: 'Failed to load story progress', details: err.message }, 500);
   }
 });
 
