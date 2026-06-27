@@ -1063,6 +1063,42 @@ app.post('/api/redeem_promo_code', authMiddleware, async (c) => {
   }
 });
 
+// 6. Баг-репорты
+app.post('/api/bug_report', authMiddleware, async (c) => {
+  const userId = c.get('userId');
+  try {
+    const body = await c.req.json();
+    const comment = (body.comment || '').toString().trim();
+    if (comment.length > 2000) {
+      return c.json({ error: 'Comment is too long' }, 400);
+    }
+
+    const payload = {
+      user_id: userId,
+      current_node_id: body.current_node_id || null,
+      player_state: body.player_state || null,
+      comment: comment || null,
+      app_version: (body.app_version || '').toString() || null,
+      locale: (body.locale || '').toString() || null,
+    };
+
+    const res = await supabaseFetch(c.env, '/bug_reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Supabase error ${res.status}: ${errText}`);
+    }
+
+    return c.json({ success: true });
+  } catch (err) {
+    console.error('❌ Error in /api/bug_report:', err.message);
+    return c.json({ error: 'Failed to send bug report', details: err.message }, 500);
+  }
+});
+
 // Health-check
 app.get('/', (c) => c.json({ status: '🚀 Engine Running', platform: 'Cloudflare Workers' }));
 
