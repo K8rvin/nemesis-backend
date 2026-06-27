@@ -734,7 +734,7 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
   const t = timingStart();
   const userId = c.get('userId');
   try {
-    const { choiceId, difficulty } = await c.req.json();
+    const { choiceId, difficulty, retry } = await c.req.json();
     if (!choiceId) return c.json({ error: 'Missing choiceId' }, 400);
 
     const lang = normalizeLang(c.req.header('Accept-Language'));
@@ -757,6 +757,48 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
     const failNodeId = `fail_${choiceId}`;
     const failedFlag = `${choiceId}_failed`;
 
+    // Apply damage on minigame failure; Hard difficulty doubles it
+    const baseDamage = effects.apply_damage || 10;
+    const damageMultiplier = difficulty === 'hard' ? 2 : 1;
+    const newHp = Math.max(0, (player.hp || 100) - baseDamage * damageMultiplier);
+
+    const allowRetry = retry === true;
+    const hpDepleted = newHp <= 0;
+
+    // Если разрешён повтор и здоровье ещё есть — остаёмся на текущей ноде и не ставим флаг провала.
+    if (allowRetry && !hpDepleted) {
+      const updates = {
+        ...player,
+        hp: newHp,
+      };
+      await updatePlayerState(c.env, userId, updates);
+      timingStep(t, 'update');
+
+      const [currentNode, allChoices] = await Promise.all([
+        getNode(c.env, player.current_node_id, lang),
+        getChoicesForNode(c.env, player.current_node_id, lang),
+      ]);
+      timingStep(t, 'node+choices');
+
+      if (!currentNode) return c.json({ error: 'Current node not found' }, 404);
+
+      const availableChoices = filterChoices(allChoices, updates);
+
+      timingLog('POST /api/minigame/failure retry', t, { user: userId, choice: choiceId, cache: cacheStats().size });
+      return c.json({
+        success: true,
+        narrative_override: null,
+        node: currentNode,
+        choices: availableChoices,
+        player: updates,
+        is_ending: currentNode.is_ending || false,
+        ending_type: currentNode.ending_type || null,
+        unlocked_achievement: null,
+        retry: true,
+      });
+    }
+
+    // Полный провал: переход в fail-ноду и установка флага.
     const storyFlags = [...(player.story_flags || [])];
     if (!storyFlags.includes(failedFlag)) storyFlags.push(failedFlag);
 
@@ -764,12 +806,8 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
       ...player,
       current_node_id: failNodeId,
       story_flags: storyFlags,
+      hp: newHp,
     };
-
-    // Apply damage on minigame failure; Hard difficulty doubles it
-    const baseDamage = effects.apply_damage || 10;
-    const damageMultiplier = difficulty === 'hard' ? 2 : 1;
-    updates.hp = Math.max(0, (player.hp || 100) - baseDamage * damageMultiplier);
 
     await updatePlayerState(c.env, userId, updates);
     timingStep(t, 'update');
