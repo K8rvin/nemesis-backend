@@ -220,6 +220,16 @@ async function getAchievements(env, lang) {
 async function unlockAchievement(env, userId, achievementId, alreadyUnlocked = false) {
   if (alreadyUnlocked) return false;
 
+  // Проверяем, не получена ли ачивка ранее, чтобы избежать повторных уведомлений.
+  const checkRes = await supabaseFetch(
+    env,
+    `/user_achievements?user_id=eq.${userId}&achievement_id=eq.${achievementId}&select=achievement_id`,
+  );
+  if (checkRes) {
+    const existing = await checkRes.json();
+    if (existing && existing.length > 0) return false;
+  }
+
   const res = await supabaseFetch(env, '/user_achievements', {
     method: 'POST',
     headers: { 'Prefer': 'return=minimal' },
