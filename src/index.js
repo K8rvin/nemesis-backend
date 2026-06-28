@@ -1242,6 +1242,30 @@ app.get('/api/leaderboard', async (c) => {
   }
 });
 
+// 6a. 🎭 Номинации рейтинга (лидеры по категориям)
+app.get('/api/leaderboard/nominations', authMiddleware, async (c) => {
+  const t = timingStart();
+  try {
+    const userId = c.get('userId');
+    const hasProAccess = await isProUser(c.env, userId);
+    if (!hasProAccess) {
+      timingLog('GET /api/leaderboard/nominations PRO REQUIRED', t, { user: userId });
+      return c.json({ error: 'pro_required', message: 'Рейтинг доступен в Pro версии' }, 403);
+    }
+
+    const res = await supabaseFetch(c.env, '/rpc/get_leaderboard_nominations', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+    const nominations = await res.json();
+    timingLog('GET /api/leaderboard/nominations', t, { count: Array.isArray(nominations) ? nominations.length : 0 });
+    return c.json({ nominations: Array.isArray(nominations) ? nominations : [] });
+  } catch (err) {
+    timingLog('GET /api/leaderboard/nominations ERROR', t, { error: err.message });
+    return c.json({ error: 'Failed to load nominations', details: err.message }, 500);
+  }
+});
+
 // 7. 💎 Pro-статус
 app.get('/api/pro/verify', authMiddleware, async (c) => {
   const t = timingStart();
