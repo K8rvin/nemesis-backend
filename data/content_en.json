@@ -2104,6 +2104,10 @@
       "label": "👣 Step aside and explore Quarter B-12",
       "narrative_override": ""
     },
+    "ch_2_start_back": {
+      "label": "↩️ Return to the crossroads",
+      "narrative_override": ""
+    },
     "trans_choice_ch_1_hub_to_explore": {
       "label": "➡️ Look around",
       "narrative_override": ""
