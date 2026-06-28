@@ -1272,11 +1272,15 @@ app.post('/api/bug_report', authMiddleware, async (c) => {
       return c.json({ error: 'Comment is too long' }, 400);
     }
 
+    const allowedTypes = ['bug', 'suggestion', 'idea', 'feedback', 'other'];
+    const type = allowedTypes.includes(body.type) ? body.type : 'other';
+
     const payload = {
       user_id: userId,
       current_node_id: body.current_node_id || null,
       player_state: body.player_state || null,
       comment: comment || null,
+      type,
       app_version: (body.app_version || '').toString() || null,
       locale: (body.locale || '').toString() || null,
     };
@@ -1303,25 +1307,33 @@ app.post('/api/bug_report', authMiddleware, async (c) => {
 app.get('/api/admin/bug_reports', adminMiddleware, async (c) => {
   const t = timingStart();
   try {
-    const { status, limit = '50', offset = '0' } = c.req.query();
+    const { status, type, limit = '50', offset = '0' } = c.req.query();
     const params = new URLSearchParams();
-    params.append('select', 'id,user_id,current_node_id,comment,status,app_version,locale,created_at,player_state');
+    params.append('select', 'id,user_id,current_node_id,comment,status,type,app_version,locale,created_at,player_state');
     params.append('order', 'created_at.desc');
     params.append('limit', limit);
     params.append('offset', offset);
     if (status) {
       params.append('status', `eq.${status}`);
     }
+    if (type) {
+      params.append('type', `eq.${type}`);
+    }
+
+    const countParams = new URLSearchParams();
+    countParams.append('select', 'id');
+    if (status) countParams.append('status', `eq.${status}`);
+    if (type) countParams.append('type', `eq.${type}`);
 
     const [itemsRes, countRes] = await Promise.all([
       supabaseFetch(c.env, `/bug_reports?${params.toString()}`),
-      supabaseFetch(c.env, `/bug_reports?select=id${status ? `&status=eq.${status}` : ''}`),
+      supabaseFetch(c.env, `/bug_reports?${countParams.toString()}`),
     ]);
 
     const items = await itemsRes.json();
     const total = (await countRes.json()).length;
 
-    timingLog('GET /api/admin/bug_reports', t, { count: items.length, status: status || 'all' });
+    timingLog('GET /api/admin/bug_reports', t, { count: items.length, status: status || 'all', type: type || 'all' });
     return c.json({ items, total });
   } catch (err) {
     timingLog('GET /api/admin/bug_reports ERROR', t, { error: err.message });
