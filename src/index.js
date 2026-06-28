@@ -1053,9 +1053,9 @@ app.get('/api/story/stats', authMiddleware, async (c) => {
     const [stateRes, historyRes, endingsRes, achievementsRes, nodesRes] = await Promise.all([
       supabaseFetch(c.env, `/game_state?user_id=eq.${userId}&select=visited_nodes,created_at`),
       supabaseFetch(c.env, `/player_history?user_id=eq.${userId}&select=node_id,failure`),
-      supabaseFetch(c.env, `/user_endings?user_id=eq.${userId}&select=node_id`),
+      supabaseFetch(c.env, `/user_endings?user_id=eq.${userId}&select=node_id,ending_type`),
       supabaseFetch(c.env, `/user_achievements?user_id=eq.${userId}&select=achievement_id`),
-      supabaseFetch(c.env, `/nodes?select=id,type`),
+      supabaseFetch(c.env, `/nodes?select=id`),
     ]);
 
     const stateData = await stateRes.json();
@@ -1065,11 +1065,10 @@ app.get('/api/story/stats', authMiddleware, async (c) => {
     const nodesData = await nodesRes.json();
 
     const state = stateData[0] || {};
-    const nodeTypes = new Map(nodesData.map((n) => [n.id, n.type]));
 
     const uniqueNodesVisited = (state.visited_nodes || []).length;
     const totalSteps = historyData.length;
-    const totalDeaths = historyData.filter((h) => nodeTypes.get(h.node_id) === 'death').length;
+    const totalDeaths = endingsData.filter((e) => e.ending_type === 'death').length;
     const totalFailures = historyData.filter((h) => h.failure).length;
     const endingsSeen = endingsData.length;
     const achievementsUnlocked = achievementsData.length;

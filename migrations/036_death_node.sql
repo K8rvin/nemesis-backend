@@ -1,14 +1,8 @@
--- 036_death_node.sql
--- Нода смерти при обнулении HP.
-
 BEGIN;
-
-ALTER TABLE public.nodes
-  ADD COLUMN IF NOT EXISTS type text;
 
 INSERT INTO public.nodes (
   id, act, location_name, title, narrative, thought,
-  is_start_node, is_ending, ending_type, type, image_prompt, translations
+  is_start_node, is_ending, ending_type, image_prompt, translations
 ) VALUES (
   'death_hp_zero',
   0,
@@ -18,7 +12,6 @@ INSERT INTO public.nodes (
   'Смерть не прощает ошибок.',
   false,
   true,
-  'death',
   'death',
   'dark damaged spacesuit floating in zero gravity with red warning lights',
   $JSON${
@@ -57,7 +50,6 @@ ON CONFLICT (id) DO UPDATE SET
   is_start_node = EXCLUDED.is_start_node,
   is_ending = EXCLUDED.is_ending,
   ending_type = EXCLUDED.ending_type,
-  type = EXCLUDED.type,
   image_prompt = EXCLUDED.image_prompt,
   translations = EXCLUDED.translations;
 
