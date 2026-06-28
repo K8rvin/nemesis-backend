@@ -1070,11 +1070,7 @@ app.post('/api/redeem_promo_code', authMiddleware, async (c) => {
       return c.json({ error: 'Missing promo code' }, 400);
     }
 
-    if (await isProUser(c.env, userId)) {
-      return c.json({ error: 'already_pro' }, 400);
-    }
-
-    const promoRes = await supabaseFetch(c.env, `/promo_codes?code=eq.${encodeURIComponent(code.trim())}&is_active=eq.true&select=code,max_uses,used_count,expires_at`);
+    const promoRes = await supabaseFetch(c.env, `/promo_codes?code=eq.${encodeURIComponent(code.trim())}&is_active=eq.true&select=code,effect,max_uses,used_count,expires_at`);
     const promos = await promoRes.json();
     if (promos.length === 0) {
       timingLog('POST /api/redeem_promo_code INVALID', t, { user: userId, code: code.trim(), cache: cacheStats().size });
@@ -1082,6 +1078,8 @@ app.post('/api/redeem_promo_code', authMiddleware, async (c) => {
     }
 
     const promo = promos[0];
+    const effect = promo.effect || 'pro';
+
     if (promo.expires_at && new Date(promo.expires_at) < new Date()) {
       timingLog('POST /api/redeem_promo_code EXPIRED', t, { user: userId, code: code.trim(), cache: cacheStats().size });
       return c.json({ error: 'expired_code' }, 400);
@@ -1102,9 +1100,18 @@ app.post('/api/redeem_promo_code', authMiddleware, async (c) => {
       throw new Error('Failed to update promo code usage count');
     }
 
-    await setProUser(c.env, userId, 'promo_code');
-    timingLog('POST /api/redeem_promo_code OK', t, { user: userId, code: code.trim(), cache: cacheStats().size });
-    return c.json({ success: true, is_pro: true });
+    let isPro = false;
+    let isAdmin = false;
+
+    if (effect === 'admin') {
+      isAdmin = true;
+    } else {
+      await setProUser(c.env, userId, 'promo_code');
+      isPro = true;
+    }
+
+    timingLog('POST /api/redeem_promo_code OK', t, { user: userId, code: code.trim(), effect, cache: cacheStats().size });
+    return c.json({ success: true, effect, is_pro: isPro, is_admin: isAdmin });
   } catch (err) {
     timingLog('POST /api/redeem_promo_code ERROR', t, { user: userId, error: err.message, cache: cacheStats().size });
     return c.json({ error: 'Failed to redeem promo code', details: err.message }, 500);
