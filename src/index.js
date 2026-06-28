@@ -863,7 +863,6 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
     const damageMultiplier = difficulty === 'hard' ? 2 : 1;
     const newHp = Math.max(0, (player.hp || 100) - baseDamage * damageMultiplier);
 
-:
     const allowRetry = retry === true;
     const hpDepleted = newHp <= 0;
 
