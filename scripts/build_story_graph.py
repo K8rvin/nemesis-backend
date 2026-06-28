@@ -14,7 +14,6 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 BACKUP_DIR = PROJECT_ROOT / "Материалы" / "backups" / "db" / "20260628"
-LEGACY_BACKUP_DIR = PROJECT_ROOT / "Материалы" / "backups" / "db" / "20260622"
 
 NODE_COLS = [
     "id", "act", "location_name", "title", "narrative", "thought",
@@ -203,11 +202,7 @@ def build_layout(nodes, edges):
 
 def main():
     nodes = parse_nodes(BACKUP_DIR / "nodes_rows.sql")
-    choices_file = BACKUP_DIR / "choices_rows.sql"
-    if not choices_file.exists():
-        choices_file = LEGACY_BACKUP_DIR / "choices_rows.sql"
-        print(f"WARNING: choices_rows.sql not found in {BACKUP_DIR}, falling back to {choices_file}")
-    choices = parse_choices(choices_file)
+    choices = parse_choices(BACKUP_DIR / "choices_rows.sql")
 
     edges = []
     for ch in choices:
