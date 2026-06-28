@@ -71,13 +71,22 @@ function formatChoiceRequirements(choice) {
   if (!choice) return null;
   const conds = choice.conditions || {};
   const reqs = [];
-  if (conds.required_skill) reqs.push({ type: 'skill', value: conds.required_skill });
+  if (conds.required_skill) {
+    const skills = Array.isArray(conds.required_skill) ? conds.required_skill : [conds.required_skill];
+    skills.forEach(s => reqs.push({ type: 'skill', value: String(s) }));
+  }
   if (conds.flag_required) {
     const flags = Array.isArray(conds.flag_required) ? conds.flag_required : [conds.flag_required];
     flags.forEach(f => reqs.push({ type: 'flag', value: f }));
   }
-  if (conds.item_required) reqs.push({ type: 'item', value: conds.item_required });
-  if (conds.item_required_any) reqs.push({ type: 'item', value: Array.isArray(conds.item_required_any) ? conds.item_required_any.join(' / ') : conds.item_required_any });
+  if (conds.item_required) {
+    const items = Array.isArray(conds.item_required) ? conds.item_required : [conds.item_required];
+    reqs.push({ type: 'item', value: items.join(' + ') });
+  }
+  if (conds.item_required_any) {
+    const items = Array.isArray(conds.item_required_any) ? conds.item_required_any : [conds.item_required_any];
+    reqs.push({ type: 'item', value: items.join(' / ') });
+  }
   if (choice.effects?.add_skill) reqs.push({ type: 'no_skill', value: choice.effects.add_skill });
   return reqs.length > 0 ? reqs : null;
 }

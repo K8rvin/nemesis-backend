@@ -330,13 +330,25 @@ function formatChoiceRequirements(choice) {
   if (!choice) return null;
   const conds = choice.conditions || {};
   const reqs = [];
-  if (conds.required_skill) reqs.push(`навык: ${conds.required_skill}`);
+  if (conds.required_skill) {
+    const skills = Array.isArray(conds.required_skill) ? conds.required_skill : [conds.required_skill];
+    skills.forEach(s => reqs.push({ type: 'skill', value: String(s) }));
+  }
   if (conds.flag_required) {
     const flags = Array.isArray(conds.flag_required) ? conds.flag_required : [conds.flag_required];
-    reqs.push(...flags.map(f => `флаг: ${f}`));
+    flags.forEach(f => reqs.push({ type: 'flag', value: String(f) }));
   }
-  if (conds.item_required) reqs.push(`предмет: ${conds.item_required}`);
-  if (choice.effects?.add_skill) reqs.push(`не иметь навык: ${choice.effects.add_skill}`);
+  if (conds.item_required) {
+    const items = Array.isArray(conds.item_required) ? conds.item_required : [conds.item_required];
+    reqs.push({ type: 'item', value: items.join(' + ') });
+  }
+  if (conds.item_required_any) {
+    const items = Array.isArray(conds.item_required_any) ? conds.item_required_any : [conds.item_required_any];
+    reqs.push({ type: 'item', value: items.join(' / ') });
+  }
+  if (choice.effects?.add_skill) {
+    reqs.push({ type: 'no_skill', value: String(choice.effects.add_skill) });
+  }
   return reqs.length > 0 ? reqs : null;
 }
 
