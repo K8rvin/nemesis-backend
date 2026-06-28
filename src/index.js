@@ -151,7 +151,7 @@ async function createPlayerState(env, userId, startNodeId) {
       user_id: userId,
       current_node_id: startNodeId,
       visited_nodes: [startNodeId],
-      hp: 100,
+      hp: 90,
       story_flags: [],
       inventory: [],
       skills: [],
@@ -868,7 +868,7 @@ app.post('/api/reset', authMiddleware, async (c) => {
     if (!startNodeId) throw new Error('No start node configured in DB');
 
     await updatePlayerState(c.env, userId, {
-      hp: 100,
+      hp: 90,
       story_flags: [],
       inventory: [],
       skills: [],
