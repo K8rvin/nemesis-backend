@@ -46,6 +46,38 @@ async function authMiddleware(c, next) {
   }
 }
 
+async function adminMiddleware(c, next) {
+  const authHeader = c.req.header('authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return c.json({ error: 'Отсутствует токен авторизации' }, 401);
+  }
+
+  const token = authHeader.slice(7);
+  try {
+    const userRes = await fetch(`${c.env.SUPABASE_URL}/auth/v1/user`, {
+      headers: {
+        'apikey': c.env.SUPABASE_SERVICE_ROLE_KEY,
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!userRes.ok) {
+      throw new Error(`Auth API returned ${userRes.status}`);
+    }
+
+    const user = await userRes.json();
+    const userId = user.id;
+    if (!(await isAdminUser(c.env, userId))) {
+      return c.json({ error: 'admin_required' }, 403);
+    }
+    c.set('userId', userId);
+    await next();
+  } catch (err) {
+    console.error('❌ [ADMIN AUTH] Verify error:', err.message);
+    return c.json({ error: 'Недействительный или просроченный токен' }, 401);
+  }
+}
+
 // ==========================================
 // 📦 КЛИЕНТ SUPABASE REST
 // ==========================================
@@ -126,6 +158,28 @@ async function setProUser(env, userId, source) {
       is_pro: true,
       purchased_at: new Date().toISOString(),
       source,
+    }),
+  });
+  await res.text();
+}
+
+async function isAdminUser(env, userId) {
+  const res = await supabaseFetch(env, `/user_pro_status?user_id=eq.${userId}&select=is_admin`);
+  const data = await res.json();
+  return data.length > 0 && data[0].is_admin === true;
+}
+
+async function setAdminUser(env, userId, value) {
+  const res = await supabaseFetch(env, '/user_pro_status', {
+    method: 'POST',
+    headers: {
+      'Prefer': 'resolution=merge-duplicates',
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      is_admin: value,
+      purchased_at: new Date().toISOString(),
+      source: 'promo_code',
     }),
   });
   await res.text();
@@ -1138,9 +1192,12 @@ app.get('/api/pro/verify', authMiddleware, async (c) => {
   const t = timingStart();
   const userId = c.get('userId');
   try {
-    const isPro = await isProUser(c.env, userId);
-    timingLog('GET /api/pro/verify', t, { user: userId, is_pro: isPro, cache: cacheStats().size });
-    return c.json({ is_pro: isPro });
+    const [isPro, isAdmin] = await Promise.all([
+      isProUser(c.env, userId),
+      isAdminUser(c.env, userId),
+    ]);
+    timingLog('GET /api/pro/verify', t, { user: userId, is_pro: isPro, is_admin: isAdmin, cache: cacheStats().size });
+    return c.json({ is_pro: isPro, is_admin: isAdmin });
   } catch (err) {
     timingLog('GET /api/pro/verify ERROR', t, { user: userId, error: err.message, cache: cacheStats().size });
     return c.json({ error: 'Failed to verify pro status', details: err.message }, 500);
@@ -1190,6 +1247,7 @@ app.post('/api/redeem_promo_code', authMiddleware, async (c) => {
     let isAdmin = false;
 
     if (effect === 'admin') {
+      await setAdminUser(c.env, userId, true);
       isAdmin = true;
     } else {
       await setProUser(c.env, userId, 'promo_code');
@@ -1237,6 +1295,90 @@ app.post('/api/bug_report', authMiddleware, async (c) => {
   } catch (err) {
     console.error('❌ Error in /api/bug_report:', err.message);
     return c.json({ error: 'Failed to send bug report', details: err.message }, 500);
+  }
+});
+
+// 5. Админ-эндпоинты
+
+app.get('/api/admin/bug_reports', adminMiddleware, async (c) => {
+  const t = timingStart();
+  try {
+    const { status, limit = '50', offset = '0' } = c.req.query();
+    const params = new URLSearchParams();
+    params.append('select', 'id,user_id,current_node_id,comment,status,app_version,locale,created_at,player_state');
+    params.append('order', 'created_at.desc');
+    params.append('limit', limit);
+    params.append('offset', offset);
+    if (status) {
+      params.append('status', `eq.${status}`);
+    }
+
+    const [itemsRes, countRes] = await Promise.all([
+      supabaseFetch(c.env, `/bug_reports?${params.toString()}`),
+      supabaseFetch(c.env, `/bug_reports?select=id${status ? `&status=eq.${status}` : ''}`),
+    ]);
+
+    const items = await itemsRes.json();
+    const total = (await countRes.json()).length;
+
+    timingLog('GET /api/admin/bug_reports', t, { count: items.length, status: status || 'all' });
+    return c.json({ items, total });
+  } catch (err) {
+    timingLog('GET /api/admin/bug_reports ERROR', t, { error: err.message });
+    return c.json({ error: 'Failed to load bug reports', details: err.message }, 500);
+  }
+});
+
+app.patch('/api/admin/bug_reports/:id', adminMiddleware, async (c) => {
+  const t = timingStart();
+  const reportId = c.req.param('id');
+  try {
+    const body = await c.req.json();
+    const payload = {};
+    if (body.comment !== undefined) payload.comment = body.comment;
+    if (body.status !== undefined) payload.status = body.status;
+
+    if (Object.keys(payload).length === 0) {
+      return c.json({ error: 'No fields to update' }, 400);
+    }
+
+    const res = await supabaseFetch(c.env, `/bug_reports?id=eq.${encodeURIComponent(reportId)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Supabase error ${res.status}: ${errText}`);
+    }
+
+    timingLog('PATCH /api/admin/bug_reports', t, { id: reportId });
+    return c.json({ success: true });
+  } catch (err) {
+    timingLog('PATCH /api/admin/bug_reports ERROR', t, { id: reportId, error: err.message });
+    return c.json({ error: 'Failed to update bug report', details: err.message }, 500);
+  }
+});
+
+app.delete('/api/admin/bug_reports/:id', adminMiddleware, async (c) => {
+  const t = timingStart();
+  const reportId = c.req.param('id');
+  try {
+    const res = await supabaseFetch(c.env, `/bug_reports?id=eq.${encodeURIComponent(reportId)}`, {
+      method: 'DELETE',
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Supabase error ${res.status}: ${errText}`);
+    }
+
+    timingLog('DELETE /api/admin/bug_reports', t, { id: reportId });
+    return c.json({ success: true });
+  } catch (err) {
+    timingLog('DELETE /api/admin/bug_reports ERROR', t, { id: reportId, error: err.message });
+    return c.json({ error: 'Failed to delete bug report', details: err.message }, 500);
   }
 });
 
