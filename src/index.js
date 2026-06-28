@@ -268,6 +268,24 @@ async function recordUserEnding(env, userId, nodeId, endingType) {
   }
 }
 
+async function recordPlayerHistory(env, userId, nodeId, sourceChoiceId, sourceLabel, failure) {
+  try {
+    await supabaseFetch(env, '/player_history', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        user_id: userId,
+        node_id: nodeId,
+        source_choice_id: sourceChoiceId || null,
+        source_label: sourceLabel || null,
+        failure: failure || false,
+      }),
+    });
+  } catch (err) {
+    console.warn('⚠️ Failed to record player history:', err.message);
+  }
+}
+
 // 🏆 Рейтинг: принудительный пересчёт строки игрока.
 async function recalculateLeaderboard(env, userId) {
   try {
@@ -645,6 +663,7 @@ app.post('/api/choice', authMiddleware, async (c) => {
 
     updates.current_node_id = choice.target_node_id;
     await updatePlayerState(c.env, userId, updates);
+    await recordPlayerHistory(c.env, userId, choice.target_node_id, choiceId, choice.label, false);
     timingStep(t, 'update');
 
     // Логика обработки явной ачивки из выбора (если не была выдана автопроверкой)
@@ -810,6 +829,7 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
     };
 
     await updatePlayerState(c.env, userId, updates);
+    await recordPlayerHistory(c.env, userId, failNodeId, choiceId, choice.label, true);
     timingStep(t, 'update');
 
     const [failNode, allChoices] = await Promise.all([
@@ -856,6 +876,13 @@ app.post('/api/reset', authMiddleware, async (c) => {
       visited_nodes: [startNodeId],
     });
 
+    // Очищаем историю перемещений при сбросе прогресса.
+    try {
+      await supabaseFetch(c.env, `/player_history?user_id=eq.${userId}`, { method: 'DELETE' });
+    } catch (err) {
+      console.warn('⚠️ Failed to reset player history:', err.message);
+    }
+
     return c.json({ success: true });
   } catch (err) {
     console.error('❌ Error in /api/reset:', err.message);
@@ -872,15 +899,17 @@ app.get('/api/story/progress', authMiddleware, async (c) => {
       return c.json({ error: 'pro_required', message: 'Карта сюжета доступна в Pro версии' }, 403);
     }
 
-    const [playerRes, achievementsRes, endingsRes] = await Promise.all([
+    const [playerRes, achievementsRes, endingsRes, historyRes] = await Promise.all([
       supabaseFetch(c.env, `/game_state?user_id=eq.${userId}&select=visited_nodes,current_node_id`),
       supabaseFetch(c.env, `/user_achievements?user_id=eq.${userId}&select=achievement_id`),
       supabaseFetch(c.env, `/user_endings?user_id=eq.${userId}&select=node_id,ending_type`),
+      supabaseFetch(c.env, `/player_history?user_id=eq.${userId}&order=created_at.asc&select=node_id,source_choice_id,source_label,failure,created_at`),
     ]);
 
     const playerData = await playerRes.json();
     const achievementsData = await achievementsRes.json();
     const endingsData = await endingsRes.json();
+    const historyData = await historyRes.json();
 
     const player = playerData[0] || {};
     return c.json({
@@ -888,10 +917,67 @@ app.get('/api/story/progress', authMiddleware, async (c) => {
       current_node_id: player.current_node_id || null,
       unlocked_achievements: achievementsData.map((r) => r.achievement_id),
       unlocked_endings: endingsData.map((r) => ({ node_id: r.node_id, ending_type: r.ending_type })),
+      history: historyData.map((r) => ({
+        node_id: r.node_id,
+        source_choice_id: r.source_choice_id,
+        source_label: r.source_label,
+        failure: r.failure,
+        created_at: r.created_at,
+      })),
     });
   } catch (err) {
     console.error('❌ Error in GET /api/story/progress:', err.message);
     return c.json({ error: 'Failed to load story progress', details: err.message }, 500);
+  }
+});
+
+// 3.2 Статистика сессии для карты сюжета (Pro)
+app.get('/api/story/stats', authMiddleware, async (c) => {
+  try {
+    const userId = c.get('userId');
+    const isPro = await isProUser(c.env, userId);
+    if (!isPro) {
+      return c.json({ error: 'pro_required', message: 'Статистика доступна в Pro версии' }, 403);
+    }
+
+    const [stateRes, historyRes, endingsRes, achievementsRes, nodesRes] = await Promise.all([
+      supabaseFetch(c.env, `/game_state?user_id=eq.${userId}&select=visited_nodes,created_at`),
+      supabaseFetch(c.env, `/player_history?user_id=eq.${userId}&select=node_id,failure`),
+      supabaseFetch(c.env, `/user_endings?user_id=eq.${userId}&select=node_id`),
+      supabaseFetch(c.env, `/user_achievements?user_id=eq.${userId}&select=achievement_id`),
+      supabaseFetch(c.env, `/nodes?select=id,type`),
+    ]);
+
+    const stateData = await stateRes.json();
+    const historyData = await historyRes.json();
+    const endingsData = await endingsRes.json();
+    const achievementsData = await achievementsRes.json();
+    const nodesData = await nodesRes.json();
+
+    const state = stateData[0] || {};
+    const nodeTypes = new Map(nodesData.map((n) => [n.id, n.type]));
+
+    const uniqueNodesVisited = (state.visited_nodes || []).length;
+    const totalSteps = historyData.length;
+    const totalDeaths = historyData.filter((h) => nodeTypes.get(h.node_id) === 'death').length;
+    const totalFailures = historyData.filter((h) => h.failure).length;
+    const endingsSeen = endingsData.length;
+    const achievementsUnlocked = achievementsData.length;
+    const sessionStart = historyData[0]?.created_at || state.created_at || null;
+
+    return c.json({
+      unique_nodes_visited: uniqueNodesVisited,
+      total_nodes: nodesData.length,
+      total_steps: totalSteps,
+      total_deaths: totalDeaths,
+      total_failures: totalFailures,
+      endings_seen: endingsSeen,
+      achievements_unlocked: achievementsUnlocked,
+      session_start: sessionStart,
+    });
+  } catch (err) {
+    console.error('❌ Error in GET /api/story/stats:', err.message);
+    return c.json({ error: 'Failed to load story stats', details: err.message }, 500);
   }
 });
 
