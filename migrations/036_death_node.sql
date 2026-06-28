@@ -3,6 +3,9 @@
 
 BEGIN;
 
+ALTER TABLE public.nodes
+  ADD COLUMN IF NOT EXISTS type text;
+
 INSERT INTO public.nodes (
   id, act, location_name, title, narrative, thought,
   is_start_node, is_ending, ending_type, type, image_prompt, translations
@@ -18,7 +21,7 @@ INSERT INTO public.nodes (
   'death',
   'death',
   'dark damaged spacesuit floating in zero gravity with red warning lights',
-  '{
+  $JSON${
     "en": {
       "title": "PROTOCOL TERMINATED",
       "location_name": "CRITICAL SECTOR",
@@ -43,7 +46,7 @@ INSERT INTO public.nodes (
       "narrative": "Die Biosignale des Operators sind verloren. Der Anzug ist drucklos und die Lebenserhaltungssysteme haben sich abgeschaltet. Die Station Nemesis bleibt stummer Zeuge eines weiteren Todes in ihren dunklen Korridoren.",
       "thought": "Der Tod verzeiht keine Fehler."
     }
-  }'::jsonb
+  }$JSON$::jsonb
 )
 ON CONFLICT (id) DO UPDATE SET
   act = EXCLUDED.act,
