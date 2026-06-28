@@ -608,6 +608,9 @@ app.post('/api/choice', authMiddleware, async (c) => {
     if (effects.add_hp) updates.hp = Math.min(100, updates.hp + effects.add_hp);
     if (effects.set_hp !== undefined) updates.hp = effects.set_hp;
 
+    // Гарантируем диапазон 0..100
+    updates.hp = Math.max(0, Math.min(100, updates.hp));
+
     if (effects.add_flag) {
       const flags = updates.story_flags || [];
       if (!flags.includes(effects.add_flag)) flags.push(effects.add_flag);
@@ -714,6 +717,31 @@ app.post('/api/choice', authMiddleware, async (c) => {
       }
     }
     // ---
+
+    // --- СМЕРТЬ ПРИ HP = 0 ---
+    if (updates.hp <= 0) {
+      updates.current_node_id = 'death_hp_zero';
+      await updatePlayerState(c.env, userId, updates);
+      await recordPlayerHistory(c.env, userId, 'death_hp_zero', choiceId, choice.label, false);
+      await recordUserEnding(c.env, userId, 'death_hp_zero', 'death');
+      timingStep(t, 'update');
+
+      const deathNode = await getNode(c.env, 'death_hp_zero', lang);
+      timingStep(t, 'node+choices');
+
+      timingLog('POST /api/choice death', t, { user: userId, choice: choiceId, cache: cacheStats().size });
+      return c.json({
+        success: true,
+        narrative_override: choice.narrative_override,
+        node: deathNode,
+        choices: [],
+        player: updates,
+        is_ending: true,
+        ending_type: 'death',
+        unlocked_achievement: unlockedAchievement,
+        already_unlocked: alreadyUnlocked,
+      });
+    }
 
     updates.current_node_id = choice.target_node_id;
     await updatePlayerState(c.env, userId, updates);
@@ -835,8 +863,37 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
     const damageMultiplier = difficulty === 'hard' ? 2 : 1;
     const newHp = Math.max(0, (player.hp || 100) - baseDamage * damageMultiplier);
 
+:
     const allowRetry = retry === true;
     const hpDepleted = newHp <= 0;
+
+    // --- СМЕРТЬ ПРИ HP = 0 ---
+    if (hpDepleted) {
+      const updates = {
+        ...player,
+        current_node_id: 'death_hp_zero',
+        hp: 0,
+      };
+      await updatePlayerState(c.env, userId, updates);
+      await recordPlayerHistory(c.env, userId, 'death_hp_zero', choiceId, choice.label, false);
+      await recordUserEnding(c.env, userId, 'death_hp_zero', 'death');
+      timingStep(t, 'update');
+
+      const deathNode = await getNode(c.env, 'death_hp_zero', lang);
+      timingStep(t, 'node+choices');
+
+      timingLog('POST /api/minigame/failure death', t, { user: userId, choice: choiceId, cache: cacheStats().size });
+      return c.json({
+        success: true,
+        narrative_override: null,
+        node: deathNode,
+        choices: [],
+        player: updates,
+        is_ending: true,
+        ending_type: 'death',
+        unlocked_achievement: null,
+      });
+    }
 
     // Если разрешён повтор и здоровье ещё есть — остаёмся на текущей ноде и не ставим флаг провала.
     if (allowRetry && !hpDepleted) {
