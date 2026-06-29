@@ -722,8 +722,8 @@ app.post('/api/choice', authMiddleware, async (c) => {
     if (updates.hp <= 0) {
       updates.current_node_id = 'death_hp_zero';
       await updatePlayerState(c.env, userId, updates);
-      await recordPlayerHistory(c.env, userId, 'death_hp_zero', choiceId, choice.label, false);
-      await recordUserEnding(c.env, userId, 'death_hp_zero', 'death');
+      recordPlayerHistory(c.env, userId, 'death_hp_zero', choiceId, choice.label, false).catch(() => {});
+      recordUserEnding(c.env, userId, 'death_hp_zero', 'death').catch(() => {});
       timingStep(t, 'update');
 
       const deathNode = await getNode(c.env, 'death_hp_zero', lang);
@@ -745,7 +745,7 @@ app.post('/api/choice', authMiddleware, async (c) => {
 
     updates.current_node_id = choice.target_node_id;
     await updatePlayerState(c.env, userId, updates);
-    await recordPlayerHistory(c.env, userId, choice.target_node_id, choiceId, choice.label, false);
+    recordPlayerHistory(c.env, userId, choice.target_node_id, choiceId, choice.label, false).catch(() => {});
     timingStep(t, 'update');
 
     // Логика обработки явной ачивки из выбора (если не была выдана автопроверкой)
@@ -791,9 +791,9 @@ app.post('/api/choice', authMiddleware, async (c) => {
 
     if (!newNode) return c.json({ error: 'Target node missing from database' }, 404);
 
-    // 🏆 Фиксируем достигнутую концовку для рейтинга.
+    // 🏆 Фиксируем достигнутую концовку для рейтинга (не блокируем ответ).
     if (newNode.is_ending) {
-      await recordUserEnding(c.env, userId, newNode.id, newNode.ending_type || null);
+      recordUserEnding(c.env, userId, newNode.id, newNode.ending_type || null).catch(() => {});
     }
 
     // 🏆 Автоматическая выдача достижений по типу концовки (если choice ещё не выдал ачивку).
@@ -874,8 +874,8 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
         hp: 0,
       };
       await updatePlayerState(c.env, userId, updates);
-      await recordPlayerHistory(c.env, userId, 'death_hp_zero', choiceId, choice.label, false);
-      await recordUserEnding(c.env, userId, 'death_hp_zero', 'death');
+      recordPlayerHistory(c.env, userId, 'death_hp_zero', choiceId, choice.label, false).catch(() => {});
+      recordUserEnding(c.env, userId, 'death_hp_zero', 'death').catch(() => {});
       timingStep(t, 'update');
 
       const deathNode = await getNode(c.env, 'death_hp_zero', lang);
@@ -939,7 +939,7 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
     };
 
     await updatePlayerState(c.env, userId, updates);
-    await recordPlayerHistory(c.env, userId, failNodeId, choiceId, choice.label, true);
+    recordPlayerHistory(c.env, userId, failNodeId, choiceId, choice.label, true).catch(() => {});
     timingStep(t, 'update');
 
     const [failNode, allChoices] = await Promise.all([
