@@ -9,6 +9,24 @@ import { cacheGet, cacheSet, cacheStats } from './cache.js';
 // ==========================================
 const app = new Hono();
 
+// Кэш проверенных JWT: token -> { userId, expiresAt }
+const TOKEN_CACHE_TTL_MS = 5 * 60 * 1000;
+const tokenCache = new Map();
+
+function getCachedUserId(token) {
+  const entry = tokenCache.get(token);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    tokenCache.delete(token);
+    return null;
+  }
+  return entry.userId;
+}
+
+function cacheUserId(token, userId) {
+  tokenCache.set(token, { userId, expiresAt: Date.now() + TOKEN_CACHE_TTL_MS });
+}
+
 app.use(cors({
   origin: '*',
   allowMethods: ['GET', 'POST', 'OPTIONS', 'PATCH'],
@@ -26,19 +44,24 @@ async function authMiddleware(c, next) {
 
   const token = authHeader.slice(7);
   try {
-    const userRes = await fetch(`${c.env.SUPABASE_URL}/auth/v1/user`, {
-      headers: {
-        'apikey': c.env.SUPABASE_SERVICE_ROLE_KEY,
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+    let userId = getCachedUserId(token);
+    if (!userId) {
+      const userRes = await fetch(`${c.env.SUPABASE_URL}/auth/v1/user`, {
+        headers: {
+          'apikey': c.env.SUPABASE_SERVICE_ROLE_KEY,
+          'Authorization': `Bearer ${token}`,
+        },
+      });
 
-    if (!userRes.ok) {
-      throw new Error(`Auth API returned ${userRes.status}`);
+      if (!userRes.ok) {
+        throw new Error(`Auth API returned ${userRes.status}`);
+      }
+
+      const user = await userRes.json();
+      userId = user.id;
+      cacheUserId(token, userId);
     }
-
-    const user = await userRes.json();
-    c.set('userId', user.id);
+    c.set('userId', userId);
     await next();
   } catch (err) {
     console.error('❌ [AUTH] Verify error:', err.message);
@@ -54,19 +77,23 @@ async function adminMiddleware(c, next) {
 
   const token = authHeader.slice(7);
   try {
-    const userRes = await fetch(`${c.env.SUPABASE_URL}/auth/v1/user`, {
-      headers: {
-        'apikey': c.env.SUPABASE_SERVICE_ROLE_KEY,
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+    let userId = getCachedUserId(token);
+    if (!userId) {
+      const userRes = await fetch(`${c.env.SUPABASE_URL}/auth/v1/user`, {
+        headers: {
+          'apikey': c.env.SUPABASE_SERVICE_ROLE_KEY,
+          'Authorization': `Bearer ${token}`,
+        },
+      });
 
-    if (!userRes.ok) {
-      throw new Error(`Auth API returned ${userRes.status}`);
+      if (!userRes.ok) {
+        throw new Error(`Auth API returned ${userRes.status}`);
+      }
+
+      const user = await userRes.json();
+      userId = user.id;
+      cacheUserId(token, userId);
     }
-
-    const user = await userRes.json();
-    const userId = user.id;
     if (!(await isAdminUser(c.env, userId))) {
       return c.json({ error: 'admin_required' }, 403);
     }
@@ -1189,15 +1216,19 @@ app.get('/api/leaderboard', async (c) => {
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
         const token = authHeader.slice(7);
-        const userRes = await fetch(`${c.env.SUPABASE_URL}/auth/v1/user`, {
-          headers: {
-            'apikey': c.env.SUPABASE_SERVICE_ROLE_KEY,
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        if (userRes.ok) {
-          const user = await userRes.json();
-          currentUserId = user.id;
+        currentUserId = getCachedUserId(token);
+        if (!currentUserId) {
+          const userRes = await fetch(`${c.env.SUPABASE_URL}/auth/v1/user`, {
+            headers: {
+              'apikey': c.env.SUPABASE_SERVICE_ROLE_KEY,
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+          if (userRes.ok) {
+            const user = await userRes.json();
+            currentUserId = user.id;
+            cacheUserId(token, currentUserId);
+          }
         }
       } catch (err) {
         // Токен недействителен — просто не показываем "мою" позицию.
