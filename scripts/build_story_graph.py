@@ -13,7 +13,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-BACKUP_DIR = PROJECT_ROOT / "Материалы" / "backups" / "db" / "20260628"
+BACKUP_ROOT = PROJECT_ROOT / "Материалы" / "backups" / "db"
+BACKUP_DIR = max(BACKUP_ROOT.iterdir(), key=lambda p: p.name)
 
 NODE_COLS = [
     "id", "act", "location_name", "title", "narrative", "thought",
