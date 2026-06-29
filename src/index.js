@@ -796,17 +796,21 @@ app.post('/api/choice', authMiddleware, async (c) => {
       recordUserEnding(c.env, userId, newNode.id, newNode.ending_type || null).catch(() => {});
     }
 
-    // 🏆 Автоматическая выдача достижений по типу концовки (если choice ещё не выдал ачивку).
+    // 🏆 Автоматическая выдача достижений по типу концовки.
+    // Выдаём независимо от ачивки, полученной через choice (например, chronos_master + ach_steel_cocoon).
     const ENDING_ACHIEVEMENTS = {
       'victory_stasis': 'ach_steel_cocoon',
     };
-    if (newNode.is_ending && ENDING_ACHIEVEMENTS[newNode.ending_type] && !unlockedAchievement) {
+    if (newNode.is_ending && ENDING_ACHIEVEMENTS[newNode.ending_type]) {
       const endingAchId = ENDING_ACHIEVEMENTS[newNode.ending_type];
       const endingAch = await getAchievement(c.env, endingAchId, lang);
       if (endingAch) {
         const wasNew = await unlockAchievement(c.env, userId, endingAchId);
-        unlockedAchievement = endingAch;
-        alreadyUnlocked = !wasNew;
+        // Показываем уведомление об ending-ачивке, если она новая, даже если choice уже выдал другую.
+        if (wasNew || !unlockedAchievement) {
+          unlockedAchievement = endingAch;
+          alreadyUnlocked = !wasNew;
+        }
       }
     }
 
