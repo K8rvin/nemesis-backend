@@ -141,6 +141,74 @@ function buildResponse(player, targetAchievement, route, nextChoice, stepsFromHe
   };
 }
 
+function evaluateRouteProgress(player, route, choicesById) {
+  const path = route.path || [];
+  if (path.length === 0) {
+    return { progress: -1, nextChoice: null, stepsFromHere: null, onRoute: false, goalReached: false };
+  }
+
+  let progress = -1;
+  const simSkills = new Set();
+  const simFlags = new Set();
+  const simItems = new Set();
+  let simNode = START_NODE_ID;
+
+  for (let i = 0; i < path.length; i++) {
+    const choice = choicesById.get(path[i]);
+    if (!choice) continue;
+
+    const eff = choice.effects || {};
+    asArray(eff.add_skill).forEach(s => simSkills.add(s));
+    asArray(eff.add_flag).forEach(f => simFlags.add(f));
+    asArray(eff.add_item).forEach(it => simItems.add(it));
+    asArray(eff.remove_flags).forEach(f => simFlags.delete(f));
+    asArray(eff.remove_item).forEach(it => simItems.delete(it));
+
+    simNode = choice.target_node_id || simNode;
+
+    const stateMatches =
+      simNode === player.current_node_id &&
+      [...simSkills].every(s => player.skills?.includes(s)) &&
+      [...simFlags].every(f => player.story_flags?.includes(f)) &&
+      [...simItems].every(it => player.inventory?.includes(it));
+
+    if (stateMatches) {
+      progress = i;
+    }
+  }
+
+  let nextChoice = null;
+  let stepsFromHere = null;
+
+  for (let i = progress + 1; i < path.length; i++) {
+    const choice = choicesById.get(path[i]);
+    if (!choice) continue;
+    if (choice.node_id !== player.current_node_id) continue;
+
+    if (!nextChoice) {
+      nextChoice = choice;
+      stepsFromHere = path.slice(i).filter(id => choicesById.has(id)).length;
+    }
+
+    if (filterSingleChoice(choice, clonePlayer(player))) {
+      nextChoice = choice;
+      stepsFromHere = path.slice(i).filter(id => choicesById.has(id)).length;
+      break;
+    }
+  }
+
+  const finalChoice = choicesById.get(path[path.length - 1]);
+  const goalReached = finalChoice && finalChoice.target_node_id === player.current_node_id;
+
+  return {
+    progress,
+    nextChoice,
+    stepsFromHere,
+    onRoute: !!nextChoice,
+    goalReached,
+  };
+}
+
 export async function getHint(env, userId, targetTier, _targetType, targetAchievementId, dataProviders) {
   const { getPlayerState, supabaseFetch, lang } = dataProviders;
 
@@ -211,101 +279,65 @@ export async function getHint(env, userId, targetTier, _targetType, targetAchiev
     };
   }
 
-  // Сортируем: сначала ближайшие по маршруту, при равенстве — по порядку тиров
-  candidates.sort((a, b) => {
-    const diff = a.route.steps_remaining - b.route.steps_remaining;
-    if (diff !== 0) return diff;
-    const tierA = TIER_ORDER.indexOf((a.achievement.medal_tier || 'BRONZE').toUpperCase());
-    const tierB = TIER_ORDER.indexOf((b.achievement.medal_tier || 'BRONZE').toUpperCase());
-    return tierA - tierB;
-  });
+  // Собираем id всех выборов по всем кандидатам, чтобы загрузить их одним запросом.
+  const allChoiceIds = Array.from(new Set(candidates.flatMap(c => c.route.path || [])));
+  const choicesById = await loadChoicesForPath(env, supabaseFetch, allChoiceIds);
 
-  const selected = candidates[0];
+  // Оцениваем каждый маршрут: находится ли игрок на нём и сколько шагов осталось.
+  const evaluated = candidates
+    .map(c => ({ ...c, ...evaluateRouteProgress(player, c.route, choicesById) }))
+    .filter(c => (c.route.path || []).length > 0);
+
+  if (evaluated.length === 0) {
+    return {
+      hint_enabled: true,
+      reachable: false,
+      reason: 'no_suitable_achievement',
+      target_achievement: null,
+      next_choice: null,
+    };
+  }
+
+  const tierIndex = a => TIER_ORDER.indexOf((a.achievement.medal_tier || 'BRONZE').toUpperCase());
+
+  // Приоритет — маршруты, на которых игрок уже находится (меньше оставшихся шагов первее).
+  const onRoute = evaluated.filter(c => c.onRoute);
+  let selected;
+  if (onRoute.length > 0) {
+    onRoute.sort((a, b) => {
+      const diff = a.stepsFromHere - b.stepsFromHere;
+      if (diff !== 0) return diff;
+      return tierIndex(a) - tierIndex(b);
+    });
+    selected = onRoute[0];
+  } else {
+    // Если ни на одном маршруте не находимся — берём кратчайший от старта.
+    evaluated.sort((a, b) => {
+      const diff = a.route.steps_remaining - b.route.steps_remaining;
+      if (diff !== 0) return diff;
+      return tierIndex(a) - tierIndex(b);
+    });
+    selected = evaluated[0];
+  }
+
   const { route } = selected;
   const achievement = localizeAchievement(selected.achievement, lang);
   const path = route.path || [];
 
-  // Загружаем объекты выборов из маршрута, чтобы найти текущую позицию игрока
-  const choicesById = await loadChoicesForPath(env, supabaseFetch, path);
-
-  // Определяем, как далеко игрок продвинулся по маршруту.
-  // Симулируем прохождение маршрута шаг за шагом. Шаг считается пройденным, если
-  // после него смоделированное состояние совместимо с состоянием игрока
-  // (все полученные навыки/флаги/предметы есть у игрока) и смоделированная нода
-  // совпадает с текущей нодой игрока. Это позволяет корректно обрабатывать
-  // возвраты к уже посещённым нодам.
-  let progress = -1;
-  let simSkills = new Set();
-  let simFlags = new Set();
-  let simItems = new Set();
-  let simNode = START_NODE_ID;
-
-  for (let i = 0; i < path.length; i++) {
-    const choice = choicesById.get(path[i]);
-    if (!choice) continue;
-
-    const eff = choice.effects || {};
-    asArray(eff.add_skill).forEach(s => simSkills.add(s));
-    asArray(eff.add_flag).forEach(f => simFlags.add(f));
-    asArray(eff.add_item).forEach(it => simItems.add(it));
-    asArray(eff.remove_flags).forEach(f => simFlags.delete(f));
-    asArray(eff.remove_item).forEach(it => simItems.delete(it));
-
-    simNode = choice.target_node_id || simNode;
-
-    const stateMatches =
-      simNode === player.current_node_id &&
-      [...simSkills].every(s => player.skills?.includes(s)) &&
-      [...simFlags].every(f => player.story_flags?.includes(f)) &&
-      [...simItems].every(it => player.inventory?.includes(it));
-
-    if (stateMatches) {
-      progress = i;
-    }
+  if (selected.goalReached) {
+    return {
+      hint_enabled: true,
+      reachable: true,
+      reason: null,
+      goal_reached: true,
+      target_achievement: achievement,
+      path,
+      next_choice: null,
+      steps_remaining: 0,
+    };
   }
 
-  // Ищем следующий доступный выбор в маршруте после прогресса на текущей ноде.
-  let nextChoice = null;
-  let stepsFromHere = null;
-
-  for (let i = progress + 1; i < path.length; i++) {
-    const choice = choicesById.get(path[i]);
-    if (!choice) continue;
-    if (choice.node_id !== player.current_node_id) continue;
-
-    // Запоминаем первый выбор на ноде после прогресса как fallback
-    if (!nextChoice) {
-      nextChoice = choice;
-      const remainingChoices = path.slice(i).filter(id => choicesById.has(id));
-      stepsFromHere = remainingChoices.length;
-    }
-
-    // Если нашли доступный выбор — используем его
-    if (filterSingleChoice(choice, clonePlayer(player))) {
-      nextChoice = choice;
-      const remainingChoices = path.slice(i).filter(id => choicesById.has(id));
-      stepsFromHere = remainingChoices.length;
-      break;
-    }
-  }
-
-  // Если игрок не находится на маршруте
-  if (!nextChoice) {
-    // Если текущая нода совпадает с финальной нодой маршрута — цель достигнута
-    const finalChoice = choicesById.get(path[path.length - 1]);
-    if (finalChoice && finalChoice.target_node_id === player.current_node_id) {
-      return {
-        hint_enabled: true,
-        reachable: true,
-        reason: null,
-        goal_reached: true,
-        target_achievement: achievement,
-        path,
-        next_choice: null,
-        steps_remaining: 0,
-      };
-    }
-
+  if (!selected.onRoute) {
     return {
       hint_enabled: true,
       reachable: false,
@@ -317,5 +349,5 @@ export async function getHint(env, userId, targetTier, _targetType, targetAchiev
     };
   }
 
-  return buildResponse(player, achievement, route, nextChoice, stepsFromHere, lang);
+  return buildResponse(player, achievement, route, selected.nextChoice, selected.stepsFromHere, lang);
 }
