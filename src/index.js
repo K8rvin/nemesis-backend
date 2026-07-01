@@ -334,9 +334,9 @@ async function getAchievement(env, achievementId, lang) {
 // 🏆 Рейтинг: запись концовки игрока.
 async function recordUserEnding(env, userId, nodeId, endingType) {
   try {
-    const res = await supabaseFetch(env, '/user_endings', {
+    const res = await supabaseFetch(env, '/user_endings?on_conflict=user_id,node_id', {
       method: 'POST',
-      headers: { 'Prefer': 'return=minimal' },
+      headers: { 'Prefer': 'resolution=ignore-duplicates,return=minimal' },
       body: JSON.stringify({
         user_id: userId,
         node_id: nodeId,
@@ -367,6 +367,17 @@ async function recordPlayerHistory(env, userId, nodeId, sourceChoiceId, sourceLa
   }
 }
 
+// В Cloudflare Workers асинхронные задачи после ответа могут быть оборваны.
+// waitUntil позволяет доработать фоновым запросам (запись концовок, истории,
+// пересчёт рейтинга) после того, как клиент получил ответ.
+function backgroundTask(c, promise) {
+  if (c.executionCtx && typeof c.executionCtx.waitUntil === 'function') {
+    c.executionCtx.waitUntil(promise);
+  } else {
+    promise.catch(() => {});
+  }
+}
+
 // 🏆 Рейтинг: принудительный пересчёт строки игрока.
 async function recalculateLeaderboard(env, userId) {
   try {
@@ -379,6 +390,7 @@ async function recalculateLeaderboard(env, userId) {
     console.warn('⚠️ Failed to recalculate leaderboard:', err.message);
   }
 }
+
 
 // Изображения теперь встроены в Flutter-клиент (assets/images/).
 // Бэкенд больше не отдает imageUrl.
@@ -749,8 +761,8 @@ app.post('/api/choice', authMiddleware, async (c) => {
     if (updates.hp <= 0) {
       updates.current_node_id = 'death_hp_zero';
       await updatePlayerState(c.env, userId, updates);
-      recordPlayerHistory(c.env, userId, 'death_hp_zero', choiceId, choice.label, false).catch(() => {});
-      recordUserEnding(c.env, userId, 'death_hp_zero', 'death').catch(() => {});
+      backgroundTask(c, recordPlayerHistory(c.env, userId, 'death_hp_zero', choiceId, choice.label, false));
+      backgroundTask(c, recordUserEnding(c.env, userId, 'death_hp_zero', 'death'));
       timingStep(t, 'update');
 
       const deathNode = await getNode(c.env, 'death_hp_zero', lang);
@@ -772,7 +784,7 @@ app.post('/api/choice', authMiddleware, async (c) => {
 
     updates.current_node_id = choice.target_node_id;
     await updatePlayerState(c.env, userId, updates);
-    recordPlayerHistory(c.env, userId, choice.target_node_id, choiceId, choice.label, false).catch(() => {});
+    backgroundTask(c, recordPlayerHistory(c.env, userId, choice.target_node_id, choiceId, choice.label, false));
     timingStep(t, 'update');
 
     // Логика обработки явной ачивки из выбора (если не была выдана автопроверкой)
@@ -820,7 +832,7 @@ app.post('/api/choice', authMiddleware, async (c) => {
 
     // 🏆 Фиксируем достигнутую концовку для рейтинга (не блокируем ответ).
     if (newNode.is_ending) {
-      recordUserEnding(c.env, userId, newNode.id, newNode.ending_type || null).catch(() => {});
+      backgroundTask(c, recordUserEnding(c.env, userId, newNode.id, newNode.ending_type || null));
     }
 
     // 🏆 Автоматическая выдача достижений по типу концовки (если choice ещё не выдал ачивку).
@@ -901,8 +913,8 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
         hp: 0,
       };
       await updatePlayerState(c.env, userId, updates);
-      recordPlayerHistory(c.env, userId, 'death_hp_zero', choiceId, choice.label, false).catch(() => {});
-      recordUserEnding(c.env, userId, 'death_hp_zero', 'death').catch(() => {});
+      backgroundTask(c, recordPlayerHistory(c.env, userId, 'death_hp_zero', choiceId, choice.label, false));
+      backgroundTask(c, recordUserEnding(c.env, userId, 'death_hp_zero', 'death'));
       timingStep(t, 'update');
 
       const deathNode = await getNode(c.env, 'death_hp_zero', lang);
@@ -966,7 +978,7 @@ app.post('/api/minigame/failure', authMiddleware, async (c) => {
     };
 
     await updatePlayerState(c.env, userId, updates);
-    recordPlayerHistory(c.env, userId, failNodeId, choiceId, choice.label, true).catch(() => {});
+    backgroundTask(c, recordPlayerHistory(c.env, userId, failNodeId, choiceId, choice.label, true));
     timingStep(t, 'update');
 
     const [failNode, allChoices] = await Promise.all([
@@ -1013,11 +1025,17 @@ app.post('/api/reset', authMiddleware, async (c) => {
       visited_nodes: [startNodeId],
     });
 
-    // Очищаем историю перемещений при сбросе прогресса.
+    // Очищаем историю перемещений и достигнутые концовки при сбросе прогресса,
+    // чтобы рейтинг не учитывал старые прохождения и не ломался на дубликатах.
     try {
       await supabaseFetch(c.env, `/player_history?user_id=eq.${userId}`, { method: 'DELETE' });
     } catch (err) {
       console.warn('⚠️ Failed to reset player history:', err.message);
+    }
+    try {
+      await supabaseFetch(c.env, `/user_endings?user_id=eq.${userId}`, { method: 'DELETE' });
+    } catch (err) {
+      console.warn('⚠️ Failed to reset user endings:', err.message);
     }
 
     return c.json({ success: true });
